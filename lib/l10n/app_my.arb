@@ -2,5 +2,12 @@
     "home": "မူလ",
     "profile": "အကောင့်",
     "notification": "စာတို",
-    "search": "ရှာဖွေရန် နှိပ်ပါ"
+    "search": "ရှာဖွေရန် နှိပ်ပါ",
+    "filter": "ရှာဖွေရန်",
+    "exchange_money": "ငွေလဲ",
+    "cash_out": "ငွေထုတ်",
+    "service": "ဝန်ဆောင်မှု",
+    "charge": "ဝန်ဆောင်ခ",
+    "fixed_amount": "ပုံသေပမာဏ",
+    "percentage": "ရာခိုင်နှုန်း"
 }
