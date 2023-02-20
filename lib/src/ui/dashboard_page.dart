@@ -1,14 +1,18 @@
 import 'dart:ui' as ui;
-import 'package:clippy_flutter/triangle.dart';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:p2p_pay/src/ui/chat_page.dart';
+import 'package:p2p_pay/src/theme/color_theme.dart';
 import 'package:p2p_pay/src/ui/notification_page.dart';
+import 'package:p2p_pay/src/ui/search_page.dart';
+import 'package:p2p_pay/src/ui/widgets/float_button.dart';
+import 'package:p2p_pay/src/ui/widgets/marker_window.dart';
+import 'package:p2p_pay/src/ui/widgets/post_item.dart';
 import '../models/Post.dart';
-import '../utils/map_util.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -18,35 +22,106 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  final LatLng _center = const LatLng(16.831714136117466, 96.1698195437041);
   final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
   final List<Marker> _markers = <Marker>[];
+  List<Provider> types = [
+    Provider(
+        id: 1,
+        image: ImageUrl(url: "assets/images/kbz-pay.png"),
+        icon: ImageUrl(url: "assets/images/kbz-pay-circle.png"),
+        marker: ImageUrl(url: "assets/images/kbz-marker.png"),
+        name: "KBZ Pay"),
+    Provider(
+        id: 2,
+        image: ImageUrl(url: "assets/images/cb-pay.png"),
+        icon: ImageUrl(url: "assets/images/cb-pay-circle.png"),
+        marker: ImageUrl(url: "assets/images/cb-marker.png"),
+        name: "CB Pay"),
+    Provider(
+        id: 3,
+        image: ImageUrl(url: "assets/images/wave-pay.png"),
+        icon: ImageUrl(url: "assets/images/wave-pay-circle.png"),
+        marker: ImageUrl(url: "assets/images/wave-marker.png"),
+        name: "Wave Pay"),
+    Provider(
+        id: 4,
+        image: ImageUrl(url: "assets/images/aya-pay.png"),
+        icon: ImageUrl(url: "assets/images/aya-pay-circle.png"),
+        marker: ImageUrl(url: "assets/images/aya-marker.png"),
+        name: "Aya Pay")
+  ];
   List<Post> posts = [
     Post(
-        icon: 'assets/images/aya-marker.png',
-        phone: '0982342342342',
-        latLng: const LatLng(27.6602292, 85.308027)),
+        id: 1,
+        type: Type(id: 1, name: 'Cash Out'),
+        provider: Provider(
+            id: 1,
+            name: 'KBZ Pay',
+            icon: ImageUrl(url: 'assets/images/kbz-pay-circle.png'),
+            marker: ImageUrl(url: "assets/images/kbz-marker.png"),
+            image: ImageUrl(url: 'assets/images/kbz-pay.png')),
+        amount: 1000000,
+        percentage: 3,
+        phone: '09767947154',
+        latLng: const LatLng(16.79729673247046, 96.13215959983089),
+        distance: 3),
     Post(
-        icon: 'assets/images/cb-marker.png',
-        phone: '0982342342342',
-        latLng: const LatLng(27.6599592, 85.3102498)),
+        id: 1,
+        type: Type(id: 1, name: 'Cash Out'),
+        provider: Provider(
+            id: 1,
+            name: 'Aya Pay',
+            icon: ImageUrl(url: 'assets/images/aya-pay-circle.png'),
+            marker: ImageUrl(url: "assets/images/aya-marker.png"),
+            image: ImageUrl(url: 'assets/images/aya-pay.png')),
+        amount: 1000000,
+        percentage: 3,
+        phone: '09767947154',
+        latLng: const LatLng(16.793922748028915, 96.13219677131646),
+        distance: 3),
     Post(
-        icon: 'assets/images/wave-marker.png',
-        phone: '0982342342342',
-        latLng: const LatLng(27.659470, 85.3077363)),
+        id: 1,
+        type: Type(id: 1, name: 'Cash Out'),
+        provider: Provider(
+            id: 1,
+            name: 'Wave Pay',
+            icon: ImageUrl(url: 'assets/images/wave-pay-circle.png'),
+            marker: ImageUrl(url: "assets/images/wave-marker.png"),
+            image: ImageUrl(url: 'assets/images/wave-pay.png')),
+        amount: 1000000,
+        percentage: 3,
+        phone: '09767947154',
+        latLng: const LatLng(16.800179334591768, 96.13606352271559),
+        distance: 3),
     Post(
-        icon: 'assets/images/kbz-marker.png',
-        phone: '0982342342342',
-        latLng: const LatLng(27.65964100546146, 85.30831566390248))
+        id: 1,
+        type: Type(id: 1, name: 'Cash Out'),
+        provider: Provider(
+            id: 1,
+            name: 'CB Pay',
+            icon: ImageUrl(url: 'assets/images/cb-pay-circle.png'),
+            marker: ImageUrl(url: "assets/images/cb-marker.png"),
+            image: ImageUrl(url: 'assets/images/cb-pay.png')),
+        amount: 1000000,
+        percentage: 3,
+        phone: '09767947154',
+        latLng: const LatLng(16.79962246841343, 96.13262424796903),
+        distance: 3),
   ];
   late GoogleMapController mapController;
 
-  final LatLng _center = const LatLng(27.6602292, 85.308027);
+  late Marker myLocation;
+
+  bool mapsType = true;
+  bool switching = false;
 
   @override
   void initState() {
     super.initState();
     loadData();
+    _getCurrentPosition();
   }
 
   @override
@@ -56,244 +131,27 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   loadData() async {
+    myLocation = Marker(
+        markerId: const MarkerId("my-location"),
+        icon: BitmapDescriptor.fromBytes(
+            await getImages("assets/images/my-location.png", 200)),
+        position: _center);
+    _markers.add(myLocation);
     for (int i = 0; i < posts.length; i++) {
-      final Uint8List markIcons = await getImages(posts[i].icon, 200);
+      final Uint8List markIcons =
+          await getImages(posts[i].provider.marker.url, 200);
       // makers added according to index
       _markers.add(Marker(
           markerId: MarkerId(i.toString()),
           icon: BitmapDescriptor.fromBytes(markIcons),
           position: posts[i].latLng,
+          consumeTapEvents: true,
           onTap: () {
+            Post post = posts[i];
             _customInfoWindowController.addInfoWindow!(
-              Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _customInfoWindowController
-                                        .hideInfoWindow!();
-                                  },
-                                  child: const Icon(Icons.close,
-                                      size: 18, color: Colors.black45),
-                                ),
-                              ),
-                              Center(
-                                child: Image.asset('assets/images/kbz-pay.png',
-                                    width: 50, height: 50),
-                              ),
-                              const SizedBox(height: 10),
-                              Center(
-                                child: Text(
-                                  "KBZ Pay",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Service",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black,
-                                        ),
-                                  ),
-                                  const SizedBox(
-                                    width: 8.0,
-                                  ),
-                                  Text(
-                                    "Cash Pay",
-                                    textAlign: TextAlign.right,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black45,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Amount",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black,
-                                        ),
-                                  ),
-                                  const SizedBox(
-                                    width: 8.0,
-                                  ),
-                                  Text(
-                                    "10,000,000 MMK",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black45,
-                                        ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Percentage",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black,
-                                        ),
-                                  ),
-                                  const SizedBox(
-                                    width: 8.0,
-                                  ),
-                                  Text(
-                                    "3 %",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black45,
-                                        ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Phone",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black,
-                                        ),
-                                  ),
-                                  const SizedBox(
-                                    width: 8.0,
-                                  ),
-                                  Text(
-                                    "09 767 947 154",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black45,
-                                        ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Distance",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black,
-                                        ),
-                                  ),
-                                  const SizedBox(
-                                    width: 8.0,
-                                  ),
-                                  Text(
-                                    "3 km",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                          color: Colors.black45,
-                                        ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  OutlinedButton(
-                                    onPressed: () {
-                                      MapUtils.openMap(posts[i].latLng.latitude,
-                                          posts[i].latLng.longitude);
-                                    },
-                                    child: const Text('Direction'),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  TextButton(
-                                    style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.lightBlue),
-                                      foregroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.blue),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => ChatPage()),
-                                      );
-                                    },
-                                    child: const Text('Contact Me',
-                                        style: TextStyle(color: Colors.white)),
-                                  )
-                                ],
-                              )
-                            ],
-                          )),
-                    ),
-                  ),
-                  Triangle.isosceles(
-                    edge: Edge.BOTTOM,
-                    child: Container(
-                      color: Colors.white,
-                      width: 20.0,
-                      height: 10.0,
-                    ),
-                  ),
-                ],
-              ),
+              MarkerWindow(
+                  post: posts[i],
+                  infoWindowController: _customInfoWindowController),
               posts[i].latLng,
             );
           }));
@@ -311,102 +169,514 @@ class _DashboardPageState extends State<DashboardPage> {
         .asUint8List();
   }
 
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _getCurrentPosition() async {
+    final hasPermission = await _handleLocationPermission();
+
+    if (!hasPermission) return;
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) async {
+      _markers[0] = Marker(
+          markerId: const MarkerId("my-location"),
+          icon: BitmapDescriptor.fromBytes(
+              await getImages("assets/images/my-location.png", 200)),
+          position: LatLng(position.latitude, position.longitude));
+      mapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            zoom: 18,
+            target: LatLng(
+              position.latitude,
+              position.longitude,
+            ),
+          ),
+        ),
+      );
+    }).catchError((e) {
+      debugPrint(e);
+    });
+  }
+
+  Future<void> _getAddressFromLatLng(Position position) async {
+    await placemarkFromCoordinates(position.latitude, position.longitude)
+        .then((List<Placemark> placemarks) {
+      Placemark place = placemarks[0];
+      setState(() {
+        //  _currentAddress =
+        //      '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}';
+      });
+    }).catchError((e) {
+      debugPrint(e);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: Wrap(
+          direction: Axis.vertical,
+          children: <Widget>[
+            if (mapsType && !switching)
+              Container(
+                  margin: const EdgeInsets.all(10),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      _getCurrentPosition();
+                    },
+                    backgroundColor: Colors.white,
+                    child: const Icon(Icons.my_location,
+                        color: AppColor.primaryColor),
+                  )),
+            Container(
+                margin: const EdgeInsets.all(10),
+                child: FloatingActionButton(
+                  onPressed: () async {
+                    _customInfoWindowController.hideInfoWindow!();
+                    if (!switching) {
+                      setState(() {
+                        switching = true;
+                      });
+                      await Future.delayed(const Duration(milliseconds: 1000));
+                      setState(() {
+                        switching = false;
+                        mapsType = mapsType ? false : true;
+                      });
+                    }
+                  },
+                  backgroundColor: AppColor.primaryColor,
+                  child: Icon(mapsType ? Icons.list : Icons.map,
+                      color: Colors.white),
+                ))
+          ],
+        ),
         body: Stack(
-      children: <Widget>[
-        GoogleMap(
-          onTap: (position) {
-            _customInfoWindowController.hideInfoWindow!();
-          },
-          onCameraMove: (position) {
-            _customInfoWindowController.onCameraMove!();
-          },
-          myLocationEnabled: true,
-          myLocationButtonEnabled: true,
-          onMapCreated: (GoogleMapController controller) async {
-            mapController = controller;
-            _customInfoWindowController.googleMapController = controller;
-          },
-          markers: Set<Marker>.of(_markers),
-          initialCameraPosition: CameraPosition(
-            target: _center,
-            zoom: 16.0,
-          ),
-        ),
-        CustomInfoWindow(
-          controller: _customInfoWindowController,
-          height: 340,
-          width: 250,
-          offset: 50,
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 50.0, 16.0, 16.0),
-          child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(32),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(32),
-                ),
-                width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Icon(
-                            Icons.search,
-                            size: 24,
-                            color: Colors.black45,
+          children: <Widget>[
+            _mapsOrList(),
+            CustomInfoWindow(
+              controller: _customInfoWindowController,
+              height: 370,
+              width: 250,
+              offset: 50,
+            ),
+            Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 50.0, 16.0, 16.0),
+                child: Column(
+                  children: [
+                    Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                            side: const BorderSide(
+                                color: Colors.white24, width: 1)),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(32),
                           ),
-                          const SizedBox(width: 16),
-                          Text(
-                            AppLocalizations.of(context)!.search,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  color: Colors.black45,
+                          width: double.infinity,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 5, 10, 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SearchPage()));
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const Icon(
+                                        Icons.search,
+                                        size: 24,
+                                        color: Colors.black45,
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Text(
+                                        AppLocalizations.of(context)!.search,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .copyWith(
+                                              color: Colors.black45,
+                                            ),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                          )
-                        ],
-                      ),
-                      Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            height: 32,
-                            width: 32,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const NotificationPage()));
-                              },
-                              child: const Icon(Icons.notifications,
-                                  size: 24, color: Colors.black),
+                                Stack(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black12,
+                                        borderRadius: BorderRadius.circular(32),
+                                      ),
+                                      height: 32,
+                                      width: 32,
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const NotificationPage()));
+                                        },
+                                        child: const Icon(Icons.notifications,
+                                            size: 24, color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
                             ),
                           ),
-                        ],
-                      )
-                    ],
-                  ),
+                        )),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 46,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        clipBehavior: Clip.none,
+                        children: types
+                            .map((type) => FloatButton(
+                                  title: type.name,
+                                  icon: type.icon.url,
+                                  onSelected: (selected) {},
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                    // const SizedBox(height: 8),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.end,
+                    //   children: [
+                    //     Card(
+                    //       shape: RoundedRectangleBorder(
+                    //           borderRadius: BorderRadius.circular(24)),
+                    //       child: GestureDetector(
+                    //         onTap: () {
+                    //           showModalBottomSheet(
+                    //             context: context,
+                    //             builder: (context) {
+                    //               return Wrap(
+                    //                 children: [
+                    //                   ListTile(
+                    //                     title: Text(
+                    //                       AppLocalizations.of(context)!.filter,
+                    //                       style: Theme.of(context)
+                    //                           .textTheme
+                    //                           .titleLarge!
+                    //                           .copyWith(
+                    //                             color: Colors.black45,
+                    //                           ),
+                    //                     ),
+                    //                   ),
+                    //                   Padding(
+                    //                     padding: const EdgeInsets.fromLTRB(
+                    //                         16, 0, 16, 32),
+                    //                     child: Column(
+                    //                       children: [
+                    //                         Row(
+                    //                           mainAxisAlignment:
+                    //                               MainAxisAlignment.start,
+                    //                           children: [
+                    //                             Text(
+                    //                               AppLocalizations.of(context)!
+                    //                                   .service,
+                    //                               style: Theme.of(context)
+                    //                                   .textTheme
+                    //                                   .bodyLarge!
+                    //                                   .copyWith(
+                    //                                     color: Colors.black45,
+                    //                                   ),
+                    //                             )
+                    //                           ],
+                    //                         ),
+                    //                         const SizedBox(height: 8),
+                    //                         SizedBox(
+                    //                           height: 80,
+                    //                           child: ListView(
+                    //                             scrollDirection:
+                    //                                 Axis.horizontal,
+                    //                             children: [
+                    //                               Card(
+                    //                                   shape: RoundedRectangleBorder(
+                    //                                       borderRadius:
+                    //                                           BorderRadius
+                    //                                               .circular(8),
+                    //                                       side: const BorderSide(
+                    //                                           color: AppColor
+                    //                                               .primaryColor,
+                    //                                           width: 1)),
+                    //                                   child: Padding(
+                    //                                     padding:
+                    //                                         const EdgeInsets
+                    //                                             .all(16),
+                    //                                     child: Row(
+                    //                                       children: [
+                    //                                         SizedBox(
+                    //                                           width: 32,
+                    //                                           height: 32,
+                    //                                           child: Image.asset(
+                    //                                               "assets/images/cash-out.png"),
+                    //                                         ),
+                    //                                         const SizedBox(
+                    //                                             width: 8),
+                    //                                         Text(
+                    //                                           AppLocalizations.of(
+                    //                                                   context)!
+                    //                                               .cash_out,
+                    //                                           style: Theme.of(
+                    //                                                   context)
+                    //                                               .textTheme
+                    //                                               .bodyLarge!
+                    //                                               .copyWith(
+                    //                                                 color: Colors
+                    //                                                     .black45,
+                    //                                               ),
+                    //                                         ),
+                    //                                       ],
+                    //                                     ),
+                    //                                   )),
+                    //                               const SizedBox(width: 8),
+                    //                               Card(
+                    //                                   shape: RoundedRectangleBorder(
+                    //                                       borderRadius:
+                    //                                           BorderRadius
+                    //                                               .circular(8),
+                    //                                       side:
+                    //                                           const BorderSide(
+                    //                                               color: Colors
+                    //                                                   .black45,
+                    //                                               width: 1)),
+                    //                                   child: Padding(
+                    //                                     padding:
+                    //                                         const EdgeInsets
+                    //                                             .all(16),
+                    //                                     child: Row(
+                    //                                       children: [
+                    //                                         SizedBox(
+                    //                                           width: 32,
+                    //                                           height: 32,
+                    //                                           child: Image.asset(
+                    //                                               "assets/images/exchange-money.png"),
+                    //                                         ),
+                    //                                         const SizedBox(
+                    //                                             width: 8),
+                    //                                         Text(
+                    //                                           AppLocalizations.of(
+                    //                                                   context)!
+                    //                                               .exchange_money,
+                    //                                           style: Theme.of(
+                    //                                                   context)
+                    //                                               .textTheme
+                    //                                               .bodyLarge!
+                    //                                               .copyWith(
+                    //                                                 color: Colors
+                    //                                                     .black45,
+                    //                                               ),
+                    //                                         ),
+                    //                                       ],
+                    //                                     ),
+                    //                                   ))
+                    //                             ],
+                    //                           ),
+                    //                         ),
+                    //                         const SizedBox(height: 16),
+                    //                         Row(
+                    //                           mainAxisAlignment:
+                    //                               MainAxisAlignment.start,
+                    //                           children: [
+                    //                             Text(
+                    //                               AppLocalizations.of(context)!
+                    //                                   .charge,
+                    //                               style: Theme.of(context)
+                    //                                   .textTheme
+                    //                                   .bodyLarge!
+                    //                                   .copyWith(
+                    //                                     color: Colors.black45,
+                    //                                   ),
+                    //                             )
+                    //                           ],
+                    //                         ),
+                    //                         const SizedBox(height: 8),
+                    //                         SizedBox(
+                    //                           height: 80,
+                    //                           child: ListView(
+                    //                             scrollDirection:
+                    //                                 Axis.horizontal,
+                    //                             clipBehavior: Clip.none,
+                    //                             children: [
+                    //                               Card(
+                    //                                   shape: RoundedRectangleBorder(
+                    //                                       borderRadius:
+                    //                                           BorderRadius
+                    //                                               .circular(8),
+                    //                                       side: const BorderSide(
+                    //                                           color: AppColor
+                    //                                               .primaryColor,
+                    //                                           width: 1)),
+                    //                                   child: Padding(
+                    //                                     padding:
+                    //                                         const EdgeInsets
+                    //                                             .all(16),
+                    //                                     child: Row(
+                    //                                       children: [
+                    //                                         const Icon(
+                    //                                             Icons
+                    //                                                 .attach_money,
+                    //                                             size: 32,
+                    //                                             color: Colors
+                    //                                                 .black45),
+                    //                                         const SizedBox(
+                    //                                             width: 8),
+                    //                                         Text(
+                    //                                           AppLocalizations.of(
+                    //                                                   context)!
+                    //                                               .fixed_amount,
+                    //                                           style: Theme.of(
+                    //                                                   context)
+                    //                                               .textTheme
+                    //                                               .bodyLarge!
+                    //                                               .copyWith(
+                    //                                                 color: Colors
+                    //                                                     .black45,
+                    //                                               ),
+                    //                                         ),
+                    //                                       ],
+                    //                                     ),
+                    //                                   )),
+                    //                               const SizedBox(width: 8),
+                    //                               Card(
+                    //                                   shape: RoundedRectangleBorder(
+                    //                                       borderRadius:
+                    //                                           BorderRadius
+                    //                                               .circular(8),
+                    //                                       side:
+                    //                                           const BorderSide(
+                    //                                               color: Colors
+                    //                                                   .black45,
+                    //                                               width: 1)),
+                    //                                   child: Padding(
+                    //                                     padding:
+                    //                                         const EdgeInsets
+                    //                                             .all(16),
+                    //                                     child: Row(
+                    //                                       children: [
+                    //                                         const Icon(
+                    //                                             Icons.percent,
+                    //                                             size: 32,
+                    //                                             color: Colors
+                    //                                                 .black45),
+                    //                                         const SizedBox(
+                    //                                             width: 8),
+                    //                                         Text(
+                    //                                           AppLocalizations.of(
+                    //                                                   context)!
+                    //                                               .percentage,
+                    //                                           style: Theme.of(
+                    //                                                   context)
+                    //                                               .textTheme
+                    //                                               .bodyLarge!
+                    //                                               .copyWith(
+                    //                                                 color: Colors
+                    //                                                     .black45,
+                    //                                               ),
+                    //                                         ),
+                    //                                       ],
+                    //                                     ),
+                    //                                   ))
+                    //                             ],
+                    //                           ),
+                    //                         )
+                    //                       ],
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               );
+                    //             },
+                    //           );
+                    //         },
+                    //         child: const Padding(
+                    //             padding: EdgeInsets.all(8),
+                    //             child: Icon(Icons.filter_alt_outlined,
+                    //                 size: 24, color: Colors.black87)),
+                    //       ),
+                    //     )
+                    //   ],
+                    // )
+                  ],
+                )),
+          ],
+        ));
+  }
+
+  Widget _mapsOrList() {
+    return (switching)
+        ? const Center(child: CircularProgressIndicator())
+        : mapsType
+            ? GoogleMap(
+                onTap: (position) {
+                  _customInfoWindowController.hideInfoWindow!();
+                },
+                onCameraMove: (position) {
+                  _customInfoWindowController.onCameraMove!();
+                },
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                zoomControlsEnabled: false,
+                onMapCreated: (GoogleMapController controller) async {
+                  mapController = controller;
+                  _customInfoWindowController.googleMapController = controller;
+                },
+                markers: Set<Marker>.of(_markers),
+                initialCameraPosition: CameraPosition(
+                  target: _center,
+                  zoom: 18.0,
                 ),
-              )),
-        )
-      ],
-    ));
+              )
+            : Container(
+                margin: const EdgeInsets.only(top: 172),
+                clipBehavior: Clip.none,
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                  clipBehavior: Clip.none,
+                  children: [...posts.map((post) => PostItem(post: post))],
+                ),
+              );
   }
 }

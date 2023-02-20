@@ -52,7 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemBuilder: (BuildContext context, int index) {
           return Image.network(
-            snapshot.data![index].icon,
+            snapshot.data![index].provider.image.url,
             fit: BoxFit.cover,
           );
         });

@@ -2,5 +2,20 @@
     "home": "Home",
     "profile": "Profile",
     "notification": "Notification",
-    "search": "Tap to Search"
+    "search": "Tap to Search",
+    "filter": "Filter",
+    "exchange_money": "Exchange Money",
+    "cash_out": "Cash Out",
+    "service": "Service",
+    "charge": "Charge",
+    "fixed_amount": "Fixed Amount",
+    "percentage": "Percentage",
+    "search_here": "Search here",
+    "recent_search": "Recent Search",
+    "type": "Type",
+    "amount": "Amount",
+    "distance": "Distance",
+    "direction": "Direction",
+    "contact": "Contact",
+    "phone": "Phone"
 }
