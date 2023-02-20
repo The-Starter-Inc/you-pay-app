@@ -28,8 +28,8 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         body: Center(child: screens.elementAt(currentTab)),
         floatingActionButton: SizedBox(
-          height: 64,
-          width: 64,
+          height: 60,
+          width: 60,
           child: FloatingActionButton(
             onPressed: () {
               Navigator.push(
@@ -37,13 +37,13 @@ class _HomePageState extends State<HomePage> {
                 MaterialPageRoute(builder: (context) => CreatePostPage()),
               );
             },
-            backgroundColor: Colors.white,
+            backgroundColor: AppColor.primaryColor,
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15.0))),
             child: const Icon(
               Icons.add,
               size: 32,
-              color: AppColor.primaryColor,
+              color: Colors.white,
             ),
           ),
         ),
@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
                           width: 64,
                           height: 30,
                           decoration: const BoxDecoration(
-                            color: Color.fromARGB(124, 255, 255, 255),
+                            color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           child: const Icon(Icons.dashboard,
@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                           width: 64,
                           height: 30,
                           decoration: const BoxDecoration(
-                            color: Color.fromARGB(124, 255, 255, 255),
+                            color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           child: const Icon(Icons.person,
@@ -81,10 +81,10 @@ class _HomePageState extends State<HomePage> {
                           color: Color.fromARGB(198, 0, 0, 0)),
                   label: AppLocalizations.of(context)!.profile)
             ],
-            backgroundColor: AppColor.primaryColor,
+            backgroundColor: Colors.white,
             type: BottomNavigationBarType.fixed,
             currentIndex: currentTab,
-            selectedItemColor: Colors.black,
+            selectedItemColor: AppColor.primaryColor,
             iconSize: 30,
             onTap: _onItemTapped,
             elevation: 5));

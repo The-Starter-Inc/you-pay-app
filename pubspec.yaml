@@ -47,6 +47,8 @@ dependencies:
   intl_translation: ^0.18.0
   google_fonts: ^4.0.3
   provider: ^6.0.5
+  geolocator: ^9.0.2
+  geocoding: ^2.0.5
 
 dev_dependencies:
   flutter_test:

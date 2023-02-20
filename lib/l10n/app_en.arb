@@ -9,5 +9,13 @@
     "service": "Service",
     "charge": "Charge",
     "fixed_amount": "Fixed Amount",
-    "percentage": "Percentage"
+    "percentage": "Percentage",
+    "search_here": "Search here",
+    "recent_search": "Recent Search",
+    "type": "Type",
+    "amount": "Amount",
+    "distance": "Distance",
+    "direction": "Direction",
+    "contact": "Contact",
+    "phone": "Phone"
 }

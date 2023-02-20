@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:p2p_pay/src/ui/widgets/ripples_animation%20.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -12,12 +13,7 @@ class _NotificationPagetate extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Notification")),
-      body: const Center(
-        child: Text(
-          "Notification",
-          style: TextStyle(fontSize: 40),
-        ),
-      ),
+      body: const RipplesAnimation(),
     );
   }
 }
