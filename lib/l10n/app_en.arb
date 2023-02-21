@@ -17,5 +17,12 @@
     "distance": "Distance",
     "direction": "Direction",
     "contact": "Contact",
-    "phone": "Phone"
+    "phone": "Phone",
+    "no_device_id": "Device ID not found.",
+    "type_here": "Type here...",
+    "empty_chat_msg": "No messages here yet",
+    "send_with_media": "Send with Media",
+    "choose_photo": "Choose Photo",
+    "choose_file": "Choose File",
+    "cancel": "Cancel"
 }

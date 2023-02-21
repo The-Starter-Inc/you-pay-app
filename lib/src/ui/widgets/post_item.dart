@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../../models/Post.dart';
+import '../../models/post.dart';
 import '../../utils/map_util.dart';
 import '../chat_page.dart';
 
@@ -152,10 +152,10 @@ class _PostItemState extends State<PostItem> {
                         MaterialStateProperty.all<Color>(Colors.blue),
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ChatPage()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => ChatPage()),
+                    // );
                   },
                   child: Text(AppLocalizations.of(context)!.contact,
                       style: const TextStyle(color: Colors.white)),
