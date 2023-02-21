@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:p2p_pay/src/ui/entry/create_post_page.dart';
+import 'package:faker/faker.dart';
+import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
+import 'package:platform_device_id/platform_device_id.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../src/constants/app_constant.dart';
+import '../../src/ui/entry/create_post_page.dart';
+import '../../firebase_options.dart';
 import '../theme/color_theme.dart';
 import 'profile_page.dart';
 import 'dashboard_page.dart';
@@ -16,6 +24,94 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentTab = 0;
   final List<Widget> screens = [const DashboardPage(), const ProfilePage()];
+
+  @override
+  void initState() {
+    initializeFlutterFire();
+    super.initState();
+  }
+
+  void initializeFlutterFire() async {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        setState(() {
+          AppConstant.firebaseUser = user;
+        });
+      });
+      String? deviceId = await PlatformDeviceId.getDeviceId;
+      if (deviceId != null) {
+        try {
+          final credential =
+              await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: "$deviceId@fk.com",
+            password: "123!@#",
+          );
+          final faker = Faker();
+          await FirebaseChatCore.instance.createUserInFirestore(
+            types.User(
+              firstName: faker.person.firstName(),
+              lastName: faker.person.lastName(),
+              id: credential.user!.uid,
+              imageUrl: 'https://i.pravatar.cc/300?u=$deviceId',
+            ),
+          );
+          firebaseUserLogin("$deviceId@fk.com");
+          if (!mounted) return;
+        } catch (e) {
+          if (e.toString().contains("email-already-in-use")) {
+            firebaseUserLogin("$deviceId@fk.com");
+          } else {
+            showErrorAlert(e);
+          }
+        }
+      } else {
+        showErrorAlert(AppLocalizations.of(context)!.no_device_id);
+      }
+    } catch (e) {
+      showErrorAlert(e);
+    }
+  }
+
+  Future<void> firebaseUserLogin(String email) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: "123!@#",
+      );
+      if (!mounted) return;
+    } catch (e) {
+      showErrorAlert(e);
+    }
+  }
+
+  Future<void> showErrorAlert(message) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+        content: Text(message,
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: Colors.black,
+                )),
+        title: Text(
+          'Error',
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: Colors.black,
+              ),
+        ),
+      ),
+    );
+  }
 
   void _onItemTapped(int index) {
     setState(() {
