@@ -24,5 +24,7 @@
     "send_with_media": "Send with Media",
     "choose_photo": "Choose Photo",
     "choose_file": "Choose File",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "exchange": "Exchange",
+    "out": "Cash Out"
 }

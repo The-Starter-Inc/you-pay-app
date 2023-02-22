@@ -38,9 +38,9 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-            title: const Text(
-              "09767947154",
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              widget.room.name ?? "",
+              style: const TextStyle(color: Colors.white),
             ),
             actions: [
               IconButton(

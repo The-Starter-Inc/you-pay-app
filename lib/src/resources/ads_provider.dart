@@ -1,27 +1,27 @@
 import 'dart:async';
 import 'package:http/http.dart' show Client;
+import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'dart:convert';
-import '../constants/app_constant.dart';
 import '../models/post.dart';
 
-class PostApiProvider {
+class AdsApiProvider {
   Client client = Client();
 
-  Future<List<Post>> fetchPosts() async {
+  Future<List<Provider>> fetchProviders() async {
     Map<String, String> headers = {
       'Accept': 'application/json',
       'Authorization': 'Bearer ${AppConstant.accessToken}'
     };
     final response = await client.get(
-        Uri.parse("${AppConstant.host}/api/adspost?rows=9999"),
+        Uri.parse("${AppConstant.host}/api/provider?rows=99"),
         headers: headers);
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
-      return Post.fromJson(json.decode(response.body));
+      return Provider.fromJson(json.decode(response.body));
     } else {
       // If that call was not successful, throw an error.
-      throw Exception('Failed to load post');
+      throw Exception('Failed to load providers');
     }
   }
 }

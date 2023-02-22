@@ -45,13 +45,13 @@ class _MarkerWindowState extends State<MarkerWindow> {
                       ),
                     ),
                     Center(
-                      child: Image.asset(widget.post.provider.image.url,
+                      child: Image.network(widget.post.providers[0].image.url,
                           width: 50, height: 50),
                     ),
                     const SizedBox(height: 10),
                     Center(
                       child: Text(
-                        widget.post.provider.name,
+                        widget.post.providers[0].name,
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium!
@@ -202,7 +202,10 @@ class _MarkerWindowState extends State<MarkerWindow> {
                             //       builder: (context) => ChatPage()),
                             // );
                           },
-                          child: Text(AppLocalizations.of(context)!.contact,
+                          child: Text(
+                              widget.post.type.id == 1
+                                  ? AppLocalizations.of(context)!.out
+                                  : AppLocalizations.of(context)!.exchange,
                               style: const TextStyle(color: Colors.white)),
                         )
                       ],

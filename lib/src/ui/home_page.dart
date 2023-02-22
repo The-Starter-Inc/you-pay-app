@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:flutter/material.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
@@ -6,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import './../blocs/auth_bloc.dart';
+import './../models/token.dart';
 import '../../src/constants/app_constant.dart';
 import '../../src/ui/entry/create_post_page.dart';
 import '../../firebase_options.dart';
@@ -24,9 +28,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentTab = 0;
   final List<Widget> screens = [const DashboardPage(), const ProfilePage()];
+  final AuthBloc authBloc = AuthBloc();
 
   @override
   void initState() {
+    authBloc.fetchToken({
+      "grant_type": "client_credentials",
+      "client_id": AppConstant.clientId,
+      "client_secret": AppConstant.clientSecret
+    });
     initializeFlutterFire();
     super.initState();
   }
@@ -122,7 +132,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(child: screens.elementAt(currentTab)),
+        body: buildLayout(),
         floatingActionButton: SizedBox(
           height: 60,
           width: 60,
@@ -185,4 +195,33 @@ class _HomePageState extends State<HomePage> {
             onTap: _onItemTapped,
             elevation: 5));
   }
+
+  Widget buildLayout() {
+    return StreamBuilder<Token>(
+        stream: authBloc.token,
+        builder: (context, AsyncSnapshot<Token> snapshot) {
+          if (snapshot.hasData) {
+            print("AccessToken ${snapshot.data!.access_token}");
+            AppConstant.accessToken = snapshot.data!.access_token;
+            return screens.elementAt(currentTab);
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
+  }
 }
+
+// class TabLayout extends StatelessWidget {
+//   const TabLayout({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return StreamBuilder<Token>(
+//         stream: bloc.token,
+//         builder: (context, AsyncSnapshot<Token> snapshot) {
+//           return screens.elementAt(currentTab);
+//         });
+//   }
+// }

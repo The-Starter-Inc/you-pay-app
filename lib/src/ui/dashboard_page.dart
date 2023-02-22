@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:p2p_pay/src/blocs/post_bloc.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import 'package:p2p_pay/src/ui/notification_page.dart';
 import 'package:p2p_pay/src/ui/search_page.dart';
 import 'package:p2p_pay/src/ui/widgets/float_button.dart';
 import 'package:p2p_pay/src/ui/widgets/marker_window.dart';
 import 'package:p2p_pay/src/ui/widgets/post_item.dart';
+import '../blocs/provider_bloc.dart';
 import '../models/post.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -21,94 +23,13 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final LatLng _center = const LatLng(16.79729673247046, 96.13215959983089);
+  late LatLng _center = const LatLng(16.79729673247046, 96.13215959983089);
+  final ProviderBloc providerBloc = ProviderBloc();
+  final PostBloc postBloc = PostBloc();
   final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
-  final List<Marker> _markers = <Marker>[];
-  List<Provider> types = [
-    Provider(
-        id: 1,
-        image: ImageUrl(url: "assets/images/kbz-pay.png"),
-        icon: ImageUrl(url: "assets/images/kbz-pay-circle.png"),
-        marker: ImageUrl(url: "assets/images/kbz-marker.png"),
-        name: "KBZ Pay"),
-    Provider(
-        id: 2,
-        image: ImageUrl(url: "assets/images/cb-pay.png"),
-        icon: ImageUrl(url: "assets/images/cb-pay-circle.png"),
-        marker: ImageUrl(url: "assets/images/cb-marker.png"),
-        name: "CB Pay"),
-    Provider(
-        id: 3,
-        image: ImageUrl(url: "assets/images/wave-pay.png"),
-        icon: ImageUrl(url: "assets/images/wave-pay-circle.png"),
-        marker: ImageUrl(url: "assets/images/wave-marker.png"),
-        name: "Wave Pay"),
-    Provider(
-        id: 4,
-        image: ImageUrl(url: "assets/images/aya-pay.png"),
-        icon: ImageUrl(url: "assets/images/aya-pay-circle.png"),
-        marker: ImageUrl(url: "assets/images/aya-marker.png"),
-        name: "Aya Pay")
-  ];
-  List<Post> posts = [
-    Post(
-        id: 1,
-        type: Type(id: 1, name: 'Cash Out'),
-        provider: Provider(
-            id: 1,
-            name: 'KBZ Pay',
-            icon: ImageUrl(url: 'assets/images/kbz-pay-circle.png'),
-            marker: ImageUrl(url: "assets/images/kbz-marker.png"),
-            image: ImageUrl(url: 'assets/images/kbz-pay.png')),
-        amount: 1000000,
-        percentage: 3,
-        phone: '09767947154',
-        latLng: const LatLng(16.79729673247046, 96.13215959983089),
-        distance: 3),
-    Post(
-        id: 1,
-        type: Type(id: 1, name: 'Cash Out'),
-        provider: Provider(
-            id: 1,
-            name: 'Aya Pay',
-            icon: ImageUrl(url: 'assets/images/aya-pay-circle.png'),
-            marker: ImageUrl(url: "assets/images/aya-marker.png"),
-            image: ImageUrl(url: 'assets/images/aya-pay.png')),
-        amount: 1000000,
-        percentage: 3,
-        phone: '09767947154',
-        latLng: const LatLng(16.793922748028915, 96.13219677131646),
-        distance: 3),
-    Post(
-        id: 1,
-        type: Type(id: 1, name: 'Cash Out'),
-        provider: Provider(
-            id: 1,
-            name: 'Wave Pay',
-            icon: ImageUrl(url: 'assets/images/wave-pay-circle.png'),
-            marker: ImageUrl(url: "assets/images/wave-marker.png"),
-            image: ImageUrl(url: 'assets/images/wave-pay.png')),
-        amount: 1000000,
-        percentage: 3,
-        phone: '09767947154',
-        latLng: const LatLng(16.800179334591768, 96.13606352271559),
-        distance: 3),
-    Post(
-        id: 1,
-        type: Type(id: 1, name: 'Cash Out'),
-        provider: Provider(
-            id: 1,
-            name: 'CB Pay',
-            icon: ImageUrl(url: 'assets/images/cb-pay-circle.png'),
-            marker: ImageUrl(url: "assets/images/cb-marker.png"),
-            image: ImageUrl(url: 'assets/images/cb-pay.png')),
-        amount: 1000000,
-        percentage: 3,
-        phone: '09767947154',
-        latLng: const LatLng(16.79962246841343, 96.13262424796903),
-        distance: 3),
-  ];
+  List<Provider> types = [];
+  List<Post> posts = [];
   late GoogleMapController mapController;
 
   late Marker myLocation;
@@ -119,34 +40,41 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    loadData();
+    initData();
+  }
+
+  initData() async {
     _getCurrentPosition();
+    providerBloc.fetchProviders();
+    postBloc.fetchPosts();
   }
 
   @override
   void dispose() {
     _customInfoWindowController.dispose();
+    mapController.dispose();
+    providerBloc.dispose();
+    postBloc.dispose();
     super.dispose();
   }
 
-  loadData() async {
+  Future<Set<Marker>> addMarkers() async {
+    List<Marker> markers = [];
     myLocation = Marker(
         markerId: const MarkerId("my-location"),
         icon: BitmapDescriptor.fromBytes(
             await getImages("assets/images/my-location.png", 200)),
         position: _center);
-    _markers.add(myLocation);
+    markers.add(myLocation);
     for (int i = 0; i < posts.length; i++) {
-      final Uint8List markIcons =
-          await getImages(posts[i].provider.marker.url, 200);
       // makers added according to index
-      _markers.add(Marker(
-          markerId: MarkerId(i.toString()),
-          icon: BitmapDescriptor.fromBytes(markIcons),
+      markers.add(Marker(
+          markerId: MarkerId(posts[i].id.toString()),
+          icon: BitmapDescriptor.fromBytes(
+              await getImages("assets/images/my-location.png", 200)),
           position: posts[i].latLng,
           consumeTapEvents: true,
           onTap: () {
-            Post post = posts[i];
             _customInfoWindowController.addInfoWindow!(
               MarkerWindow(
                   post: posts[i],
@@ -154,14 +82,27 @@ class _DashboardPageState extends State<DashboardPage> {
               posts[i].latLng,
             );
           }));
-      setState(() {});
     }
+
+    return markers.toSet();
   }
 
   Future<Uint8List> getImages(String path, int width) async {
     ByteData data = await rootBundle.load(path);
     ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
         targetHeight: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
+  Future<Uint8List> getImageUrl(String path, int width) async {
+    final Uint8List data =
+        (await NetworkAssetBundle(Uri.parse(path)).load(path))
+            .buffer
+            .asUint8List();
+    ui.Codec codec = await ui.instantiateImageCodec(data, targetHeight: width);
     ui.FrameInfo fi = await codec.getNextFrame();
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
         .buffer
@@ -206,11 +147,9 @@ class _DashboardPageState extends State<DashboardPage> {
     if (!hasPermission) return;
     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) async {
-      _markers[0] = Marker(
-          markerId: const MarkerId("my-location"),
-          icon: BitmapDescriptor.fromBytes(
-              await getImages("assets/images/my-location.png", 200)),
-          position: LatLng(position.latitude, position.longitude));
+      setState(() {
+        _center = LatLng(position.latitude, position.longitude);
+      });
       mapController.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -222,9 +161,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
       );
-    }).catchError((e) {
-      debugPrint(e);
-    });
+    }).catchError((e) {});
   }
 
   // Future<void> _getAddressFromLatLng(Position position) async {
@@ -266,10 +203,15 @@ class _DashboardPageState extends State<DashboardPage> {
                       setState(() {
                         switching = true;
                       });
-                      await Future.delayed(const Duration(milliseconds: 1000));
+                      await Future.delayed(const Duration(milliseconds: 300));
                       setState(() {
                         switching = false;
-                        mapsType = mapsType ? false : true;
+                        if (mapsType) {
+                          mapController.dispose();
+                          mapsType = false;
+                        } else {
+                          mapsType = true;
+                        }
                       });
                     }
                   },
@@ -281,7 +223,16 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         body: Stack(
           children: <Widget>[
-            _mapsOrList(),
+            StreamBuilder(
+                stream: postBloc.posts,
+                builder: (context, AsyncSnapshot<List<Post>> snapshot) {
+                  if (snapshot.hasData) {
+                    posts = snapshot.data!;
+                    addMarkers();
+                    return _mapsOrList();
+                  }
+                  return Container();
+                }),
             CustomInfoWindow(
               controller: _customInfoWindowController,
               height: 370,
@@ -292,6 +243,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 padding: const EdgeInsets.fromLTRB(16.0, 50.0, 16.0, 16.0),
                 child: Column(
                   children: [
+                    // Search Toolbar
                     Card(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
@@ -365,18 +317,27 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                         )),
                     const SizedBox(height: 8),
+                    // Provider List
                     SizedBox(
                       height: 46,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        clipBehavior: Clip.none,
-                        children: types
-                            .map((type) => FloatButton(
-                                  title: type.name,
-                                  icon: type.icon.url,
-                                  onSelected: (selected) {},
-                                ))
-                            .toList(),
+                      child: StreamBuilder<List<Provider>>(
+                        stream: providerBloc.providers,
+                        builder:
+                            (context, AsyncSnapshot<List<Provider>> snapshot) {
+                          if (snapshot.hasData) {
+                            return ListView(
+                                scrollDirection: Axis.horizontal,
+                                clipBehavior: Clip.none,
+                                children: snapshot.data!
+                                    .map((type) => FloatButton(
+                                          title: type.name,
+                                          icon: type.icon.url,
+                                          onSelected: (selected) {},
+                                        ))
+                                    .toList());
+                          }
+                          return Container();
+                        },
                       ),
                     )
                   ],
@@ -389,24 +350,32 @@ class _DashboardPageState extends State<DashboardPage> {
     return (switching)
         ? const Center(child: CircularProgressIndicator())
         : mapsType
-            ? GoogleMap(
-                onTap: (position) {
-                  _customInfoWindowController.hideInfoWindow!();
-                },
-                onCameraMove: (position) {
-                  _customInfoWindowController.onCameraMove!();
-                },
-                zoomControlsEnabled: false,
-                onMapCreated: (GoogleMapController controller) async {
-                  mapController = controller;
-                  _customInfoWindowController.googleMapController = controller;
-                },
-                markers: Set<Marker>.of(_markers),
-                initialCameraPosition: CameraPosition(
-                  target: _center,
-                  zoom: 18.0,
-                ),
-              )
+            ? FutureBuilder(
+                future: addMarkers(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return GoogleMap(
+                      onTap: (position) {
+                        _customInfoWindowController.hideInfoWindow!();
+                      },
+                      onCameraMove: (position) {
+                        _customInfoWindowController.onCameraMove!();
+                      },
+                      zoomControlsEnabled: false,
+                      onMapCreated: (GoogleMapController controller) async {
+                        mapController = controller;
+                        _customInfoWindowController.googleMapController =
+                            controller;
+                      },
+                      markers: snapshot.data!,
+                      initialCameraPosition: CameraPosition(
+                        target: _center,
+                        zoom: 17.5,
+                      ),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                })
             : Container(
                 margin: const EdgeInsets.only(top: 172),
                 clipBehavior: Clip.none,

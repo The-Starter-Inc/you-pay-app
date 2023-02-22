@@ -14,64 +14,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  List<Post> posts = [
-    Post(
-        id: 1,
-        type: Type(id: 1, name: 'Cash Out'),
-        provider: Provider(
-            id: 1,
-            name: 'KBZ Pay',
-            icon: ImageUrl(url: 'assets/images/kbz-pay-circle.png'),
-            marker: ImageUrl(url: "assets/images/kbz-marker.png"),
-            image: ImageUrl(url: 'assets/images/kbz-pay.png')),
-        amount: 1000000,
-        percentage: 3,
-        phone: '09767947154',
-        latLng: const LatLng(16.79729673247046, 96.13215959983089),
-        distance: 3),
-    Post(
-        id: 1,
-        type: Type(id: 1, name: 'Cash Out'),
-        provider: Provider(
-            id: 1,
-            name: 'Aya Pay',
-            icon: ImageUrl(url: 'assets/images/aya-pay-circle.png'),
-            marker: ImageUrl(url: "assets/images/aya-marker.png"),
-            image: ImageUrl(url: 'assets/images/aya-pay.png')),
-        amount: 1000000,
-        percentage: 3,
-        phone: '09767947154',
-        latLng: const LatLng(16.793922748028915, 96.13219677131646),
-        distance: 3),
-    Post(
-        id: 1,
-        type: Type(id: 1, name: 'Cash Out'),
-        provider: Provider(
-            id: 1,
-            name: 'Wave Pay',
-            icon: ImageUrl(url: 'assets/images/wave-pay-circle.png'),
-            marker: ImageUrl(url: "assets/images/wave-marker.png"),
-            image: ImageUrl(url: 'assets/images/wave-pay.png')),
-        amount: 1000000,
-        percentage: 3,
-        phone: '09767947154',
-        latLng: const LatLng(16.800179334591768, 96.13606352271559),
-        distance: 3),
-    Post(
-        id: 1,
-        type: Type(id: 1, name: 'Cash Out'),
-        provider: Provider(
-            id: 1,
-            name: 'CB Pay',
-            icon: ImageUrl(url: 'assets/images/cb-pay-circle.png'),
-            marker: ImageUrl(url: "assets/images/cb-marker.png"),
-            image: ImageUrl(url: 'assets/images/cb-pay.png')),
-        amount: 1000000,
-        percentage: 3,
-        phone: '09767947154',
-        latLng: const LatLng(16.79962246841343, 96.13262424796903),
-        distance: 3),
-  ];
+  List<Post> posts = [];
 
   @override
   Widget build(BuildContext context) {

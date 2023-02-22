@@ -1,4 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:p2p_pay/src/blocs/exchange_bloc.dart';
+import 'package:p2p_pay/src/constants/app_constant.dart';
+import 'package:p2p_pay/src/models/exchange.dart';
 import 'package:p2p_pay/src/ui/widgets/ripples_animation%20.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,181 +23,86 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPagetate extends State<NotificationPage> {
-  bool _error = false;
-  bool _initialized = false;
-  bool _loggingIn = false;
-  User? _user;
+  ExchangeBloc exchangeBloc = ExchangeBloc();
 
   @override
   void initState() {
-    initializeFlutterFire();
-    _login();
     super.initState();
-  }
-
-  void _login() async {
-    FocusScope.of(context).unfocus();
-
-    setState(() {
-      _loggingIn = true;
-    });
-
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: "sawmainek@gmail.com",
-        password: "smk461990",
-      );
-      if (!mounted) return;
-    } catch (e) {
-      setState(() {
-        _loggingIn = false;
-      });
-
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-          content: Text(
-            e.toString(),
-          ),
-          title: const Text('Error'),
-        ),
-      );
-    }
+    exchangeBloc.fetchExchages();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Notification")),
-      //body: const RipplesAnimation(),
-      body: _user == null
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : StreamBuilder<List<types.Room>>(
-              stream: FirebaseChatCore.instance.rooms(),
-              initialData: const [],
-              builder: (context, snapshot) {
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return StreamBuilder<List<types.User>>(
-                    stream: FirebaseChatCore.instance.users(),
-                    initialData: const [],
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Container(
-                          alignment: Alignment.center,
-                          margin: const EdgeInsets.only(
-                            bottom: 200,
+        appBar: AppBar(title: const Text("Notification")),
+        //body: const RipplesAnimation(),
+        body: StreamBuilder<List<Exchange>>(
+          stream: exchangeBloc.exchange,
+          initialData: const [],
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  final exchange = snapshot.data![index];
+
+                  return GestureDetector(
+                    onTap: () async {
+                      FirebaseChatCoreConfig config =
+                          const FirebaseChatCoreConfig(
+                        null,
+                        'rooms',
+                        'users',
+                      );
+                      FirebaseFirestore getFirebaseFirestore() =>
+                          config.firebaseAppName != null
+                              ? FirebaseFirestore.instanceFor(
+                                  app: Firebase.app(config.firebaseAppName!),
+                                )
+                              : FirebaseFirestore.instance;
+                      final otherUser = await fetchUser(
+                        getFirebaseFirestore(),
+                        exchange.post!.firebaseUserId,
+                        config.usersCollectionName,
+                      );
+
+                      final room = await getFirebaseFirestore()
+                          .collection("rooms")
+                          .doc(exchange.roomId!)
+                          .get();
+                      print(room.data());
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            room: types.Room.fromJson(room.data()!),
                           ),
-                          child: const Text('No users'),
-                        );
-                      }
-
-                      return ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          final user = snapshot.data![index];
-
-                          return GestureDetector(
-                            onTap: () {
-                              _handlePressed(user, context);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              child: Row(
-                                children: [
-                                  _buildAvatarUser(user),
-                                  Text("${user.firstName} ${user.lastName}",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(
-                                            color: Colors.black,
-                                          )),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                        ),
                       );
                     },
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    final room = snapshot.data![index];
-
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ChatPage(
-                              room: room,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        child: Row(
-                          children: [
-                            _buildAvatarRoom(room),
-                            Text(room.name ?? '',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(
-                                      color: Colors.black,
-                                    )),
-                          ],
-                        ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 24,
                       ),
-                    );
-                  },
-                );
-              },
-            ),
-    );
-  }
-
-  void initializeFlutterFire() async {
-    try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        setState(() {
-          _user = user;
-        });
-      });
-      setState(() {
-        _initialized = true;
-      });
-    } catch (e) {
-      setState(() {
-        _error = true;
-      });
-    }
-  }
-
-  void logout() async {
-    await FirebaseAuth.instance.signOut();
+                      child: Row(
+                        children: [
+                          Text(exchange.exDeviceId,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                    color: Colors.black,
+                                  )),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+            return Container();
+          },
+        ));
   }
 
   Widget _buildAvatarRoom(types.Room room) {
@@ -201,7 +111,7 @@ class _NotificationPagetate extends State<NotificationPage> {
     if (room.type == types.RoomType.direct) {
       try {
         final otherUser = room.users.firstWhere(
-          (u) => u.id != _user!.uid,
+          (u) => u.id != AppConstant.firebaseUser!.uid,
         );
 
         color = Colors.pinkAccent;

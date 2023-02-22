@@ -1,8 +1,16 @@
+// ignore_for_file: depend_on_referenced_packages
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:p2p_pay/src/blocs/exchange_bloc.dart';
+import 'package:p2p_pay/src/constants/app_constant.dart';
+import 'package:p2p_pay/src/models/exchange.dart';
+import 'package:platform_device_id/platform_device_id.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import '../chat_page.dart';
 import '../../models/post.dart';
 import '../../utils/map_util.dart';
-import '../chat_page.dart';
 
 class PostItem extends StatefulWidget {
   final Post post;
@@ -13,6 +21,7 @@ class PostItem extends StatefulWidget {
 }
 
 class _PostItemState extends State<PostItem> {
+  final ExchangeBloc exchangeBloc = ExchangeBloc();
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -20,15 +29,16 @@ class _PostItemState extends State<PostItem> {
       child: Column(
         children: [
           ListTile(
-              title: Text(widget.post.provider.name,
+              title: Text(widget.post.providers[0].name,
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         color: Colors.black,
                       )),
-              subtitle: Text("12/02/2023 04:01 PM",
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Colors.black45,
-                      )),
-              leading: Image.asset(widget.post.provider.image.url,
+              subtitle:
+                  Text(timeago.format(DateTime.parse(widget.post.createdAt)),
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: Colors.black45,
+                          )),
+              leading: Image.network(widget.post.providers[0].image.url,
                   width: 50, height: 50)),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -49,7 +59,7 @@ class _PostItemState extends State<PostItem> {
                                   ),
                         ),
                         Text(
-                          "Cash Out",
+                          widget.post.type.name,
                           style:
                               Theme.of(context).textTheme.titleMedium!.copyWith(
                                     color: Colors.black45,
@@ -151,13 +161,34 @@ class _PostItemState extends State<PostItem> {
                     foregroundColor:
                         MaterialStateProperty.all<Color>(Colors.blue),
                   ),
-                  onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => ChatPage()),
-                    // );
+                  onPressed: () async {
+                    try {
+                      final navigator = Navigator.of(context);
+                      final room = await FirebaseChatCore.instance.createRoom(
+                          types.User(id: widget.post.firebaseUserId));
+                      await exchangeBloc.createExchange({
+                        "ads_post_id": widget.post.id.toString(),
+                        "ex_user_id": AppConstant.firebaseUser!.uid,
+                        "ex_device_id": await PlatformDeviceId.getDeviceId,
+                        "room_id": room.id,
+                        "amount": "0",
+                        "status": "initiated"
+                      });
+                      await navigator.push(
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            room: room,
+                          ),
+                        ),
+                      );
+                    } catch (e) {
+                      print(e);
+                    }
                   },
-                  child: Text(AppLocalizations.of(context)!.contact,
+                  child: Text(
+                      widget.post.type.id == 1
+                          ? AppLocalizations.of(context)!.out
+                          : AppLocalizations.of(context)!.exchange,
                       style: const TextStyle(color: Colors.white)),
                 )
               ],

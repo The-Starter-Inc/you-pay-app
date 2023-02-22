@@ -44,7 +44,7 @@ class _FloatButtonState extends State<FloatButton> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               if (widget.icon != null) ...[
-                CircleAvatar(backgroundImage: AssetImage(widget.icon!)),
+                CircleAvatar(backgroundImage: NetworkImage(widget.icon!)),
                 const SizedBox(width: 5),
               ],
               Text(
