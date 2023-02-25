@@ -63,6 +63,7 @@ dependencies:
   faker: ^2.1.0
   timeago: ^3.3.0
   connectivity: ^3.0.6
+  dropdown_search: ^5.0.5
 
 dev_dependencies:
   flutter_test:
