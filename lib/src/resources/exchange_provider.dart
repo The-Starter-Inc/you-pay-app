@@ -12,9 +12,10 @@ class ExchangeApiProvider {
     'Authorization': 'Bearer ${AppConstant.accessToken}'
   };
 
-  Future<List<Exchange>> fetchExchanges() async {
+  Future<List<Exchange>> fetchExchanges(String firebaseUserId) async {
     final response = await client.get(
-        Uri.parse("${AppConstant.host}/api/exchange?rows=99999"),
+        Uri.parse(
+            "${AppConstant.host}/api/exchange?search=ads_user_id:$firebaseUserId|ex_user_id:equal:$firebaseUserId:true&rows=99999"),
         headers: headers);
 
     if (response.statusCode == 200) {
@@ -22,7 +23,23 @@ class ExchangeApiProvider {
       return Exchange.fromJson(json.decode(response.body));
     } else {
       // If that call was not successful, throw an error.
-      throw Exception('Failed to load types');
+      throw Exception(response.body);
+    }
+  }
+
+  Future<List<Exchange>> checkExchangeExist(
+      String adsPostid, String exUserId) async {
+    final response = await client.get(
+        Uri.parse(
+            "${AppConstant.host}/api/exchange?search=ads_post_id:equal:$adsPostid|ex_user_id:equal:$exUserId|status:not_equal:completed"),
+        headers: headers);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      return Exchange.fromJson(json.decode(response.body));
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception(response.body);
     }
   }
 

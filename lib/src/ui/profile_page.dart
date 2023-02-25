@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../constants/app_constant.dart';
+import '../ui/widgets/my_post_item.dart';
 import '../models/post.dart';
 import '../blocs/post_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import 'widgets/post_item.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,11 +14,21 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  List<Post> posts = [];
+  final PostBloc postBloc = PostBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    getMyPosts();
+  }
+
+  void getMyPosts() {
+    //"ads_user_id:equal:${AppConstant.firebaseUser!.uid}"
+    postBloc.fetchPosts(null, null);
+  }
 
   @override
   Widget build(BuildContext context) {
-    //bloc.fetchPosts();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -26,27 +36,42 @@ class _ProfilePageState extends State<ProfilePage> {
           style: const TextStyle(color: Colors.white),
         ),
       ),
-      // body: StreamBuilder(
-      //   stream: bloc.posts,
-      //   builder: (context, AsyncSnapshot<List<Post>> snapshot) {
-      //     if (snapshot.hasData) {
-      //       return buildList(snapshot);
-      //     } else if (snapshot.hasError) {
-      //       return Text(snapshot.error.toString());
-      //     }
-      //     return const Center(child: CircularProgressIndicator());
-      //   },
-      // ),
-      body: buildList(posts),
-    );
-  }
-
-//AsyncSnapshot<List<Post>> snapshot
-  Widget buildList(List<Post> posts) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      clipBehavior: Clip.none,
-      children: [...posts.map((post) => PostItem(post: post))],
+      body: StreamBuilder(
+        stream: postBloc.posts,
+        builder: (context, AsyncSnapshot<List<Post>> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data!.isEmpty) {
+              return Center(
+                  child: Text(AppLocalizations.of(context)!.no_data,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(color: Colors.black45)));
+            }
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final post = snapshot.data![index];
+                return Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: MyPostItem(
+                        post: post,
+                        onDeleted: () {
+                          getMyPosts();
+                        }));
+              },
+            );
+          } else if (snapshot.hasError) {
+            return Text(snapshot.error.toString(),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium!
+                    .copyWith(color: Colors.black45));
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
 }

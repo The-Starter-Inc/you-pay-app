@@ -6,22 +6,91 @@ import '../models/post.dart';
 
 class PostApiProvider {
   Client client = Client();
+  Map<String, String> headers = {
+    'Accept': 'application/json',
+    'Authorization': 'Bearer ${AppConstant.accessToken}'
+  };
 
-  Future<List<Post>> fetchPosts() async {
-    Map<String, String> headers = {
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ${AppConstant.accessToken}'
-    };
-    final response = await client.get(
-        Uri.parse("${AppConstant.host}/api/adspost?rows=9999"),
+  Future<List<Post>> fetchPosts(String? keywords, String? search) async {
+    // If kewords and search filter with
+    if (keywords != null && search != null) {
+      final response = await client.get(
+          Uri.parse(
+              "${AppConstant.host}/api/adspost?keyword=$keywords&search=$search&rows=9999"),
+          headers: headers);
+      if (response.statusCode == 200) {
+        return Post.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to load post');
+      }
+    }
+
+    // If keywords or search filter with
+    if (keywords != null || search != null) {
+      // If keywords filter with
+      if (keywords != null) {
+        print("/api/adspost?keyword=$keywords&rows=9999");
+        final response = await client.get(
+            Uri.parse(
+                "${AppConstant.host}/api/adspost?keyword=\"$keywords\"&rows=9999"),
+            headers: headers);
+        if (response.statusCode == 200) {
+          return Post.fromJson(json.decode(response.body));
+        } else {
+          throw Exception('Failed to load post');
+        }
+      } else {
+        // If search filter with
+        final response = await client.get(
+            Uri.parse(
+                "${AppConstant.host}/api/adspost?search=$search&rows=9999"),
+            headers: headers);
+
+        if (response.statusCode == 200) {
+          return Post.fromJson(json.decode(response.body));
+        } else {
+          throw Exception('Failed to load post');
+        }
+      }
+    } else {
+      // No Filter
+      final response = await client.get(
+          Uri.parse("${AppConstant.host}/api/adspost?rows=9999"),
+          headers: headers);
+      if (response.statusCode == 200) {
+        return Post.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to load post');
+      }
+    }
+  }
+
+  Future<Post> createAdsPost(payload) async {
+    final response = await client.post(
+        Uri.parse("${AppConstant.host}/api/adspost"),
+        headers: headers,
+        body: payload);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      return Post.fromJsonObj(json.decode(response.body));
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception(response.body);
+    }
+  }
+
+  Future<dynamic> deleteAdsPost(id) async {
+    final response = await client.delete(
+        Uri.parse("${AppConstant.host}/api/adspost/$id"),
         headers: headers);
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
-      return Post.fromJson(json.decode(response.body));
+      return response.body;
     } else {
       // If that call was not successful, throw an error.
-      throw Exception('Failed to load post');
+      throw Exception(response.body);
     }
   }
 }

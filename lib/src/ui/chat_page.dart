@@ -14,6 +14,7 @@ import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({
@@ -46,7 +47,14 @@ class _ChatPageState extends State<ChatPage> {
               IconButton(
                 padding: const EdgeInsets.only(right: 16),
                 icon: const Icon(Icons.phone, size: 24, color: Colors.white),
-                onPressed: () {},
+                onPressed: () async {
+                  if (await canLaunchUrl(
+                      Uri.parse("tel://${widget.room.name}"))) {
+                    await launchUrl(Uri.parse("tel://${widget.room.name}"));
+                  } else {
+                    throw 'Could not call phone intent.';
+                  }
+                },
               ),
             ]),
         body: StreamBuilder<types.Room>(

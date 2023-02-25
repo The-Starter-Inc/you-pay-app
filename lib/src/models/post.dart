@@ -12,9 +12,8 @@ class Post {
   double distance;
   double? percentage;
   double? fees;
-  String firebaseUserId;
-  String deviceId;
-  int? userId;
+  String adsUserId;
+  String adsDeviceId;
   String createdAt;
 
   Post(
@@ -25,24 +24,21 @@ class Post {
       required this.phone,
       required this.latLng,
       required this.distance,
-      required this.firebaseUserId,
-      required this.deviceId,
+      required this.adsUserId,
+      required this.adsDeviceId,
       this.percentage,
       this.fees,
-      this.userId,
       required this.createdAt});
 
   static fromJsonProviders(parsedJson) {
     final List<Provider> providers = [];
     for (int i = 0; i < parsedJson.length; i++) {
-      if (parsedJson[i]['provider'] != null) {
-        providers.add(Provider(
-            id: parsedJson[i]['provider']['id'],
-            name: parsedJson[i]['provider']['name'],
-            image: ImageUrl(url: parsedJson[i]['provider']['image']['url']),
-            marker: ImageUrl(url: parsedJson[i]['provider']['marker']['url']),
-            icon: ImageUrl(url: parsedJson[i]['provider']['icon']['url'])));
-      }
+      providers.add(Provider(
+          id: parsedJson[i]['id'],
+          name: parsedJson[i]['name'],
+          image: ImageUrl(url: parsedJson[i]['image']['url']),
+          marker: ImageUrl(url: parsedJson[i]['marker']['url']),
+          icon: ImageUrl(url: parsedJson[i]['icon']['url'])));
     }
     return providers;
   }
@@ -66,9 +62,8 @@ class Post {
                   .toDouble(),
           fees:
               double.parse((parsedJson[i]['fees'] ?? 0).toString()).toDouble(),
-          firebaseUserId: parsedJson[i]['firebase_user_id'],
-          deviceId: parsedJson[i]['device_id'],
-          userId: parsedJson[i]['user_id'],
+          adsUserId: parsedJson[i]['ads_user_id'],
+          adsDeviceId: parsedJson[i]['ads_device_id'],
           createdAt: parsedJson[i]['type']['created_at']));
     }
     return results;
@@ -87,9 +82,8 @@ class Post {
         percentage:
             double.parse((parsedJson['percentage'] ?? 0).toString()).toDouble(),
         fees: double.parse((parsedJson['fees'] ?? 0).toString()).toDouble(),
-        firebaseUserId: parsedJson['firebase_user_id'],
-        deviceId: parsedJson['device_id'],
-        userId: parsedJson['user_id'],
+        adsUserId: parsedJson['ads_user_id'],
+        adsDeviceId: parsedJson['ads_device_id'],
         createdAt: parsedJson['type']['created_at']);
   }
 }

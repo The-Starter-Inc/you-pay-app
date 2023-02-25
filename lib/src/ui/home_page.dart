@@ -1,5 +1,8 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
+import 'dart:async';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
@@ -30,6 +33,8 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> screens = [const DashboardPage(), const ProfilePage()];
   final AuthBloc authBloc = AuthBloc();
 
+  late StreamSubscription<ConnectivityResult> subscription;
+
   @override
   void initState() {
     authBloc.fetchToken({
@@ -39,9 +44,22 @@ class _HomePageState extends State<HomePage> {
     });
     initializeFlutterFire();
     super.initState();
+    subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      if (result == ConnectivityResult.none) {
+        showErrorAlert(AppLocalizations.of(context)!.no_network);
+        return;
+      }
+    });
   }
 
   void initializeFlutterFire() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      showErrorAlert(AppLocalizations.of(context)!.no_network);
+      return;
+    }
     try {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
@@ -130,6 +148,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  dispose() {
+    super.dispose();
+
+    subscription.cancel();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: buildLayout(),
@@ -190,7 +215,7 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Colors.white,
             type: BottomNavigationBarType.fixed,
             currentIndex: currentTab,
-            selectedItemColor: AppColor.primaryColor,
+            selectedItemColor: Colors.black,
             iconSize: 30,
             onTap: _onItemTapped,
             elevation: 5));
@@ -201,7 +226,6 @@ class _HomePageState extends State<HomePage> {
         stream: authBloc.token,
         builder: (context, AsyncSnapshot<Token> snapshot) {
           if (snapshot.hasData) {
-            print("AccessToken ${snapshot.data!.access_token}");
             AppConstant.accessToken = snapshot.data!.access_token;
             return screens.elementAt(currentTab);
           } else {
@@ -212,16 +236,3 @@ class _HomePageState extends State<HomePage> {
         });
   }
 }
-
-// class TabLayout extends StatelessWidget {
-//   const TabLayout({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return StreamBuilder<Token>(
-//         stream: bloc.token,
-//         builder: (context, AsyncSnapshot<Token> snapshot) {
-//           return screens.elementAt(currentTab);
-//         });
-//   }
-// }

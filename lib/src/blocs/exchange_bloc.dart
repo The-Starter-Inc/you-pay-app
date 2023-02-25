@@ -5,9 +5,7 @@ import '../resources/exchange_repository.dart';
 class ExchangeBloc {
   final repository = ExchangeRepository();
   final exchangeFetcher = PublishSubject<List<Exchange>>();
-  final exchangeCreater = PublishSubject<Exchange>();
 
-  Stream<Exchange> get creater => exchangeCreater.stream;
   Stream<List<Exchange>> get exchange => exchangeFetcher.stream;
 
   Future<Exchange> createExchange(payload) async {
@@ -15,14 +13,20 @@ class ExchangeBloc {
     return exchange;
   }
 
-  fetchExchages() async {
-    List<Exchange> exchanges = await repository.fetchExchanges();
+  Future<List<Exchange>> checkExchangeExist(
+      String adsPostId, String exUserId) async {
+    List<Exchange> exchange =
+        await repository.checkExchangeExist(adsPostId, exUserId);
+    return exchange;
+  }
+
+  fetchExchages(String firebaseUserId) async {
+    List<Exchange> exchanges = await repository.fetchExchanges(firebaseUserId);
     exchangeFetcher.sink.add(exchanges);
   }
 
   dispose() {
     exchangeFetcher.close();
-    exchangeCreater.close();
   }
 }
 

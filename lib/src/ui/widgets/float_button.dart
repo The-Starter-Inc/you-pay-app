@@ -32,7 +32,7 @@ class _FloatButtonState extends State<FloatButton> {
           setState(() {
             widget.selected = widget.selected == true ? false : true;
             if (widget.onSelected != null) {
-              widget.onSelected!(widget.selected);
+              widget.onSelected!(widget.selected, widget.title);
             }
           });
         },

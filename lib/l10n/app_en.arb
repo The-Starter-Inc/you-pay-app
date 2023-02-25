@@ -1,7 +1,7 @@
 { 
     "home": "Home",
     "profile": "Profile",
-    "notification": "Notification",
+    "notifications": "Notifications",
     "search": "Tap to Search",
     "filter": "Filter",
     "exchange_money": "Exchange Money",
@@ -26,5 +26,12 @@
     "choose_file": "Choose File",
     "cancel": "Cancel",
     "exchange": "Exchange",
-    "out": "Cash Out"
+    "out": "Cash Out",
+    "no_data": "There is no data yet.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "no_network": "No internet connectivity.",
+    "delete_confirm_msg": "Are you sure to delete?",
+    "confirm": "Confirm",
+    "ok": "OK"
 }

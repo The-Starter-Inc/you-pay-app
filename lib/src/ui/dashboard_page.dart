@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:p2p_pay/src/blocs/post_bloc.dart';
+import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import 'package:p2p_pay/src/ui/notification_page.dart';
 import 'package:p2p_pay/src/ui/search_page.dart';
@@ -23,6 +24,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  late List<String> filterProviders = [];
   late LatLng _center = const LatLng(16.79729673247046, 96.13215959983089);
   final ProviderBloc providerBloc = ProviderBloc();
   final PostBloc postBloc = PostBloc();
@@ -46,7 +48,7 @@ class _DashboardPageState extends State<DashboardPage> {
   initData() async {
     _getCurrentPosition();
     providerBloc.fetchProviders();
-    postBloc.fetchPosts();
+    postBloc.fetchPosts(null, null);
   }
 
   @override
@@ -70,8 +72,8 @@ class _DashboardPageState extends State<DashboardPage> {
       // makers added according to index
       markers.add(Marker(
           markerId: MarkerId(posts[i].id.toString()),
-          icon: BitmapDescriptor.fromBytes(
-              await getImages("assets/images/my-location.png", 200)),
+          icon: BitmapDescriptor.fromBytes(await getBestterImage(
+              posts[i].providers[0].name, posts[i].providers[0].marker.url)),
           position: posts[i].latLng,
           consumeTapEvents: true,
           onTap: () {
@@ -85,6 +87,21 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     return markers.toSet();
+  }
+
+  Future<Uint8List> getBestterImage(providerName, url) async {
+    switch (providerName) {
+      case "KBZ Pay":
+        return await getImages("assets/images/kbz-marker.png", 200);
+      case "Aya Pay":
+        return await getImages("assets/images/aya-marker.png", 200);
+      case "Wave Pay":
+        return await getImages("assets/images/wave-marker.png", 200);
+      case "CB Pay":
+        return await getImages("assets/images/cb-marker.png", 200);
+      default:
+        return await getImageUrl(url, 200);
+    }
   }
 
   Future<Uint8List> getImages(String path, int width) async {
@@ -203,7 +220,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       setState(() {
                         switching = true;
                       });
-                      await Future.delayed(const Duration(milliseconds: 300));
+                      await Future.delayed(const Duration(milliseconds: 0));
                       setState(() {
                         switching = false;
                         if (mapsType) {
@@ -332,7 +349,21 @@ class _DashboardPageState extends State<DashboardPage> {
                                     .map((type) => FloatButton(
                                           title: type.name,
                                           icon: type.icon.url,
-                                          onSelected: (selected) {},
+                                          onSelected: (selected, value) {
+                                            if (selected) {
+                                              filterProviders.add(
+                                                  value.replaceAll("Pay", ""));
+                                            } else {
+                                              filterProviders.remove(
+                                                  value.replaceAll("Pay", ""));
+                                            }
+
+                                            postBloc.fetchPosts(
+                                                filterProviders.isNotEmpty
+                                                    ? filterProviders.join(" ")
+                                                    : null,
+                                                null);
+                                          },
                                         ))
                                     .toList());
                           }
