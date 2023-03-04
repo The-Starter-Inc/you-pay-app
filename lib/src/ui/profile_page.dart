@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../theme/color_theme.dart';
 import '../constants/app_constant.dart';
 import '../ui/widgets/my_post_item.dart';
 import '../models/post.dart';
@@ -23,19 +24,19 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void getMyPosts() {
-    //"ads_user_id:equal:${AppConstant.firebaseUser!.uid}"
-    postBloc.fetchPosts(null, null);
+    postBloc.fetchPosts(
+        null, "ads_user_id:equal:${AppConstant.firebaseUser!.uid}");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context)!.profile,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
+          title: Text(
+            AppLocalizations.of(context)!.profile,
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: AppColor.primaryColor),
       body: StreamBuilder(
         stream: postBloc.posts,
         builder: (context, AsyncSnapshot<List<Post>> snapshot) {
@@ -58,6 +59,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: MyPostItem(
                         post: post,
                         onDeleted: () {
+                          getMyPosts();
+                        },
+                        onCreated: () {
                           getMyPosts();
                         }));
               },

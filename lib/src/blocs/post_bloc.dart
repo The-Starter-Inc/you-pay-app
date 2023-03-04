@@ -13,14 +13,13 @@ class PostBloc {
     postFetcher.sink.add(posts);
   }
 
-  Future<Post> createAdsPost(payload) async {
+  Future<dynamic> createAdsPost(payload) async {
     Post post = await repository.createAdsPost(payload);
     return post;
   }
 
   Future<dynamic> deleteAdsPost(id) async {
-    Post post = await repository.deleteAdsPost(id);
-    return post;
+    return await repository.deleteAdsPost(id);
   }
 
   dispose() {

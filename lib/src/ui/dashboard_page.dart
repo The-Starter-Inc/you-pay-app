@@ -1,19 +1,23 @@
 import 'dart:ui' as ui;
 import 'package:custom_info_window/custom_info_window.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:p2p_pay/src/blocs/post_bloc.dart';
-import 'package:p2p_pay/src/constants/app_constant.dart';
+import 'package:p2p_pay/src/models/notification_event.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import 'package:p2p_pay/src/ui/notification_page.dart';
 import 'package:p2p_pay/src/ui/search_page.dart';
 import 'package:p2p_pay/src/ui/widgets/float_button.dart';
 import 'package:p2p_pay/src/ui/widgets/marker_window.dart';
 import 'package:p2p_pay/src/ui/widgets/post_item.dart';
+import 'package:event/event.dart';
 import '../blocs/provider_bloc.dart';
+import '../constants/app_constant.dart';
 import '../models/post.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -26,6 +30,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   late List<String> filterProviders = [];
   late LatLng _center = const LatLng(16.79729673247046, 96.13215959983089);
+  final Event notiEvent = Event<NotificationEvent>();
   final ProviderBloc providerBloc = ProviderBloc();
   final PostBloc postBloc = PostBloc();
   final CustomInfoWindowController _customInfoWindowController =
@@ -38,6 +43,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   bool mapsType = true;
   bool switching = false;
+  bool hasNotification = false;
 
   @override
   void initState() {
@@ -49,6 +55,15 @@ class _DashboardPageState extends State<DashboardPage> {
     _getCurrentPosition();
     providerBloc.fetchProviders();
     postBloc.fetchPosts(null, null);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      setState(() {
+        AppConstant.hasNotification = true;
+        hasNotification = true;
+      });
+    });
+    setState(() {
+      hasNotification = AppConstant.hasNotification;
+    });
   }
 
   @override
@@ -57,6 +72,7 @@ class _DashboardPageState extends State<DashboardPage> {
     mapController.dispose();
     providerBloc.dispose();
     postBloc.dispose();
+    notiEvent.unsubscribeAll();
     super.dispose();
   }
 
@@ -79,8 +95,25 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () {
             _customInfoWindowController.addInfoWindow!(
               MarkerWindow(
-                  post: posts[i],
-                  infoWindowController: _customInfoWindowController),
+                post: posts[i],
+                infoWindowController: _customInfoWindowController,
+                onDeleted: () {
+                  _customInfoWindowController.hideInfoWindow!();
+                  postBloc.fetchPosts(
+                      filterProviders.isNotEmpty
+                          ? filterProviders.join(" ")
+                          : null,
+                      null);
+                },
+                onUpdated: () {
+                  _customInfoWindowController.hideInfoWindow!();
+                  postBloc.fetchPosts(
+                      filterProviders.isNotEmpty
+                          ? filterProviders.join(" ")
+                          : null,
+                      null);
+                },
+              ),
               posts[i].latLng,
             );
           }));
@@ -181,18 +214,18 @@ class _DashboardPageState extends State<DashboardPage> {
     }).catchError((e) {});
   }
 
-  // Future<void> _getAddressFromLatLng(Position position) async {
-  //   await placemarkFromCoordinates(position.latitude, position.longitude)
-  //       .then((List<Placemark> placemarks) {
-  //     Placemark place = placemarks[0];
-  //     setState(() {
-  //       //  _currentAddress =
-  //       //      '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}';
-  //     });
-  //   }).catchError((e) {
-  //     debugPrint(e);
-  //   });
-  // }
+  Future<void> _getAddressFromLatLng(Position position) async {
+    await placemarkFromCoordinates(position.latitude, position.longitude)
+        .then((List<Placemark> placemarks) {
+      Placemark place = placemarks[0];
+      setState(() {
+        //  _currentAddress =
+        //      '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}';
+      });
+    }).catchError((e) {
+      debugPrint(e);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +242,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     },
                     backgroundColor: Colors.white,
                     child: const Icon(Icons.my_location,
-                        color: AppColor.primaryColor),
+                        color: AppColor.secondaryColor),
                   )),
             Container(
                 margin: const EdgeInsets.all(10),
@@ -232,8 +265,8 @@ class _DashboardPageState extends State<DashboardPage> {
                       });
                     }
                   },
-                  backgroundColor: AppColor.primaryColor,
-                  child: Icon(mapsType ? Icons.list : Icons.map,
+                  backgroundColor: AppColor.secondaryColor,
+                  child: Icon(mapsType ? Icons.list : Icons.location_pin,
                       color: Colors.white),
                 ))
           ],
@@ -278,12 +311,37 @@ class _DashboardPageState extends State<DashboardPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const SearchPage()));
+                                  onTap: () async {
+                                    List<dynamic> keywords =
+                                        await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const SearchPage()));
+                                    print(keywords);
+                                    if (keywords.isNotEmpty) {
+                                      if (keywords[2].length > 0) {
+                                        if (keywords[2].length == 2) {
+                                          postBloc.fetchPosts(
+                                              keywords[0].isNotEmpty
+                                                  ? keywords[0]
+                                                  : keywords[1].join(" "),
+                                              null);
+                                        } else {
+                                          postBloc.fetchPosts(
+                                              keywords[0].isNotEmpty
+                                                  ? keywords[0]
+                                                  : keywords[1].join(" "),
+                                              "type_id:equal:${keywords[2][0]}");
+                                        }
+                                      } else {
+                                        postBloc.fetchPosts(
+                                            keywords[0].isNotEmpty
+                                                ? keywords[0]
+                                                : keywords[1].join(" "),
+                                            null);
+                                      }
+                                    }
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -317,6 +375,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                       width: 32,
                                       child: InkWell(
                                         onTap: () {
+                                          setState(() {
+                                            hasNotification = false;
+                                          });
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -327,6 +388,16 @@ class _DashboardPageState extends State<DashboardPage> {
                                             size: 24, color: Colors.black),
                                       ),
                                     ),
+                                    if (hasNotification)
+                                      const Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsets.fromLTRB(16, 5, 0, 0),
+                                          child: Icon(Icons.brightness_1_sharp,
+                                              size: 10, color: Colors.red),
+                                        ),
+                                      )
                                   ],
                                 )
                               ],
@@ -413,7 +484,25 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                   clipBehavior: Clip.none,
-                  children: [...posts.map((post) => PostItem(post: post))],
+                  children: [
+                    ...posts.map((post) => PostItem(
+                          post: post,
+                          onDeleted: () {
+                            postBloc.fetchPosts(
+                                filterProviders.isNotEmpty
+                                    ? filterProviders.join(" ")
+                                    : null,
+                                null);
+                          },
+                          onUpdated: () {
+                            postBloc.fetchPosts(
+                                filterProviders.isNotEmpty
+                                    ? filterProviders.join(" ")
+                                    : null,
+                                null);
+                          },
+                        ))
+                  ],
                 ),
               );
   }

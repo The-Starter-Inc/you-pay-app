@@ -95,7 +95,7 @@ class _NotificationItemState extends State<NotificationItem> {
                                     ),
                               ),
                               Text(
-                                widget.exchange.post!.type.name,
+                                widget.exchange.post!.type!.name,
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium!

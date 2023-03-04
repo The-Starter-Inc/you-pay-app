@@ -15,7 +15,7 @@ class ExchangeApiProvider {
   Future<List<Exchange>> fetchExchanges(String firebaseUserId) async {
     final response = await client.get(
         Uri.parse(
-            "${AppConstant.host}/api/exchange?search=ads_user_id:$firebaseUserId|ex_user_id:equal:$firebaseUserId:true&rows=99999"),
+            "${AppConstant.host}/api/exchange?filter_user_id=$firebaseUserId&sort=id&order=desc&rows=99999"),
         headers: headers);
 
     if (response.statusCode == 200) {

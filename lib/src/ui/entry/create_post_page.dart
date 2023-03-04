@@ -1,16 +1,29 @@
+// ignore_for_file: avoid_print
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:p2p_pay/src/ui/home_page.dart';
-import 'dart:developer';
-import 'dart:ui' as ui;
+import 'package:multi_stream_builder/multi_stream_builder.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:platform_device_id/platform_device_id.dart';
+
+import './../../blocs/post_bloc.dart';
+import './../../blocs/provider_bloc.dart';
+import './../../blocs/type_bloc.dart';
+import './../../constants/app_constant.dart';
+import './../../ui/widgets/dropdown_text.dart';
+import './../../ui/widgets/input_text.dart';
+import './../../models/post.dart';
+import './../../theme/color_theme.dart';
 
 class CreatePostPage extends StatefulWidget {
-  static const String routeName = '/post';
-
-  const CreatePostPage({super.key});
+  final Post? post;
+  const CreatePostPage({super.key, this.post});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -18,41 +31,8 @@ class CreatePostPage extends StatefulWidget {
 }
 
 class _CreatePostPageState extends State<CreatePostPage> {
-  // final _postBloc = PostBloc();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Post'),
-      ),
-      body: const MyStatefulWidget(),
-    );
-  }
-}
-
-class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({Key? key}) : super(key: key);
-
-  @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
-}
-
-class Error {
-  late String type = "";
-  late String amount = "";
-  late String phone = "";
-  late String provider = "";
-  late String percentage = "";
-  late String latlng = "";
-
-  Error(this.type, this.amount, this.phone, this.provider, this.percentage,
-      this.latlng);
-}
-
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  final List<Marker> _markers = <Marker>[];
-  late GoogleMapController mapController;
+  LatLng? _currentPosition;
+  late List<Provider> providers;
 
   TextEditingController typeController = TextEditingController();
   TextEditingController amountController = TextEditingController();
@@ -61,410 +41,321 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   TextEditingController percentageController = TextEditingController();
   TextEditingController latLngController = TextEditingController();
 
-  Error frmError = Error("", "", "", "", "", "");
+  Error frmError = Error(null, null, null, null, null);
+
+  bool isLoading = false;
+  TypeBloc typeBloc = TypeBloc();
+  ProviderBloc providerBloc = ProviderBloc();
+  PostBloc postBloc = PostBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentPosition();
+    typeBloc.fetchPosts();
+    providerBloc.fetchProviders();
+    if (widget.post != null) {
+      initData();
+    }
+  }
+
+  void initData() {
+    typeController.text = "${widget.post!.type!.id}";
+    providerController.text = "${widget.post!.providers[0].id}";
+    amountController.text = "${widget.post!.amount}";
+    percentageController.text = "${widget.post!.percentage}";
+    phoneController.text = widget.post!.phone;
+    _currentPosition = widget.post!.latLng;
+    _getAddressFromLatLng(_currentPosition!);
+  }
+
+  List<Provider> getSelectedProvider() {
+    providers.retainWhere(
+        (provider) => provider.id.toString() == providerController.text);
+    return providers;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(10),
-        child: ListView(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                "Type",
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.post != null
+            ? AppLocalizations.of(context)!.edit_post
+            : AppLocalizations.of(context)!.add_new_post),
+        backgroundColor: AppColor.primaryColor,
+      ),
+      body: Padding(
+          padding: const EdgeInsets.all(10),
+          child: MultiStreamBuilder(
+              streams: [typeBloc.types, providerBloc.providers],
+              builder: (context, dataList) {
+                if (dataList[0] != null && dataList[1] != null) {
+                  providers = dataList[1];
+                  return ListView(
+                    children: <Widget>[
+                      DropDownText(
+                        label: AppLocalizations.of(context)!.type,
+                        placeholder: AppLocalizations.of(context)!.choose_type,
+                        controller: typeController,
+                        errorText: frmError.type,
+                        items: dataList[0],
+                      ),
+                      DropDownText(
+                        label: AppLocalizations.of(context)!.provider,
+                        placeholder:
+                            AppLocalizations.of(context)!.choose_provider,
+                        controller: providerController,
+                        errorText: frmError.provider,
+                        items: dataList[1],
+                      ),
+                      InputText(
+                          label: AppLocalizations.of(context)!.amount,
+                          placeholder:
+                              AppLocalizations.of(context)!.enter_amount,
+                          errorText: frmError.amount,
+                          controller: amountController,
+                          keyboardType: TextInputType.number),
+                      InputText(
+                          label: AppLocalizations.of(context)!.percentage,
+                          placeholder:
+                              AppLocalizations.of(context)!.enter_percentage,
+                          controller: percentageController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d+\.?\d{0,2}')),
+                          ]),
+                      InputText(
+                          label: AppLocalizations.of(context)!.phone,
+                          placeholder:
+                              AppLocalizations.of(context)!.enter_phone,
+                          errorText: frmError.phone,
+                          controller: phoneController,
+                          keyboardType: TextInputType.phone),
+                      InputText(
+                        label: AppLocalizations.of(context)!.location,
+                        placeholder:
+                            AppLocalizations.of(context)!.enter_location,
+                        readOnly: true,
+                        errorText: frmError.latlng,
+                        controller: latLngController,
+                        suffixIcon: const Icon(Icons.location_pin,
+                            size: 24, color: Colors.black45),
+                        onTap: () {
+                          if (_currentPosition != null) {
+                            setState(() {
+                              frmError.latlng = null;
+                            });
+                            _getAddressFromLatLng(_currentPosition!);
+                          } else {
+                            showErrorAlert(AppLocalizations.of(context)!
+                                .not_found_location);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child: SizedBox(
+                              height: 50,
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all(Colors.white),
+                                    foregroundColor: MaterialStateProperty.all(
+                                        AppColor.secondaryColor),
+                                    shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(32.0),
+                                    ))),
+                                child: Text(
+                                    AppLocalizations.of(context)!.cancel,
+                                    style: const TextStyle(
+                                        color: AppColor.secondaryColor)),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                            height: 50, // <-- SEE HERE
+                          ),
+                          Expanded(
+                              child: SizedBox(
+                            height: 50,
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                clear();
+                                bool hasError = false;
+                                if (typeController.text.isEmpty) {
+                                  hasError = true;
+                                  frmError.type = AppLocalizations.of(context)!
+                                      .pls_enter_type;
+                                }
 
-            /// Drop Down
-            DropdownButtonFormField(
-              hint: const Text("Type"),
-              autofocus: true,
-              items:
-                  <String>['ABCD', 'BDCEF', 'CDEF', 'DEFG'].map((String value) {
-                return DropdownMenuItem(value: value, child: Text(value));
-              }).toList(),
-              decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.only(left: 16, right: 10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(64),
-                    ),
-                  ),
-                  label: Text("Chooose Type"),
-                  floatingLabelBehavior: FloatingLabelBehavior.never),
-              style: const TextStyle(color: Colors.black54),
-              onChanged: (newValue) {
-                typeController.text = newValue!;
-                setState(() {
-                  typeController.text = newValue;
-                  frmError.type = "";
-                });
-              },
-            ),
-            Visibility(
-              visible: frmError.type != "",
-              child: Container(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  frmError.type,
-                  style: const TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                "Amount",
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            TextField(
-              autocorrect: false,
-              controller: amountController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(64),
-                  ),
-                ),
-                label: Text("Enter Amount"),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-              ),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
-              ], // Only numbers can be entered
-              style: const TextStyle(color: Colors.black54),
-              onChanged: (newValue) {
-                setState(() {
-                  frmError.amount = "";
-                });
-              },
-            ),
-            Visibility(
-              visible: frmError.amount != "",
-              child: Container(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  frmError.amount,
-                  style: const TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                "Phone",
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            TextField(
-              autocorrect: false,
-              autofocus: true,
-              controller: phoneController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(64),
-                  ),
-                ),
-                label: Text("Phone"),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-              ),
-              keyboardType: TextInputType.phone,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
-              ],
-              style: const TextStyle(color: Colors.black54),
-              onChanged: (newValue) {
-                setState(() {
-                  frmError.phone = "";
-                });
-              },
-            ),
-            Visibility(
-              visible: frmError.phone != "",
-              child: Container(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  frmError.phone,
-                  style: const TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                "Provider",
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
+                                if (amountController.text.isEmpty) {
+                                  hasError = true;
+                                  frmError.amount =
+                                      AppLocalizations.of(context)!
+                                          .pls_enter_amount;
+                                }
 
-            /// Drop Down
-            DropdownButtonFormField(
-              hint: const Text("Provider"),
-              autofocus: true,
-              items: <String>['Yoma', 'KBZ', 'AYA'].map((String value) {
-                return DropdownMenuItem(
-                  value: value,
-                  // child: Text(value),
-                  child: SizedBox(
-                    width: 50,
-                    child: Text(value),
-                  ),
-                );
-              }).toList(),
-              decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.only(left: 16, right: 10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(64),
-                    ),
-                  ),
-                  label: Text("Chooose Provider"),
-                  floatingLabelBehavior: FloatingLabelBehavior.never),
-              style: const TextStyle(color: Colors.black54),
-              onChanged: (newValue) {
-                providerController.text = newValue!;
-                setState(() {
-                  providerController.text = newValue;
-                  frmError.provider = "";
-                });
-              },
-            ),
-            Visibility(
-              visible: frmError.provider != "",
-              child: Container(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  frmError.provider,
-                  style: const TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                "Percentage",
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            TextField(
-              autocorrect: false,
-              autofocus: true,
-              controller: percentageController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(64),
-                  ),
-                ),
-                label: Text("Percentage"),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-              ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-              style: const TextStyle(color: Colors.black54),
-              onChanged: (newValue) {
-                setState(() {
-                  frmError.percentage = "";
-                });
-              },
-            ),
-            Visibility(
-              visible: frmError.percentage != "",
-              child: Container(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  frmError.percentage,
-                  style: const TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                "Location",
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            TextField(
-              autocorrect: false,
-              autofocus: true,
-              controller: latLngController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(64),
-                  ),
-                ),
-                label: Text("Location"),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-              ),
-              style: const TextStyle(color: Colors.black54),
-              onChanged: (newValue) {
-                setState(() {
-                  frmError.latlng = "";
-                });
-              },
-              onTap: () {
-                _getCurrentPosition();
-              },
-            ),
-            Visibility(
-              visible: frmError.latlng != "",
-              child: Container(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  frmError.latlng,
-                  style: const TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 20,
-              height: 50, // <-- SEE HERE
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()),
-                      );
-                    },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.white),
-                        foregroundColor: MaterialStateProperty.all(Colors.blue),
-                        shape: MaterialStateProperty
-                            .all<RoundedRectangleBorder>(RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18.0),
-                                side: const BorderSide(color: Colors.black)))),
-                    child: const Text('Cancel'),
-                  ),
-                ),
-                const SizedBox(
-                  width: 20,
-                  height: 50, // <-- SEE HERE
-                ),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      clear();
+                                if (phoneController.text.isEmpty) {
+                                  hasError = true;
+                                  frmError.phone = AppLocalizations.of(context)!
+                                      .pls_enter_phone;
+                                }
 
-                      if (typeController.text.isEmpty) {
-                        setState(() {
-                          frmError.type = "Please choose type";
-                        });
-                      }
+                                if (providerController.text.isEmpty) {
+                                  hasError = true;
+                                  frmError.provider =
+                                      AppLocalizations.of(context)!
+                                          .pls_choose_provider;
+                                }
 
-                      if (amountController.text.isEmpty) {
-                        setState(() {
-                          frmError.amount = "Please enter amount";
-                        });
-                      }
+                                if (latLngController.text.isEmpty) {
+                                  hasError = true;
+                                  frmError.latlng =
+                                      AppLocalizations.of(context)!
+                                          .pls_enter_location;
+                                }
+                                setState(() {});
 
-                      if (phoneController.text.isEmpty) {
-                        setState(() {
-                          frmError.phone = "Please enter phone";
-                        });
-                      }
+                                if (!hasError) {
+                                  try {
+                                    await postBloc.createAdsPost(widget.post !=
+                                            null
+                                        ? {
+                                            //Edit Record
+                                            "id": widget.post!.id.toString(),
+                                            "type_id": typeController.text,
+                                            "amount": amountController.text,
+                                            "percentage": percentageController
+                                                    .text.isEmpty
+                                                ? "0"
+                                                : percentageController.text,
+                                            "phone": phoneController.text,
+                                            "providers": jsonEncode(
+                                                Provider.toJsonArray(
+                                                    getSelectedProvider())),
+                                            "lat": _currentPosition!.latitude
+                                                .toString(),
+                                            "lng": _currentPosition!.longitude
+                                                .toString(),
+                                            "distance": "0",
+                                            "ads_user_id":
+                                                AppConstant.firebaseUser!.uid,
+                                            "ads_device_id":
+                                                await PlatformDeviceId
+                                                    .getDeviceId,
+                                          }
+                                        : {
+                                            //New Record
+                                            "type_id": typeController.text,
+                                            "amount": amountController.text,
+                                            "percentage": percentageController
+                                                    .text.isEmpty
+                                                ? "0"
+                                                : percentageController.text,
+                                            "phone": phoneController.text,
+                                            "providers": jsonEncode(
+                                                Provider.toJsonArray(
+                                                    getSelectedProvider())),
+                                            "lat": _currentPosition!.latitude
+                                                .toString(),
+                                            "lng": _currentPosition!.longitude
+                                                .toString(),
+                                            "distance": "0",
+                                            "ads_user_id":
+                                                AppConstant.firebaseUser!.uid,
+                                            "ads_device_id":
+                                                await PlatformDeviceId
+                                                    .getDeviceId,
+                                          });
 
-                      if (providerController.text.isEmpty) {
-                        setState(() {
-                          frmError.provider = "Please choose provider";
-                        });
-                      }
-
-                      if (percentageController.text.isEmpty) {
-                        setState(() {
-                          frmError.percentage = "Please enter percentage";
-                        });
-                      }
-
-                      if (latLngController.text.isEmpty) {
-                        setState(() {
-                          frmError.latlng =
-                              "Please enter Latitude and Longtitude";
-                        });
-                      }
-                    },
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.blue),
-                        foregroundColor:
-                            MaterialStateProperty.all(Colors.black),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side:
-                                        const BorderSide(color: Colors.blue)))),
-                    child: const Text('Save'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ));
+                                    await FirebaseAnalytics.instance.logEvent(
+                                      name: widget.post != null
+                                          ? "update_post"
+                                          : "create_post",
+                                      parameters: {},
+                                    );
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.pop(context, "_createdPost");
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                } else {
+                                  print("Have empty error");
+                                }
+                              },
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(isLoading
+                                          ? Colors.black45
+                                          : AppColor.secondaryColor),
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(isLoading
+                                          ? Colors.black45
+                                          : AppColor.secondaryColor),
+                                  shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(32.0),
+                                  ))),
+                              child: Text(AppLocalizations.of(context)!.save,
+                                  style: const TextStyle(color: Colors.white)),
+                            ),
+                          )),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              })),
+    );
   }
 
   void clear() {
     setState(() {
-      frmError.type = "";
-      frmError.amount = "";
-      frmError.phone = "";
-      frmError.provider = "";
-      frmError.percentage = "";
-      frmError.latlng = "";
+      frmError.type = null;
+      frmError.amount = null;
+      frmError.phone = null;
+      frmError.provider = null;
+      frmError.latlng = null;
     });
   }
 
-  Future<Uint8List> getImages(String path, int width) async {
-    ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetHeight: width);
-    ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+  Future<void> showErrorAlert(message) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(AppLocalizations.of(context)!.ok),
+          ),
+        ],
+        content: Text(message,
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: Colors.black,
+                )),
+        title: Text(
+          'Error',
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: Colors.black,
+              ),
+        ),
+      ),
+    );
   }
 
   Future<bool> _handleLocationPermission() async {
@@ -505,24 +396,27 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     if (!hasPermission) return;
     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) async {
-      _markers[0] = Marker(
-          markerId: const MarkerId("my-location"),
-          icon: BitmapDescriptor.fromBytes(
-              await getImages("assets/images/my-location.png", 200)),
-          position: LatLng(position.latitude, position.longitude));
-      mapController.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            zoom: 18,
-            target: LatLng(
-              position.latitude,
-              position.longitude,
-            ),
-          ),
-        ),
-      );
+      _currentPosition = LatLng(position.latitude, position.longitude);
     }).catchError((e) {
       debugPrint(e);
     });
   }
+
+  Future<void> _getAddressFromLatLng(LatLng latLng) async {
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+    Placemark place = placemarks[0];
+    latLngController.text =
+        '${place.thoroughfare ?? place.street}, ${place.subAdministrativeArea}';
+  }
+}
+
+class Error {
+  late String? type;
+  late String? amount;
+  late String? phone;
+  late String? provider;
+  late String? latlng;
+
+  Error(this.type, this.amount, this.phone, this.provider, this.latlng);
 }

@@ -1,8 +1,11 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:p2p_pay/src/blocs/exchange_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../theme/color_theme.dart';
 import '../ui/widgets/notification_item.dart';
 import './../constants/app_constant.dart';
 import './../models/exchange.dart';
@@ -20,14 +23,20 @@ class _NotificationPagetate extends State<NotificationPage> {
   @override
   void initState() {
     super.initState();
+    FirebaseAnalytics.instance
+        .setCurrentScreen(screenName: "Notification Page");
     exchangeBloc.fetchExchages(AppConstant.firebaseUser!.uid);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      exchangeBloc.fetchExchages(AppConstant.firebaseUser!.uid);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar:
-            AppBar(title: Text(AppLocalizations.of(context)!.notifications)),
+        appBar: AppBar(
+            title: Text(AppLocalizations.of(context)!.notifications),
+            backgroundColor: AppColor.primaryColor),
         //body: const RipplesAnimation(),
         body: StreamBuilder<List<Exchange>>(
           stream: exchangeBloc.exchange,

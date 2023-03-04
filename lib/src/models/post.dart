@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Post {
   int id;
-  Type type;
+  Type? type;
   List<Provider> providers;
   double amount;
   String phone;
@@ -18,7 +18,7 @@ class Post {
 
   Post(
       {required this.id,
-      required this.type,
+      this.type,
       required this.providers,
       required this.amount,
       required this.phone,
@@ -64,7 +64,7 @@ class Post {
               double.parse((parsedJson[i]['fees'] ?? 0).toString()).toDouble(),
           adsUserId: parsedJson[i]['ads_user_id'],
           adsDeviceId: parsedJson[i]['ads_device_id'],
-          createdAt: parsedJson[i]['type']['created_at']));
+          createdAt: parsedJson[i]['created_at']));
     }
     return results;
   }
@@ -72,8 +72,10 @@ class Post {
   static fromJsonObj(parsedJson) {
     return Post(
         id: parsedJson['id'],
-        type: Type(
-            id: parsedJson['type']['id'], name: parsedJson['type']['name']),
+        type: parsedJson['type'] != null
+            ? Type(
+                id: parsedJson['type']['id'], name: parsedJson['type']['name'])
+            : null,
         providers: Post.fromJsonProviders(parsedJson['providers'] ?? []),
         amount: double.parse(parsedJson['amount'].toString()).toDouble(),
         phone: parsedJson['phone'],
@@ -84,7 +86,7 @@ class Post {
         fees: double.parse((parsedJson['fees'] ?? 0).toString()).toDouble(),
         adsUserId: parsedJson['ads_user_id'],
         adsDeviceId: parsedJson['ads_device_id'],
-        createdAt: parsedJson['type']['created_at']);
+        createdAt: parsedJson['created_at']);
   }
 }
 
@@ -95,11 +97,12 @@ class Type {
 
   Type({required this.id, required this.name, this.icon});
 
-  static fromJson(Map<String, dynamic> parsedJson) {
+  static fromJson(parsedJson) {
     List<Type> results = [];
     for (int i = 0; i < parsedJson.length; i++) {
       results.add(Type(id: parsedJson[i]['id'], name: parsedJson[i]['name']));
     }
+    return results;
   }
 }
 
@@ -130,9 +133,27 @@ class Provider {
     }
     return results;
   }
+
+  static List<dynamic> toJsonArray(List<Provider> providers) {
+    final List<dynamic> result = [];
+    for (var i = 0; i < providers.length; i++) {
+      result.add({
+        'id': providers[i].id,
+        'name': providers[i].name,
+        'image': ImageUrl.toJson(providers[i].image),
+        'icon': ImageUrl.toJson(providers[i].icon),
+        'marker': ImageUrl.toJson(providers[i].marker)
+      });
+    }
+    return result;
+  }
 }
 
 class ImageUrl {
   String url;
   ImageUrl({required this.url});
+
+  static dynamic toJson(ImageUrl imageUrl) {
+    return {'url': imageUrl.url};
+  }
 }

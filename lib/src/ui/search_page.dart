@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../models/Post.dart';
+import './../blocs/provider_bloc.dart';
+import '../models/post.dart';
 import 'widgets/float_button.dart';
 
 class SearchPage extends StatefulWidget {
@@ -12,32 +13,16 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  List<Provider> types = [
-    Provider(
-        id: 1,
-        image: ImageUrl(url: "assets/images/kbz-pay.png"),
-        icon: ImageUrl(url: "assets/images/kbz-pay-circle.png"),
-        marker: ImageUrl(url: "assets/images/kbz-marker.png"),
-        name: "KBZ Pay"),
-    Provider(
-        id: 2,
-        image: ImageUrl(url: "assets/images/cb-pay.png"),
-        icon: ImageUrl(url: "assets/images/cb-pay-circle.png"),
-        marker: ImageUrl(url: "assets/images/cb-marker.png"),
-        name: "CB Pay"),
-    Provider(
-        id: 3,
-        image: ImageUrl(url: "assets/images/wave-pay.png"),
-        icon: ImageUrl(url: "assets/images/wave-pay-circle.png"),
-        marker: ImageUrl(url: "assets/images/wave-marker.png"),
-        name: "Wave Pay"),
-    Provider(
-        id: 4,
-        image: ImageUrl(url: "assets/images/aya-pay.png"),
-        icon: ImageUrl(url: "assets/images/aya-pay-circle.png"),
-        marker: ImageUrl(url: "assets/images/aya-marker.png"),
-        name: "Aya Pay")
-  ];
+  ProviderBloc providerBloc = ProviderBloc();
+  TextEditingController searchController = TextEditingController();
+  late List<String> filterProviders = [];
+  late List<String> filterTypes = ["1", "2"];
+  @override
+  void initState() {
+    super.initState();
+    providerBloc.fetchProviders();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,6 +65,8 @@ class _SearchPageState extends State<SearchPage> {
                       child: TextField(
                         keyboardType: TextInputType.text,
                         autofocus: true,
+                        controller: searchController,
+                        textInputAction: TextInputAction.search,
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: AppLocalizations.of(context)!.search_here,
@@ -88,6 +75,13 @@ class _SearchPageState extends State<SearchPage> {
                               vertical: 4, horizontal: 16),
                           isDense: true,
                         ),
+                        onSubmitted: (_) {
+                          Navigator.pop(context, [
+                            searchController.text,
+                            filterProviders,
+                            filterTypes
+                          ]);
+                        },
                         style:
                             Theme.of(context).textTheme.titleMedium!.copyWith(
                                   color: Colors.black,
@@ -100,17 +94,32 @@ class _SearchPageState extends State<SearchPage> {
               const SizedBox(height: 8),
               SizedBox(
                 height: 46,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  clipBehavior: Clip.none,
-                  children: types
-                      .map((type) => FloatButton(
-                            title: type.name,
-                            icon: type.icon.url,
-                            onSelected: (selected) {},
-                          ))
-                      .toList(),
-                ),
+                child: StreamBuilder<List<Provider>>(
+                    stream: providerBloc.providers,
+                    builder: (context, AsyncSnapshot<List<Provider>> snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView(
+                          scrollDirection: Axis.horizontal,
+                          clipBehavior: Clip.none,
+                          children: snapshot.data!
+                              .map((type) => FloatButton(
+                                    title: type.name,
+                                    icon: type.icon.url,
+                                    onSelected: (selected, value) {
+                                      if (selected) {
+                                        filterProviders
+                                            .add(value.replaceAll("Pay", ""));
+                                      } else {
+                                        filterProviders.remove(
+                                            value.replaceAll("Pay", ""));
+                                      }
+                                    },
+                                  ))
+                              .toList(),
+                        );
+                      }
+                      return Container();
+                    }),
               ),
               const SizedBox(height: 8),
               SizedBox(
@@ -122,16 +131,28 @@ class _SearchPageState extends State<SearchPage> {
                       FloatButton(
                         title: AppLocalizations.of(context)!.cash_out,
                         selected: true,
-                        onSelected: (selected) {},
+                        onSelected: (selected, value) {
+                          if (selected) {
+                            filterTypes.add("1");
+                          } else {
+                            filterTypes.remove("1");
+                          }
+                        },
                       ),
                       FloatButton(
                         title: AppLocalizations.of(context)!.exchange_money,
                         selected: true,
-                        onSelected: (selected) {},
+                        onSelected: (selected, value) {
+                          if (selected) {
+                            filterTypes.add("2");
+                          } else {
+                            filterTypes.remove("2");
+                          }
+                        },
                       )
                     ]),
               ),
-              Container(
+              /*Container(
                 margin: const EdgeInsets.fromLTRB(6, 16, 6, 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -144,66 +165,51 @@ class _SearchPageState extends State<SearchPage> {
                   ],
                 ),
               ),
-              Wrap(
-                alignment: WrapAlignment.start,
-                runAlignment: WrapAlignment.start,
-                textDirection: TextDirection.ltr,
-                direction: Axis.horizontal,
-                runSpacing: 8.0,
-                spacing: 8.0,
-                children: [
-                  ...types
-                      .map((type) => Container(
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(105, 128, 223, 255),
-                              border: Border.all(
-                                color: const Color.fromARGB(105, 128, 223, 255),
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            height: 32,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                              child: Text(
-                                type.name,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(
-                                      color: Colors.black45,
+              StreamBuilder(
+                  stream: providerBloc.providers,
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData) {
+                      return Wrap(
+                        alignment: WrapAlignment.start,
+                        runAlignment: WrapAlignment.start,
+                        textDirection: TextDirection.ltr,
+                        direction: Axis.horizontal,
+                        runSpacing: 8.0,
+                        spacing: 8.0,
+                        children: [
+                          ...snapshot.data!
+                              .map((type) => Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(
+                                          105, 128, 223, 255),
+                                      border: Border.all(
+                                        color: const Color.fromARGB(
+                                            105, 128, 223, 255),
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(32),
                                     ),
-                              ),
-                            ),
-                          ))
-                      .toList(),
-                  ...types
-                      .map((type) => Container(
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(105, 128, 223, 255),
-                              border: Border.all(
-                                color: const Color.fromARGB(105, 128, 223, 255),
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            height: 32,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                              child: Text(
-                                type.name,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(
-                                      color: Colors.black45,
+                                    height: 32,
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 5, 10, 5),
+                                      child: Text(
+                                        type.name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .copyWith(
+                                              color: Colors.black45,
+                                            ),
+                                      ),
                                     ),
-                              ),
-                            ),
-                          ))
-                      .toList()
-                ],
-              )
+                                  ))
+                              .toList(),
+                        ],
+                      );
+                    }
+                    return Container();
+                  })*/
             ],
           ),
         )

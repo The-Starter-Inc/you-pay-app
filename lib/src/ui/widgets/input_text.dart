@@ -1,20 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class InputText extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final TextEditingController? controller;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   final bool? isClearText;
   final bool? readOnly;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final Function()? onEditingComplete;
-  const InputText(
+  final Function()? onTap;
+  String? errorText;
+  InputText(
       {super.key,
       this.label,
       this.placeholder,
+      this.errorText,
+      this.keyboardType,
+      this.inputFormatters,
       this.controller,
       this.isClearText,
+      this.prefixIcon,
+      this.suffixIcon,
       this.readOnly,
-      this.onEditingComplete});
+      this.onEditingComplete,
+      this.onTap});
 
   @override
   State<InputText> createState() => _InputTextState();
@@ -28,15 +41,23 @@ class _InputTextState extends State<InputText> {
         children: [
           if (widget.label != null) ...[
             Container(
-              margin: const EdgeInsets.all(16),
-              child: Text(widget.label!,
-                  style: const TextStyle(color: Colors.black54)),
+              margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                children: [
+                  Text(widget.label!,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: Colors.black,
+                          ))
+                ],
+              ),
             )
           ],
           TextField(
               autocorrect: false,
               autofocus: true,
               controller: widget.controller,
+              keyboardType: widget.keyboardType,
+              inputFormatters: widget.inputFormatters,
               decoration: InputDecoration(
                 contentPadding:
                     const EdgeInsets.only(left: 16, top: 8, bottom: 8),
@@ -46,20 +67,27 @@ class _InputTextState extends State<InputText> {
                   ),
                 ),
                 labelText: widget.placeholder,
+                errorText: widget.errorText,
                 floatingLabelBehavior: FloatingLabelBehavior.never,
+                prefixIcon: widget.prefixIcon,
                 suffixIcon: widget.isClearText == true
                     ? IconButton(
                         icon: const Icon(Icons.cancel),
                         onPressed: () => widget.controller?.clear(),
                       )
-                    : null,
+                    : widget.suffixIcon,
               ),
-              keyboardType: TextInputType.emailAddress,
               onEditingComplete: widget.onEditingComplete ?? () {},
               readOnly: widget.readOnly == true ? true : false,
               textCapitalization: TextCapitalization.none,
               textInputAction: TextInputAction.next,
-              style: const TextStyle(color: Colors.black54)),
+              onTap: widget.onTap,
+              onChanged: (value) {
+                setState(() {
+                  widget.errorText = null;
+                });
+              },
+              style: const TextStyle(color: Colors.black)),
         ],
       ),
     );

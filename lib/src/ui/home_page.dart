@@ -2,7 +2,9 @@
 
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
@@ -17,6 +19,7 @@ import '../../src/constants/app_constant.dart';
 import '../../src/ui/entry/create_post_page.dart';
 import '../../firebase_options.dart';
 import '../theme/color_theme.dart';
+import 'notification_page.dart';
 import 'profile_page.dart';
 import 'dashboard_page.dart';
 
@@ -30,6 +33,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentTab = 0;
+  String? initialMessage;
+  bool _resolved = false;
+
   final List<Widget> screens = [const DashboardPage(), const ProfilePage()];
   final AuthBloc authBloc = AuthBloc();
 
@@ -37,12 +43,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+    analytics
+        .setCurrentScreen(screenName: "Home Page")
+        .whenComplete(() => print("Google Analytic Success"))
+        .onError((error, stackTrace) => print(error));
     authBloc.fetchToken({
       "grant_type": "client_credentials",
       "client_id": AppConstant.clientId,
       "client_secret": AppConstant.clientSecret
     });
     initializeFlutterFire();
+    initializeFirebaseFCM();
     super.initState();
     subscription = Connectivity()
         .onConnectivityChanged
@@ -51,6 +63,31 @@ class _HomePageState extends State<HomePage> {
         showErrorAlert(AppLocalizations.of(context)!.no_network);
         return;
       }
+    });
+  }
+
+  Future<void> initializeFirebaseFCM() async {
+    FirebaseMessaging.instance.getInitialMessage().then(
+          (value) => setState(
+            () {
+              _resolved = true;
+              initialMessage = value?.data.toString();
+            },
+          ),
+        );
+
+    await FirebaseMessaging.instance.subscribeToTopic('general');
+    await FirebaseMessaging.instance
+        .subscribeToTopic(AppConstant.firebaseUser!.uid);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      setState(() {
+        AppConstant.hasNotification = true;
+      });
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const NotificationPage()));
     });
   }
 
@@ -165,7 +202,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CreatePostPage()),
+                MaterialPageRoute(builder: (context) => const CreatePostPage()),
               );
             },
             backgroundColor: AppColor.primaryColor,

@@ -43,6 +43,7 @@ class _ChatPageState extends State<ChatPage> {
               widget.room.name ?? "",
               style: const TextStyle(color: Colors.white),
             ),
+            backgroundColor: AppColor.primaryColor,
             actions: [
               IconButton(
                 padding: const EdgeInsets.only(right: 16),
@@ -65,7 +66,7 @@ class _ChatPageState extends State<ChatPage> {
             stream: FirebaseChatCore.instance.messages(snapshot.data!),
             builder: (context, snapshot) => Chat(
               theme: const DefaultChatTheme(
-                inputBackgroundColor: AppColor.primaryColor,
+                inputBackgroundColor: AppColor.primaryLight,
                 primaryColor: AppColor.primaryColor,
               ),
               l10n: ChatL10nEn(
