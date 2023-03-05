@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -12,9 +13,12 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../utils/firebase_util.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({
@@ -33,7 +37,17 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
+    FirebaseAnalytics.instance.setCurrentScreen(screenName: "Chat Page");
+    FirebaseUtil.updateUserOnline(
+        widget.room.id, AppConstant.firebaseUser!.uid, true);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    FirebaseUtil.updateUserOnline(
+        widget.room.id, AppConstant.firebaseUser!.uid, false);
+    super.dispose();
   }
 
   @override
@@ -110,7 +124,7 @@ class _ChatPageState extends State<ChatPage> {
                 },
                 title: Text(AppLocalizations.of(context)!.choose_photo,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black54,
+                          color: Colors.black,
                         )),
               ),
               ListTile(
@@ -120,7 +134,7 @@ class _ChatPageState extends State<ChatPage> {
                 },
                 title: Text(AppLocalizations.of(context)!.choose_file,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black54,
+                          color: Colors.black,
                         )),
               ),
               ListTile(

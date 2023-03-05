@@ -50,7 +50,7 @@ class _AppSplashState extends State<AppSplash> {
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall!
-                              .copyWith(color: Colors.white)),
+                              .copyWith(color: Colors.white54)),
                     ],
                   ),
                 ),

@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously, avoid_print
 
 import 'dart:async';
 
@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../main.dart';
 import './../blocs/auth_bloc.dart';
 import './../models/token.dart';
 import '../../src/constants/app_constant.dart';
@@ -76,14 +77,12 @@ class _HomePageState extends State<HomePage> {
           ),
         );
 
+    FirebaseMessaging.onMessage.listen(showFlutterNotification);
+
     await FirebaseMessaging.instance.subscribeToTopic('general');
     await FirebaseMessaging.instance
         .subscribeToTopic(AppConstant.firebaseUser!.uid);
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      setState(() {
-        AppConstant.hasNotification = true;
-      });
-    });
+
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
       Navigator.push(context,

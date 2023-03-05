@@ -17,4 +17,12 @@ class FirebaseUtil {
           )
         : FirebaseFirestore.instance;
   }
+
+  static Future<void> updateUserOnline(
+      String roomId, String userId, bool isOnline) {
+    return getFirebaseFirestore()
+        .collection(config.usersCollectionName)
+        .doc(userId)
+        .update({'isOnline': isOnline, 'lastSeenRoom': roomId});
+  }
 }

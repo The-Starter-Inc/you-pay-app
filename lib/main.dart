@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
@@ -73,8 +74,8 @@ void showFlutterNotification(RemoteMessage message) {
           channel.name,
           channelDescription: channel.description,
           // TODO add a proper drawable resource to android, for now using
-          // one that already exists in example app.
-          // icon: 'launch_background',
+          //      one that already exists in example app.
+          icon: 'launch_background',
         ),
       ),
     );
@@ -86,6 +87,7 @@ late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Set the background messaging handler early on, as a named top-level function
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -93,6 +95,19 @@ void main() async {
   if (!kIsWeb) {
     await setupFlutterNotifications();
   }
+
+  await Permission.notification.isDenied.then((value) {
+    if (value) {
+      Permission.notification.request();
+    }
+  });
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    showFlutterNotification(message);
+    // setState(() {
+    //   AppConstant.hasNotification = true;
+    // });
+  });
 
   final GoogleMapsFlutterPlatform mapsImplementation =
       GoogleMapsFlutterPlatform.instance;

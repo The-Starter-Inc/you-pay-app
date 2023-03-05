@@ -27,7 +27,11 @@ class _NotificationPagetate extends State<NotificationPage> {
         .setCurrentScreen(screenName: "Notification Page");
     exchangeBloc.fetchExchages(AppConstant.firebaseUser!.uid);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      exchangeBloc.fetchExchages(AppConstant.firebaseUser!.uid);
+      if (message.data['type'] == 'contact') {
+        exchangeBloc.fetchExchages(AppConstant.firebaseUser!.uid);
+      } else {
+        print("roomId " + message.data['roomId']);
+      }
     });
   }
 

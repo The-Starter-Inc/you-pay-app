@@ -51,6 +51,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   void initState() {
     super.initState();
+    FirebaseAnalytics.instance.setCurrentScreen(screenName: "Post Create Page");
     _getCurrentPosition();
     typeBloc.fetchPosts();
     providerBloc.fetchProviders();
