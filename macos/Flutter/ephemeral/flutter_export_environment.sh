@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\flutter"
-export "FLUTTER_APPLICATION_PATH=D:\Projects\Flutter\p2p_pay"
+export "FLUTTER_ROOT=/Users/akp/Desktop/flutter_source/flutter"
+export "FLUTTER_APPLICATION_PATH=/Users/akp/Desktop/YouPay/you-pay-app"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
