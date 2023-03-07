@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -40,8 +41,11 @@ class _MyPostItemState extends State<MyPostItem> {
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
                             color: Colors.black45,
                           )),
-              leading: Image.network(widget.post.providers[0].image.url,
-                  width: 50, height: 50)),
+              leading: Image(
+                  image: CachedNetworkImageProvider(
+                      widget.post.providers[0].image.url),
+                  width: 50,
+                  height: 50)),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,

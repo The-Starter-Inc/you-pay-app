@@ -16,7 +16,7 @@ class PostApiProvider {
     if (keywords != null && search != null) {
       final response = await client.get(
           Uri.parse(
-              "${AppConstant.host}/api/adspost?keyword=$keywords&search=$search&sort=id&order=desc&rows=9999"),
+              "${AppConstant.host}/api/adspost?keyword=$keywords&search=$search&sort=percentage&order=asc&rows=9999"),
           headers: headers);
       if (response.statusCode == 200) {
         return Post.fromJson(json.decode(response.body));
@@ -29,10 +29,9 @@ class PostApiProvider {
     if (keywords != null || search != null) {
       // If keywords filter with
       if (keywords != null) {
-        print("/api/adspost?keyword=$keywords&rows=9999");
         final response = await client.get(
             Uri.parse(
-                "${AppConstant.host}/api/adspost?keyword=\"$keywords\"&sort=id&order=desc&rows=9999"),
+                "${AppConstant.host}/api/adspost?keyword=\"$keywords\"&sort=percentage&order=asc&rows=9999"),
             headers: headers);
         if (response.statusCode == 200) {
           return Post.fromJson(json.decode(response.body));
@@ -43,7 +42,7 @@ class PostApiProvider {
         // If search filter with
         final response = await client.get(
             Uri.parse(
-                "${AppConstant.host}/api/adspost?search=$search&sort=id&order=desc&rows=9999"),
+                "${AppConstant.host}/api/adspost?search=$search&sort=percentage&order=asc&rows=9999"),
             headers: headers);
 
         if (response.statusCode == 200) {
@@ -56,7 +55,7 @@ class PostApiProvider {
       // No Filter
       final response = await client.get(
           Uri.parse(
-              "${AppConstant.host}/api/adspost?sort=id&order=desc&rows=9999"),
+              "${AppConstant.host}/api/adspost?sort=percentage&order=asc&rows=9999"),
           headers: headers);
       if (response.statusCode == 200) {
         return Post.fromJson(json.decode(response.body));
@@ -74,7 +73,6 @@ class PostApiProvider {
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
-      print(response.body);
       return Post.fromJsonObj(json.decode(response.body));
     } else {
       // If that call was not successful, throw an error.

@@ -12,6 +12,7 @@ class Post {
   double distance;
   double? percentage;
   double? fees;
+  int? priority;
   String adsUserId;
   String adsDeviceId;
   String createdAt;
@@ -28,6 +29,7 @@ class Post {
       required this.adsDeviceId,
       this.percentage,
       this.fees,
+      this.priority,
       required this.createdAt});
 
   static fromJsonProviders(parsedJson) {
@@ -60,6 +62,8 @@ class Post {
           percentage:
               double.parse((parsedJson[i]['percentage'] ?? 0).toString())
                   .toDouble(),
+          priority:
+              double.parse((parsedJson[i]['priority'] ?? 0).toString()).toInt(),
           fees:
               double.parse((parsedJson[i]['fees'] ?? 0).toString()).toDouble(),
           adsUserId: parsedJson[i]['ads_user_id'],

@@ -93,6 +93,14 @@ class _DashboardPageState extends State<DashboardPage> {
           position: posts[i].latLng,
           consumeTapEvents: true,
           onTap: () {
+            mapController.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(
+                  zoom: 20,
+                  target: posts[i].latLng,
+                ),
+              ),
+            );
             _customInfoWindowController.addInfoWindow!(
               MarkerWindow(
                 post: posts[i],
@@ -214,19 +222,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }).catchError((e) {});
   }
 
-  Future<void> _getAddressFromLatLng(Position position) async {
-    await placemarkFromCoordinates(position.latitude, position.longitude)
-        .then((List<Placemark> placemarks) {
-      Placemark place = placemarks[0];
-      setState(() {
-        //  _currentAddress =
-        //      '${place.street}, ${place.subLocality}, ${place.subAdministrativeArea}, ${place.postalCode}';
-      });
-    }).catchError((e) {
-      debugPrint(e);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -318,7 +313,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     const SearchPage()));
-                                    print(keywords);
                                     if (keywords.isNotEmpty) {
                                       if (keywords[2].length > 0) {
                                         if (keywords[2].length == 2) {
@@ -463,6 +457,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       onCameraMove: (position) {
                         _customInfoWindowController.onCameraMove!();
                       },
+                      myLocationButtonEnabled: false,
                       zoomControlsEnabled: false,
                       onMapCreated: (GoogleMapController controller) async {
                         mapController = controller;
@@ -482,7 +477,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 margin: const EdgeInsets.only(top: 172),
                 clipBehavior: Clip.none,
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   // clipBehavior: Clip.none,
                   children: [
                     ...posts.map((post) => PostItem(

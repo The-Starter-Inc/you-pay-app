@@ -28,7 +28,8 @@ class _FloatButtonState extends State<FloatButton> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(32),
       ),
-      child: GestureDetector(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(32),
         onTap: () {
           setState(() {
             widget.selected = widget.selected == true ? false : true;

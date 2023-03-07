@@ -1,4 +1,5 @@
 // ignore_for_file: depend_on_referenced_packages
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -69,8 +70,9 @@ class _NotificationItemState extends State<NotificationItem> {
                                 ))
                       ],
                     ),
-                    leading: Image.network(
-                        widget.exchange.post!.providers[0].image.url,
+                    leading: Image(
+                        image: CachedNetworkImageProvider(
+                            widget.exchange.post!.providers[0].image.url),
                         width: 50,
                         height: 50)),
                 Row(

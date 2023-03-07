@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clippy_flutter/triangle.dart';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -68,8 +69,11 @@ class _MarkerWindowState extends State<MarkerWindow> {
                       ),
                     ),
                     Center(
-                      child: Image.network(widget.post.providers[0].image.url,
-                          width: 50, height: 50),
+                      child: Image(
+                          image: CachedNetworkImageProvider(
+                              widget.post.providers[0].image.url),
+                          width: 50,
+                          height: 50),
                     ),
                     const SizedBox(height: 10),
                     Center(
