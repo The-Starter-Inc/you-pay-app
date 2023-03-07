@@ -1,4 +1,4 @@
-package com.example.p2p_pay
+package com.thestarter.youpay
 
 import io.flutter.embedding.android.FlutterActivity
 

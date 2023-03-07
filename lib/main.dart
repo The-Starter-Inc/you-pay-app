@@ -73,8 +73,6 @@ void showFlutterNotification(RemoteMessage message) {
           channel.id,
           channel.name,
           channelDescription: channel.description,
-          // TODO add a proper drawable resource to android, for now using
-          //      one that already exists in example app.
           icon: 'launch_background',
         ),
       ),
@@ -104,9 +102,6 @@ void main() async {
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     showFlutterNotification(message);
-    // setState(() {
-    //   AppConstant.hasNotification = true;
-    // });
   });
 
   final GoogleMapsFlutterPlatform mapsImplementation =

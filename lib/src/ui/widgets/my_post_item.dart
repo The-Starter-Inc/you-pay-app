@@ -27,7 +27,7 @@ class _MyPostItemState extends State<MyPostItem> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 0),
       child: Column(
         children: [
           ListTile(
@@ -82,13 +82,15 @@ class _MyPostItemState extends State<MyPostItem> {
                               color: Colors.black45,
                             ),
                       ),
-                      Text(
-                        widget.post.amount.toString(),
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  color: Colors.black,
-                                ),
-                      )
+                      Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(widget.post.amount.toString(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                    color: Colors.black,
+                                  )))
                     ],
                   )),
               Padding(
@@ -102,12 +104,15 @@ class _MyPostItemState extends State<MyPostItem> {
                             color: Colors.black45,
                           ),
                     ),
-                    Text(
-                      "${widget.post.percentage}%",
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: Colors.black,
-                          ),
-                    )
+                    Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text("${widget.post.percentage}%",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  color: Colors.black,
+                                )))
                   ],
                 ),
               )
@@ -164,7 +169,7 @@ class _MyPostItemState extends State<MyPostItem> {
           //   ],
           // ),
           Container(
-            margin: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

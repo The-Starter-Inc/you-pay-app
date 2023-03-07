@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../theme/color_theme.dart';
 
@@ -44,7 +45,8 @@ class _FloatButtonState extends State<FloatButton> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               if (widget.icon != null) ...[
-                CircleAvatar(backgroundImage: NetworkImage(widget.icon!)),
+                CircleAvatar(
+                    backgroundImage: CachedNetworkImageProvider(widget.icon!)),
                 const SizedBox(width: 5),
               ],
               Text(

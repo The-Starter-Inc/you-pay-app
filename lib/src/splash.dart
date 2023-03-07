@@ -45,12 +45,12 @@ class _AppSplashState extends State<AppSplash> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Image.asset('assets/images/sponsor.png', width: 120),
                       Text("The Community Exchange Supported by",
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall!
                               .copyWith(color: Colors.white54)),
+                      Image.asset('assets/images/sponsor.png', width: 120),
                     ],
                   ),
                 ),

@@ -483,7 +483,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 clipBehavior: Clip.none,
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                  clipBehavior: Clip.none,
+                  // clipBehavior: Clip.none,
                   children: [
                     ...posts.map((post) => PostItem(
                           post: post,
