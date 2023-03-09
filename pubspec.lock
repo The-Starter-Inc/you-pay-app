@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.16"
+  add_comma:
+    dependency: "direct main"
+    description:
+      name: add_comma
+      sha256: "720b9055795eed03032bc16af092b5c9883fcc27308d5aa844e8835290d0824a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   analyzer:
     dependency: transitive
     description:

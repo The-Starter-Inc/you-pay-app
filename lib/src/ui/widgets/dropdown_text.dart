@@ -59,6 +59,8 @@ class _DropDownTextState extends State<DropDownText> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: DropdownButton(
                     hint: Text(widget.placeholder!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                         style: const TextStyle(
                             color: Colors.black54, fontSize: 16)),
                     value: widget.controller!.text.isNotEmpty

@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:p2p_pay/src/blocs/post_bloc.dart';
 import 'package:p2p_pay/src/models/notification_event.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
@@ -89,7 +88,12 @@ class _DashboardPageState extends State<DashboardPage> {
       markers.add(Marker(
           markerId: MarkerId(posts[i].id.toString()),
           icon: BitmapDescriptor.fromBytes(await getBestterImage(
-              posts[i].providers[0].name, posts[i].providers[0].marker.url)),
+              posts[i].adsUserId != AppConstant.firebaseUser!.uid
+                  ? posts[i].providers[1].name
+                  : posts[i].providers[0].name,
+              posts[i].adsUserId != AppConstant.firebaseUser!.uid
+                  ? posts[i].providers[1].marker.url
+                  : posts[i].providers[0].marker.url)),
           position: posts[i].latLng,
           consumeTapEvents: true,
           onTap: () {
@@ -280,7 +284,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 }),
             CustomInfoWindow(
               controller: _customInfoWindowController,
-              height: 370,
+              height: 386,
               width: 250,
               offset: 50,
             ),

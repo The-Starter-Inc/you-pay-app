@@ -1,4 +1,4 @@
-import 'package:intl/intl.dart';
+import 'package:add_comma/add_comma.dart';
 
 class MyanNunber {
   static String convertNumber(String number) {
@@ -16,10 +16,12 @@ class MyanNunber {
     return num;
   }
 
-  static String convertMoneyNumber(dynamic number) {
-    var f = NumberFormat("###.0#", "en_US");
-    String num = f.format(number);
-    num = num.replaceAll("1", "၁");
+  static dynamic convertMoneyNumber(dynamic number) {
+    var putComma = addCommas(
+      separator: ',',
+    );
+    String? num = putComma(number.round());
+    num = num!.replaceAll("1", "၁");
     num = num.replaceAll("2", "၂");
     num = num.replaceAll("3", "၃");
     num = num.replaceAll("4", "၄");

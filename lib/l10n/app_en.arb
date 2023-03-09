@@ -7,8 +7,10 @@
     "exchange_money": "Exchange Money",
     "cash_out": "Cash Out",
     "service": "Service",
-    "charge": "Charge",
+    "charge": "Charge Type",
+    "choose_charge": "Choose Charge Type",
     "fixed_amount": "Fixed Amount",
+    "enter_fixed_amount": "Enter Fixed Amount",
     "percentage": "Percentage",
     "enter_percentage": "Enter Percentage",
     "pls_enter_percentage": "Please Enter Percentage",
@@ -51,5 +53,12 @@
     "not_found_location": "Could not determine your location.",
     "save": "Save",
     "add_new_post": "Add New Post",
-    "edit_post": "Edit Post"
+    "edit_post": "Edit Post",
+    "you": "You",
+    "pay": "Pay",
+    "choose_you": "Choose You",
+    "choose_pay": "Choose Pay",
+    "pls_choose_you": "Please Choose You",
+    "pls_choose_pay": "Please Choose Pay",
+    "pls_choose_charge": "Please Choose Charge Type"
 }

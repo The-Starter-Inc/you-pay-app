@@ -72,6 +72,7 @@ dependencies:
   firebase_analytics: ^10.1.4
   permission_handler: ^10.2.0
   cached_network_image: ^3.2.3
+  add_comma: ^0.2.0
 
 dev_dependencies:
   flutter_test:

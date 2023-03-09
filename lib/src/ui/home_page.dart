@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously, avoid_print
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:connectivity/connectivity.dart';
@@ -20,6 +21,7 @@ import '../../src/constants/app_constant.dart';
 import '../../src/ui/entry/create_post_page.dart';
 import '../../firebase_options.dart';
 import '../theme/color_theme.dart';
+import 'chat_page.dart';
 import 'notification_page.dart';
 import 'profile_page.dart';
 import 'dashboard_page.dart';
@@ -83,10 +85,30 @@ class _HomePageState extends State<HomePage> {
     await FirebaseMessaging.instance
         .subscribeToTopic(AppConstant.firebaseUser!.uid);
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       print('A new onMessageOpenedApp event was published!');
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const NotificationPage()));
+      print(message.toString());
+      if (message.data['type'] == 'message') {
+        print(message.data['metadata']);
+        final userIds = jsonDecode(message.data['userIds']);
+        final metadata = jsonDecode(message.data['metadata']);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChatPage(
+                      room: types.Room(
+                          id: message.data['roomId'],
+                          name: metadata['phone'],
+                          users: [
+                            types.User(id: userIds[0]),
+                            types.User(id: userIds[1])
+                          ],
+                          type: types.RoomType.direct),
+                    )));
+      } else {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const NotificationPage()));
+      }
     });
   }
 

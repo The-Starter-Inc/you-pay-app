@@ -10,6 +10,7 @@ class Post {
   String phone;
   LatLng latLng;
   double distance;
+  String chargesType;
   double? percentage;
   double? fees;
   int? priority;
@@ -27,6 +28,7 @@ class Post {
       required this.distance,
       required this.adsUserId,
       required this.adsDeviceId,
+      required this.chargesType,
       this.percentage,
       this.fees,
       this.priority,
@@ -59,6 +61,7 @@ class Post {
           latLng: LatLng(parsedJson[i]['lat'], parsedJson[i]['lng']),
           distance:
               double.parse(parsedJson[i]['distance'].toString()).toDouble(),
+          chargesType: parsedJson[i]['charges_type'] ?? "percentage",
           percentage:
               double.parse((parsedJson[i]['percentage'] ?? 0).toString())
                   .toDouble(),
@@ -85,6 +88,7 @@ class Post {
         phone: parsedJson['phone'],
         latLng: LatLng(parsedJson['lat'], parsedJson['lng']),
         distance: double.parse(parsedJson['distance'].toString()).toDouble(),
+        chargesType: parsedJson['charges_type'] ?? 'percentage',
         percentage:
             double.parse((parsedJson['percentage'] ?? 0).toString()).toDouble(),
         fees: double.parse((parsedJson['fees'] ?? 0).toString()).toDouble(),

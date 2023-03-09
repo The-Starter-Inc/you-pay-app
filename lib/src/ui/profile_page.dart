@@ -22,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     FirebaseAnalytics.instance.setCurrentScreen(screenName: "Profile Page");
+    AppConstant.postCreated.subscribe((data) => getMyPosts());
     getMyPosts();
   }
 

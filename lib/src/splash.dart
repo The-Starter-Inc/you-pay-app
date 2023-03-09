@@ -50,7 +50,7 @@ class _AppSplashState extends State<AppSplash> {
                               .textTheme
                               .bodySmall!
                               .copyWith(color: Colors.white54)),
-                      Image.asset('assets/images/sponsor.png', width: 120),
+                      Image.asset('assets/images/sponsor.png', width: 100),
                     ],
                   ),
                 ),

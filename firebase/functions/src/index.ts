@@ -67,12 +67,14 @@ exports.changeMessageStatus = functions.firestore
                 const payload = {
                     topic : "/topics/"+user.id,
                     notification: {
-                        title: 'New Message',
+                        title: 'New Message from You Pay',
                         body: message.text
                     },
                     data: {
                         type: 'message',
-                        roomId: context.params.roomId
+                        roomId: context.params.roomId,
+                        userIds: JSON.stringify(room.get('userIds')),
+                        metadata: JSON.stringify(room.get('metadata')),
                     }
                 };
                 
@@ -83,11 +85,12 @@ exports.changeMessageStatus = functions.firestore
                 }).catch((error) => {
                     return {error: error.code};
                 });
-            } else {
-                return change.after.ref.update({
-                    status: 'seen',
-                });
-            }
+            } 
+            // else {
+            //     return change.after.ref.update({
+            //         status: 'seen',
+            //     });
+            // }
         }
         return null;
       }

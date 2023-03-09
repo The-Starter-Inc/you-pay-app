@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:p2p_pay/src/blocs/post_bloc.dart';
+import 'package:p2p_pay/src/utils/myan_number.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import '../../models/post.dart';
@@ -32,51 +33,40 @@ class _MyPostItemState extends State<MyPostItem> {
       child: Column(
         children: [
           ListTile(
-              title: Text(widget.post.providers[0].name,
+            title: Row(children: [
+              Text("ယူ ${widget.post.providers[0].name}",
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         color: Colors.black,
                       )),
-              subtitle:
-                  Text(timeago.format(DateTime.parse(widget.post.createdAt)),
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: Colors.black45,
-                          )),
-              leading: Image(
-                  image: CachedNetworkImageProvider(
-                      widget.post.providers[0].image.url),
-                  width: 50,
-                  height: 50)),
+              if (widget.post.providers.length > 1)
+                const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child:
+                        Icon(Icons.swap_horiz, color: Colors.black, size: 24)),
+              if (widget.post.providers.length > 1)
+                Text("ပေး ${widget.post.providers[1].name}",
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          color: Colors.black,
+                        ))
+            ]),
+            // subtitle:
+            //     Text(timeago.format(DateTime.parse(widget.post.createdAt)),
+            //         style: Theme.of(context).textTheme.titleMedium!.copyWith(
+            //               color: Colors.black45,
+            //             )),
+            // leading: Image(
+            //     image: CachedNetworkImageProvider(
+            //         widget.post.providers[0].image.url),
+            //     width: 50,
+            //     height: 50)
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0),
-                child: SizedBox(
-                    width: 100,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.type,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    color: Colors.black45,
-                                  ),
-                        ),
-                        Text(
-                          widget.post.type!.name,
-                          style:
-                              Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    color: Colors.black,
-                                  ),
-                        )
-                      ],
-                    )),
-              ),
-              Padding(
-                  padding:
-                      const EdgeInsets.only(left: 16, right: 16, bottom: 0),
+              Container(
+                  width: 130,
+                  margin: const EdgeInsets.only(left: 16, right: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -87,8 +77,9 @@ class _MyPostItemState extends State<MyPostItem> {
                             ),
                       ),
                       Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(widget.post.amount.toString(),
+                          padding: const EdgeInsets.only(top: 0),
+                          child: Text(
+                              MyanNunber.convertMoneyNumber(widget.post.amount),
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
@@ -97,29 +88,33 @@ class _MyPostItemState extends State<MyPostItem> {
                                   )))
                     ],
                   )),
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.percentage,
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Colors.black45,
-                          ),
-                    ),
-                    Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text("${widget.post.percentage}%",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  color: Colors.black,
-                                )))
-                  ],
-                ),
-              )
+              Container(
+                  margin: const EdgeInsets.only(right: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.post.chargesType == 'percentage'
+                            ? AppLocalizations.of(context)!.percentage
+                            : AppLocalizations.of(context)!.fixed_amount,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Colors.black45,
+                            ),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.only(top: 0),
+                          child: Text(
+                              widget.post.chargesType == 'percentage'
+                                  ? "${MyanNunber.convertNumber(widget.post.percentage.toString())}%"
+                                  : "${MyanNunber.convertMoneyNumber(widget.post.fees)}",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                    color: Colors.black,
+                                  )))
+                    ],
+                  )),
             ],
           ),
           // Row(

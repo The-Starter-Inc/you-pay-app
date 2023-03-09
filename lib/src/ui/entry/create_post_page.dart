@@ -10,8 +10,10 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:multi_stream_builder/multi_stream_builder.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:p2p_pay/src/models/post_event.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 
+import '../../models/dropdown.dart';
 import './../../blocs/post_bloc.dart';
 import './../../blocs/provider_bloc.dart';
 import './../../blocs/type_bloc.dart';
@@ -34,14 +36,18 @@ class _CreatePostPageState extends State<CreatePostPage> {
   LatLng? _currentPosition;
   late List<Provider> providers;
 
-  TextEditingController typeController = TextEditingController();
+  TextEditingController typeController = TextEditingController(text: "");
+  TextEditingController providerYouController = TextEditingController(text: "");
+  TextEditingController providerPayController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  TextEditingController providerController = TextEditingController();
+  TextEditingController chargesTypeController =
+      TextEditingController(text: "percentage");
   TextEditingController percentageController = TextEditingController();
+  TextEditingController fixAmountController = TextEditingController();
   TextEditingController latLngController = TextEditingController();
 
-  Error frmError = Error(null, null, null, null, null);
+  Error frmError = Error(null, null, null, null, null, null);
 
   bool isLoading = false;
   TypeBloc typeBloc = TypeBloc();
@@ -55,6 +61,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
     _getCurrentPosition();
     typeBloc.fetchPosts();
     providerBloc.fetchProviders();
+    providerYouController.addListener(() {
+      setState(() {
+        providerPayController.text = "";
+      });
+    });
+    chargesTypeController.addListener(() {
+      setState(() {});
+    });
     if (widget.post != null) {
       initData();
     }
@@ -62,18 +76,32 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   void initData() {
     typeController.text = "${widget.post!.type!.id}";
-    providerController.text = "${widget.post!.providers[0].id}";
+    providerYouController.text = "${widget.post!.providers[0].id}";
+    providerPayController.text =
+        "${widget.post!.providers.length > 1 ? widget.post!.providers[1].id : ''}";
     amountController.text = "${widget.post!.amount}";
+    chargesTypeController.text = widget.post!.chargesType;
     percentageController.text = "${widget.post!.percentage}";
+    fixAmountController.text = "${widget.post!.fees}";
     phoneController.text = widget.post!.phone;
     _currentPosition = widget.post!.latLng;
     _getAddressFromLatLng(_currentPosition!);
   }
 
-  List<Provider> getSelectedProvider() {
-    providers.retainWhere(
-        (provider) => provider.id.toString() == providerController.text);
-    return providers;
+  List<Provider> getSelectedProviderYouPay() {
+    var originProvidersYou = providers
+        .where(
+            (provider) => provider.id.toString() == providerYouController.text)
+        .toList();
+    print(originProvidersYou);
+    var originProvidersPay = providers
+        .where(
+            (provider) => provider.id.toString() == providerPayController.text)
+        .toList();
+    print(originProvidersPay);
+    List<Provider> selectedProviders = originProvidersYou + originProvidersPay;
+    print(selectedProviders);
+    return selectedProviders;
   }
 
   @override
@@ -92,22 +120,38 @@ class _CreatePostPageState extends State<CreatePostPage> {
               builder: (context, dataList) {
                 if (dataList[0] != null && dataList[1] != null) {
                   providers = dataList[1];
-                  return ListView(
+                  return SingleChildScrollView(
+                      child: Column(
                     children: <Widget>[
-                      DropDownText(
-                        label: AppLocalizations.of(context)!.type,
-                        placeholder: AppLocalizations.of(context)!.choose_type,
-                        controller: typeController,
-                        errorText: frmError.type,
-                        items: dataList[0],
-                      ),
-                      DropDownText(
-                        label: AppLocalizations.of(context)!.provider,
-                        placeholder:
-                            AppLocalizations.of(context)!.choose_provider,
-                        controller: providerController,
-                        errorText: frmError.provider,
-                        items: dataList[1],
+                      // DropDownText(
+                      //   label: AppLocalizations.of(context)!.type,
+                      //   placeholder: AppLocalizations.of(context)!.choose_type,
+                      //   controller: typeController,
+                      //   errorText: frmError.type,
+                      //   items: dataList[0],
+                      // ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Flexible(
+                              child: DropDownText(
+                            label: AppLocalizations.of(context)!.you,
+                            placeholder:
+                                AppLocalizations.of(context)!.choose_you,
+                            controller: providerYouController,
+                            errorText: frmError.you,
+                            items: dataList[1],
+                          )),
+                          const SizedBox(width: 16),
+                          Flexible(
+                              child: DropDownText(
+                                  label: AppLocalizations.of(context)!.pay,
+                                  placeholder:
+                                      AppLocalizations.of(context)!.choose_pay,
+                                  controller: providerPayController,
+                                  errorText: frmError.pay,
+                                  items: dataList[1]))
+                        ],
                       ),
                       InputText(
                           label: AppLocalizations.of(context)!.amount,
@@ -116,17 +160,54 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           errorText: frmError.amount,
                           controller: amountController,
                           keyboardType: TextInputType.number),
-                      InputText(
-                          label: AppLocalizations.of(context)!.percentage,
+                      Row(children: [
+                        Flexible(
+                            child: DropDownText(
+                          label: AppLocalizations.of(context)!.charge,
                           placeholder:
-                              AppLocalizations.of(context)!.enter_percentage,
-                          controller: percentageController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'^\d+\.?\d{0,2}')),
-                          ]),
+                              AppLocalizations.of(context)!.choose_charge,
+                          controller: chargesTypeController,
+                          errorText: frmError.chargesType,
+                          items: [
+                            DropDown("percentage",
+                                AppLocalizations.of(context)!.percentage),
+                            DropDown("fix_amount",
+                                AppLocalizations.of(context)!.fixed_amount),
+                          ],
+                        )),
+                        const SizedBox(width: 16),
+                        if (chargesTypeController.text == 'percentage')
+                          Flexible(
+                              child: InputText(
+                                  label:
+                                      AppLocalizations.of(context)!.percentage,
+                                  placeholder: AppLocalizations.of(context)!
+                                      .enter_percentage,
+                                  controller: percentageController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                  inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ]))
+                        else
+                          Flexible(
+                              child: InputText(
+                                  label: AppLocalizations.of(context)!
+                                      .fixed_amount,
+                                  placeholder: AppLocalizations.of(context)!
+                                      .enter_fixed_amount,
+                                  controller: fixAmountController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                  inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ]))
+                      ]),
+
                       InputText(
                           label: AppLocalizations.of(context)!.phone,
                           placeholder:
@@ -146,6 +227,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         onTap: () {
                           if (_currentPosition != null) {
                             setState(() {
+                              clear();
                               frmError.latlng = null;
                             });
                             _getAddressFromLatLng(_currentPosition!);
@@ -194,10 +276,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               onPressed: () async {
                                 clear();
                                 bool hasError = false;
-                                if (typeController.text.isEmpty) {
+                                if (providerYouController.text.isEmpty) {
                                   hasError = true;
-                                  frmError.type = AppLocalizations.of(context)!
-                                      .pls_enter_type;
+                                  frmError.you = AppLocalizations.of(context)!
+                                      .pls_choose_you;
+                                }
+
+                                if (providerPayController.text.isEmpty) {
+                                  hasError = true;
+                                  frmError.pay = AppLocalizations.of(context)!
+                                      .pls_choose_pay;
                                 }
 
                                 if (amountController.text.isEmpty) {
@@ -207,17 +295,17 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                           .pls_enter_amount;
                                 }
 
+                                if (chargesTypeController.text.isEmpty) {
+                                  hasError = true;
+                                  frmError.chargesType =
+                                      AppLocalizations.of(context)!
+                                          .pls_choose_charge;
+                                }
+
                                 if (phoneController.text.isEmpty) {
                                   hasError = true;
                                   frmError.phone = AppLocalizations.of(context)!
                                       .pls_enter_phone;
-                                }
-
-                                if (providerController.text.isEmpty) {
-                                  hasError = true;
-                                  frmError.provider =
-                                      AppLocalizations.of(context)!
-                                          .pls_choose_provider;
                                 }
 
                                 if (latLngController.text.isEmpty) {
@@ -230,55 +318,76 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
                                 if (!hasError) {
                                   try {
-                                    await postBloc.createAdsPost(widget.post !=
-                                            null
-                                        ? {
-                                            //Edit Record
-                                            "id": widget.post!.id.toString(),
-                                            "type_id": typeController.text,
-                                            "amount": amountController.text,
-                                            "percentage": percentageController
-                                                    .text.isEmpty
-                                                ? "0"
-                                                : percentageController.text,
-                                            "phone": phoneController.text,
-                                            "providers": jsonEncode(
-                                                Provider.toJsonArray(
-                                                    getSelectedProvider())),
-                                            "lat": _currentPosition!.latitude
-                                                .toString(),
-                                            "lng": _currentPosition!.longitude
-                                                .toString(),
-                                            "distance": "0",
-                                            "ads_user_id":
-                                                AppConstant.firebaseUser!.uid,
-                                            "ads_device_id":
-                                                await PlatformDeviceId
-                                                    .getDeviceId,
-                                          }
-                                        : {
-                                            //New Record
-                                            "type_id": typeController.text,
-                                            "amount": amountController.text,
-                                            "percentage": percentageController
-                                                    .text.isEmpty
-                                                ? "0"
-                                                : percentageController.text,
-                                            "phone": phoneController.text,
-                                            "providers": jsonEncode(
-                                                Provider.toJsonArray(
-                                                    getSelectedProvider())),
-                                            "lat": _currentPosition!.latitude
-                                                .toString(),
-                                            "lng": _currentPosition!.longitude
-                                                .toString(),
-                                            "distance": "0",
-                                            "ads_user_id":
-                                                AppConstant.firebaseUser!.uid,
-                                            "ads_device_id":
-                                                await PlatformDeviceId
-                                                    .getDeviceId,
-                                          });
+                                    Post post = await postBloc
+                                        .createAdsPost(widget.post != null
+                                            ? {
+                                                //Edit Record
+                                                "id":
+                                                    widget.post!.id.toString(),
+                                                "type_id": "2",
+                                                "amount": amountController.text,
+                                                "charges_type":
+                                                    chargesTypeController.text,
+                                                "percentage":
+                                                    percentageController
+                                                            .text.isEmpty
+                                                        ? "0"
+                                                        : percentageController
+                                                            .text,
+                                                "fees": fixAmountController
+                                                        .text.isEmpty
+                                                    ? "0"
+                                                    : fixAmountController.text,
+                                                "phone": phoneController.text,
+                                                "providers": jsonEncode(
+                                                    Provider.toJsonArray(
+                                                        getSelectedProviderYouPay())),
+                                                "lat": _currentPosition!
+                                                    .latitude
+                                                    .toString(),
+                                                "lng": _currentPosition!
+                                                    .longitude
+                                                    .toString(),
+                                                "distance": "0",
+                                                "ads_user_id": AppConstant
+                                                    .firebaseUser!.uid,
+                                                "ads_device_id":
+                                                    await PlatformDeviceId
+                                                        .getDeviceId,
+                                              }
+                                            : {
+                                                //New Record
+                                                "type_id": "2",
+                                                "amount": amountController.text,
+                                                "charges_type":
+                                                    chargesTypeController.text,
+                                                "percentage":
+                                                    percentageController
+                                                            .text.isEmpty
+                                                        ? "0"
+                                                        : percentageController
+                                                            .text,
+                                                "fees": fixAmountController
+                                                        .text.isEmpty
+                                                    ? "0"
+                                                    : fixAmountController.text,
+                                                "phone": phoneController.text,
+                                                "providers": jsonEncode(
+                                                    Provider.toJsonArray(
+                                                        getSelectedProviderYouPay())),
+                                                "lat": _currentPosition!
+                                                    .latitude
+                                                    .toString(),
+                                                "lng": _currentPosition!
+                                                    .longitude
+                                                    .toString(),
+                                                "distance": "0",
+                                                "ads_user_id": AppConstant
+                                                    .firebaseUser!.uid,
+                                                "ads_device_id":
+                                                    await PlatformDeviceId
+                                                        .getDeviceId,
+                                              });
 
                                     await FirebaseAnalytics.instance.logEvent(
                                       name: widget.post != null
@@ -286,6 +395,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                           : "create_post",
                                       parameters: {},
                                     );
+                                    AppConstant.postCreated
+                                        .broadcast(PostEvent(post));
                                     // ignore: use_build_context_synchronously
                                     Navigator.pop(context, "_createdPost");
                                   } catch (e) {
@@ -315,8 +426,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           )),
                         ],
                       ),
+                      const SizedBox(height: 24),
                     ],
-                  );
+                  ));
                 }
                 return const Center(child: CircularProgressIndicator());
               })),
@@ -325,10 +437,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   void clear() {
     setState(() {
-      frmError.type = null;
+      frmError.you = null;
+      frmError.pay = null;
       frmError.amount = null;
       frmError.phone = null;
-      frmError.provider = null;
       frmError.latlng = null;
     });
   }
@@ -413,11 +525,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
 }
 
 class Error {
-  late String? type;
+  late String? you;
+  late String? pay;
   late String? amount;
   late String? phone;
-  late String? provider;
   late String? latlng;
+  late String? chargesType;
 
-  Error(this.type, this.amount, this.phone, this.provider, this.latlng);
+  Error(this.you, this.pay, this.amount, this.phone, this.latlng,
+      this.chargesType);
 }

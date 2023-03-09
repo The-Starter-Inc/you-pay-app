@@ -8,9 +8,11 @@
     "cash_out": "ငွေထုတ်",
     "service": "ဝန်ဆောင်မှု",
     "charge": "ဝန်ဆောင်ခ",
+    "choose_charge": "ဝန်ဆောင်ခ ရွေးပါ",
     "fixed_amount": "ပုံသေပမာဏ",
+    "enter_fixed_amount": "ကျပ်ငွေ ထည့်ပါ",
     "percentage": "ရာခိုင်နှုန်း",
-    "enter_percentage": "ရာခိုင်နှုန်းကို ထည့်ပါ",
+    "enter_percentage": "ရာခိုင်နှုန်း ထည့်ပါ",
     "pls_enter_percentage": "ကျေးဇူးပြု၍ ရာခိုင်နှုန်းကို ရိုက်ထည့်ပါ",
     "search_here": "ရှာဖွေရန်",
     "recent_search": "လတ်တလော ရှာဖွေမှု",
@@ -51,6 +53,13 @@
     "not_found_location": "သင့်တည်နေရာကို မဆုံးဖြတ်နိုင်ပါ",
     "save": "သိမ်းဆည်းမည်",
     "add_new_post": "ပို့စ်အသစ်ထည့်ပါ",
-    "edit_post": "ပို့စ်ကို ပြင်ရန်"
+    "edit_post": "ပို့စ်ကို ပြင်ရန်",
+    "you": "ယူ",
+    "pay": "ပေး",
+    "choose_you": "ရွေးပါ",
+    "choose_pay": "ရွေးပါ",
+    "pls_choose_you": "ယူမည် ရွေးပါ",
+    "pls_choose_pay": "ပေးမည် ရွေးပါ",
+    "pls_choose_charge": "ဝန်ဆောင်ခ ရွေးပါ"
 
 }

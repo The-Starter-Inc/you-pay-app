@@ -71,14 +71,19 @@ class _MarkerWindowState extends State<MarkerWindow> {
                     Center(
                       child: Image(
                           image: CachedNetworkImageProvider(
-                              widget.post.providers[0].image.url),
+                              widget.post.adsUserId !=
+                                      AppConstant.firebaseUser!.uid
+                                  ? widget.post.providers[1].image.url
+                                  : widget.post.providers[0].image.url),
                           width: 50,
                           height: 50),
                     ),
                     const SizedBox(height: 10),
                     Center(
                       child: Text(
-                        widget.post.providers[0].name,
+                        widget.post.adsUserId != AppConstant.firebaseUser!.uid
+                            ? "${widget.post.providers[1].name} ယူ"
+                            : "${widget.post.providers[0].name} ယူ",
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium!
@@ -92,7 +97,7 @@ class _MarkerWindowState extends State<MarkerWindow> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.type,
+                          AppLocalizations.of(context)!.pay,
                           style:
                               Theme.of(context).textTheme.labelMedium!.copyWith(
                                     color: Colors.black,
@@ -102,7 +107,9 @@ class _MarkerWindowState extends State<MarkerWindow> {
                           width: 8.0,
                         ),
                         Text(
-                          widget.post.type!.name,
+                          widget.post.adsUserId != AppConstant.firebaseUser!.uid
+                              ? widget.post.providers[0].name
+                              : widget.post.providers[1].name,
                           textAlign: TextAlign.right,
                           style:
                               Theme.of(context).textTheme.labelMedium!.copyWith(
@@ -139,7 +146,9 @@ class _MarkerWindowState extends State<MarkerWindow> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.percentage,
+                          widget.post.chargesType == 'percentage'
+                              ? AppLocalizations.of(context)!.percentage
+                              : AppLocalizations.of(context)!.fixed_amount,
                           style:
                               Theme.of(context).textTheme.labelMedium!.copyWith(
                                     color: Colors.black,
@@ -149,7 +158,9 @@ class _MarkerWindowState extends State<MarkerWindow> {
                           width: 8.0,
                         ),
                         Text(
-                          "${widget.post.percentage}%",
+                          widget.post.chargesType == 'percentage'
+                              ? "${widget.post.percentage}%"
+                              : "${widget.post.fees}",
                           style:
                               Theme.of(context).textTheme.labelMedium!.copyWith(
                                     color: Colors.black45,
@@ -313,9 +324,14 @@ class _MarkerWindowState extends State<MarkerWindow> {
                                         widget.post.id.toString(),
                                         AppConstant.firebaseUser!.uid);
                                 if (existExchange.isEmpty) {
+                                  var meta = <String, dynamic>{};
+                                  meta["post_id"] = widget.post.id;
+                                  meta["phone"] = widget.post.phone;
+                                  meta["amount"] = widget.post.amount;
                                   final room = await FirebaseChatCore.instance
-                                      .createRoom(types.User(
-                                          id: widget.post.adsUserId));
+                                      .createRoom(
+                                          types.User(id: widget.post.adsUserId),
+                                          metadata: meta);
 
                                   await exchangeBloc.createExchange({
                                     "ads_post_id": widget.post.id.toString(),
