@@ -33,22 +33,58 @@ class _MyPostItemState extends State<MyPostItem> {
       child: Column(
         children: [
           ListTile(
-            title: Row(children: [
-              Text("ယူ ${widget.post.providers[0].name}",
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Colors.black,
-                      )),
-              if (widget.post.providers.length > 1)
-                const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child:
-                        Icon(Icons.swap_horiz, color: Colors.black, size: 24)),
-              if (widget.post.providers.length > 1)
-                Text("ပေး ${widget.post.providers[1].name}",
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: Colors.black,
-                        ))
-            ]),
+            title: Row(
+              children: [
+                Row(children: [
+                  Container(
+                    margin: const EdgeInsets.only(right: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.black45,
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    height: 32,
+                    width: 32,
+                    child: const Center(
+                        child: Text("ယူ",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 12))),
+                  ),
+                  Text(widget.post.providers[0].name,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge!
+                          .copyWith(color: Colors.black, fontSize: 16)),
+                ]),
+                if (widget.post.providers.length > 1)
+                  const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      child: Icon(Icons.swap_horiz,
+                          color: Colors.black, size: 22)),
+                if (widget.post.providers.length > 1)
+                  Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(right: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black45,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        height: 32,
+                        width: 32,
+                        child: const Center(
+                            child: Text("ပေး",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12))),
+                      ),
+                      Text(widget.post.providers[1].name,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge!
+                              .copyWith(color: Colors.black, fontSize: 16))
+                    ],
+                  )
+              ],
+            ),
             // subtitle:
             //     Text(timeago.format(DateTime.parse(widget.post.createdAt)),
             //         style: Theme.of(context).textTheme.titleMedium!.copyWith(

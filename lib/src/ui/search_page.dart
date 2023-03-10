@@ -122,36 +122,36 @@ class _SearchPageState extends State<SearchPage> {
                     }),
               ),
               const SizedBox(height: 8),
-              SizedBox(
-                height: 55,
-                child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    clipBehavior: Clip.none,
-                    children: [
-                      FloatButton(
-                        title: AppLocalizations.of(context)!.cash_out,
-                        selected: true,
-                        onSelected: (selected, value) {
-                          if (selected) {
-                            filterTypes.add("1");
-                          } else {
-                            filterTypes.remove("1");
-                          }
-                        },
-                      ),
-                      FloatButton(
-                        title: AppLocalizations.of(context)!.exchange_money,
-                        selected: true,
-                        onSelected: (selected, value) {
-                          if (selected) {
-                            filterTypes.add("2");
-                          } else {
-                            filterTypes.remove("2");
-                          }
-                        },
-                      )
-                    ]),
-              ),
+              // SizedBox(
+              //   height: 55,
+              //   child: ListView(
+              //       scrollDirection: Axis.horizontal,
+              //       clipBehavior: Clip.none,
+              //       children: [
+              //         FloatButton(
+              //           title: AppLocalizations.of(context)!.cash_out,
+              //           selected: true,
+              //           onSelected: (selected, value) {
+              //             if (selected) {
+              //               filterTypes.add("1");
+              //             } else {
+              //               filterTypes.remove("1");
+              //             }
+              //           },
+              //         ),
+              //         FloatButton(
+              //           title: AppLocalizations.of(context)!.exchange_money,
+              //           selected: true,
+              //           onSelected: (selected, value) {
+              //             if (selected) {
+              //               filterTypes.add("2");
+              //             } else {
+              //               filterTypes.remove("2");
+              //             }
+              //           },
+              //         )
+              //       ]),
+              // ),
               /*Container(
                 margin: const EdgeInsets.fromLTRB(6, 16, 6, 8),
                 child: Row(

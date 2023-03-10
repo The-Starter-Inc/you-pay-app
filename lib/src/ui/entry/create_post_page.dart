@@ -47,6 +47,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   TextEditingController fixAmountController = TextEditingController();
   TextEditingController latLngController = TextEditingController();
 
+  late bool checkFormError = false;
   Error frmError = Error(null, null, null, null, null, null);
 
   bool isLoading = false;
@@ -62,12 +63,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
     typeBloc.fetchPosts();
     providerBloc.fetchProviders();
     providerYouController.addListener(() {
-      setState(() {
-        providerPayController.text = "";
-      });
+      validationError();
+      providerPayController.text = "";
     });
     chargesTypeController.addListener(() {
-      setState(() {});
+      validationError();
     });
     if (widget.post != null) {
       initData();
@@ -102,6 +102,44 @@ class _CreatePostPageState extends State<CreatePostPage> {
     List<Provider> selectedProviders = originProvidersYou + originProvidersPay;
     print(selectedProviders);
     return selectedProviders;
+  }
+
+  bool validationError() {
+    bool hasError = false;
+    if (checkFormError) {
+      clear();
+      if (providerYouController.text.isEmpty) {
+        hasError = true;
+        frmError.you = AppLocalizations.of(context)!.pls_choose_you;
+      }
+
+      if (providerPayController.text.isEmpty) {
+        hasError = true;
+        frmError.pay = AppLocalizations.of(context)!.pls_choose_pay;
+      }
+
+      if (amountController.text.isEmpty) {
+        hasError = true;
+        frmError.amount = AppLocalizations.of(context)!.pls_enter_amount;
+      }
+
+      if (chargesTypeController.text.isEmpty) {
+        hasError = true;
+        frmError.chargesType = AppLocalizations.of(context)!.pls_choose_charge;
+      }
+
+      if (phoneController.text.isEmpty) {
+        hasError = true;
+        frmError.phone = AppLocalizations.of(context)!.pls_enter_phone;
+      }
+
+      if (latLngController.text.isEmpty) {
+        hasError = true;
+        frmError.latlng = AppLocalizations.of(context)!.pls_enter_location;
+      }
+      setState(() {});
+    }
+    return hasError;
   }
 
   @override
@@ -227,7 +265,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         onTap: () {
                           if (_currentPosition != null) {
                             setState(() {
-                              clear();
+                              validationError();
                               frmError.latlng = null;
                             });
                             _getAddressFromLatLng(_currentPosition!);
@@ -274,49 +312,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             height: 50,
                             child: OutlinedButton(
                               onPressed: () async {
-                                clear();
-                                bool hasError = false;
-                                if (providerYouController.text.isEmpty) {
-                                  hasError = true;
-                                  frmError.you = AppLocalizations.of(context)!
-                                      .pls_choose_you;
-                                }
-
-                                if (providerPayController.text.isEmpty) {
-                                  hasError = true;
-                                  frmError.pay = AppLocalizations.of(context)!
-                                      .pls_choose_pay;
-                                }
-
-                                if (amountController.text.isEmpty) {
-                                  hasError = true;
-                                  frmError.amount =
-                                      AppLocalizations.of(context)!
-                                          .pls_enter_amount;
-                                }
-
-                                if (chargesTypeController.text.isEmpty) {
-                                  hasError = true;
-                                  frmError.chargesType =
-                                      AppLocalizations.of(context)!
-                                          .pls_choose_charge;
-                                }
-
-                                if (phoneController.text.isEmpty) {
-                                  hasError = true;
-                                  frmError.phone = AppLocalizations.of(context)!
-                                      .pls_enter_phone;
-                                }
-
-                                if (latLngController.text.isEmpty) {
-                                  hasError = true;
-                                  frmError.latlng =
-                                      AppLocalizations.of(context)!
-                                          .pls_enter_location;
-                                }
-                                setState(() {});
-
-                                if (!hasError) {
+                                checkFormError = true;
+                                if (!validationError()) {
                                   try {
                                     Post post = await postBloc
                                         .createAdsPost(widget.post != null
