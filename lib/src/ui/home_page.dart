@@ -96,6 +96,7 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
                 builder: (context) => ChatPage(
+                      postId: metadata['post_id'],
                       room: types.Room(
                           id: message.data['roomId'],
                           name: metadata['phone'],

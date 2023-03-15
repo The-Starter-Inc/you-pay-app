@@ -9,6 +9,7 @@ class PostRepository {
   Future<List<Post>> fetchPosts(String? keywords, String? search) =>
       postApiProvider.fetchPosts(keywords, search);
 
+  Future<Post> getAdsPost(id) => postApiProvider.getAdsPost(id);
   Future<Post> createAdsPost(payload) => postApiProvider.createAdsPost(payload);
   Future<dynamic> deleteAdsPost(id) => postApiProvider.deleteAdsPost(id);
 }

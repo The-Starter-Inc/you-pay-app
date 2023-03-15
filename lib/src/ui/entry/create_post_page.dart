@@ -65,9 +65,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
     providerYouController.addListener(() {
       validationError();
       providerPayController.text = "";
+      setState(() {});
     });
     chargesTypeController.addListener(() {
       validationError();
+      setState(() {});
     });
     if (widget.post != null) {
       initData();

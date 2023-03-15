@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:localstore/localstore.dart';
 import 'package:p2p_pay/src/blocs/post_bloc.dart';
 import 'package:p2p_pay/src/models/notification_event.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
@@ -27,6 +28,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  final db = Localstore.instance;
   late List<String> filterProviders = [];
   late LatLng _center = const LatLng(16.79729673247046, 96.13215959983089);
   final Event notiEvent = Event<NotificationEvent>();
@@ -43,6 +45,7 @@ class _DashboardPageState extends State<DashboardPage> {
   bool mapsType = true;
   bool switching = false;
   bool hasNotification = false;
+  int notificationCounts = 0;
 
   @override
   void initState() {
@@ -55,14 +58,27 @@ class _DashboardPageState extends State<DashboardPage> {
     providerBloc.fetchProviders();
     postBloc.fetchPosts(null, null);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      Localstore.instance
+          .collection('notifications')
+          .doc(message.messageId)
+          .set(message.toMap());
       setState(() {
         AppConstant.hasNotification = true;
         hasNotification = true;
+        notificationCounts += 1;
       });
     });
     setState(() {
       hasNotification = AppConstant.hasNotification;
     });
+    final notifications = await db.collection('notifications').get();
+    if (notifications!.isNotEmpty) {
+      setState(() {
+        AppConstant.hasNotification = true;
+        hasNotification = AppConstant.hasNotification;
+        notificationCounts = notifications.length;
+      });
+    }
   }
 
   @override
@@ -284,7 +300,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 }),
             CustomInfoWindow(
               controller: _customInfoWindowController,
-              height: 386,
+              height: 366,
               width: 250,
               offset: 50,
             ),
@@ -374,6 +390,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                       child: InkWell(
                                         onTap: () {
                                           setState(() {
+                                            notificationCounts = 0;
                                             hasNotification = false;
                                           });
                                           Navigator.push(
@@ -386,16 +403,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                             size: 24, color: Colors.black),
                                       ),
                                     ),
-                                    if (hasNotification)
-                                      const Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Padding(
-                                          padding:
-                                              EdgeInsets.fromLTRB(16, 5, 0, 0),
-                                          child: Icon(Icons.brightness_1_sharp,
-                                              size: 10, color: Colors.red),
-                                        ),
-                                      )
                                   ],
                                 )
                               ],
@@ -442,6 +449,32 @@ class _DashboardPageState extends State<DashboardPage> {
                     )
                   ],
                 )),
+            if (hasNotification && notificationCounts > 0)
+              Positioned(
+                  top: 50,
+                  right: 24,
+                  width: 24,
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        hasNotification = false;
+                      });
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const NotificationPage()));
+                    },
+                    child: Container(
+                        alignment: Alignment.center,
+                        padding:
+                            const EdgeInsets.only(left: 2, right: 2, bottom: 1),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                        ),
+                        child: Text("$notificationCounts",
+                            style: const TextStyle(color: Colors.white))),
+                  ))
           ],
         ));
   }

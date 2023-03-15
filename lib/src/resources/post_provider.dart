@@ -65,6 +65,20 @@ class PostApiProvider {
     }
   }
 
+  Future<Post> getAdsPost(id) async {
+    final response = await client.get(
+        Uri.parse("${AppConstant.host}/api/adspost/$id"),
+        headers: headers);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      return Post.fromJsonObj(json.decode(response.body));
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception(response.body);
+    }
+  }
+
   Future<Post> createAdsPost(payload) async {
     final response = await client.post(
         Uri.parse("${AppConstant.host}/api/adspost"),

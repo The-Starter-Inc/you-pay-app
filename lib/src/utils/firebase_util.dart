@@ -25,4 +25,11 @@ class FirebaseUtil {
         .doc(userId)
         .update({'isOnline': isOnline, 'lastSeenRoom': roomId});
   }
+
+  static Future<void> updatePostId(String roomId, String postId) {
+    return getFirebaseFirestore()
+        .collection(config.roomsCollectionName)
+        .doc(roomId)
+        .update({'metadata.post_id': postId});
+  }
 }

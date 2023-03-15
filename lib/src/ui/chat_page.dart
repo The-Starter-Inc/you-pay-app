@@ -13,33 +13,36 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:p2p_pay/src/blocs/post_bloc.dart';
 import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
+import 'package:p2p_pay/src/ui/widgets/chat_post_item.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/firebase_util.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({
-    super.key,
-    required this.room,
-  });
+  const ChatPage({super.key, required this.room, required this.postId});
 
   final types.Room room;
+  final int postId;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   bool _isAttachmentUploading = false;
+  final PostBloc postBloc = PostBloc();
 
   @override
   void initState() {
     FirebaseAnalytics.instance.setCurrentScreen(screenName: "Chat Page");
     FirebaseUtil.updateUserOnline(
         widget.room.id, AppConstant.firebaseUser!.uid, true);
+    FirebaseUtil.updatePostId(widget.room.id, "${widget.postId}");
+    postBloc.fetchPostById(widget.postId);
     super.initState();
   }
 
@@ -51,28 +54,43 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      FirebaseUtil.updateUserOnline(
+          widget.room.id, AppConstant.firebaseUser!.uid, true);
+    } else if (state == AppLifecycleState.inactive) {
+      FirebaseUtil.updateUserOnline(
+          widget.room.id, AppConstant.firebaseUser!.uid, false);
+    } else if (state == AppLifecycleState.paused) {
+      FirebaseUtil.updateUserOnline(
+          widget.room.id, AppConstant.firebaseUser!.uid, false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-            title: Text(
-              widget.room.name ?? "",
-              style: const TextStyle(color: Colors.white),
+      appBar: AppBar(
+          title: Text(
+            widget.room.name ?? "",
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: AppColor.primaryColor,
+          actions: [
+            IconButton(
+              padding: const EdgeInsets.only(right: 16),
+              icon: const Icon(Icons.phone, size: 24, color: Colors.white),
+              onPressed: () async {
+                if (await canLaunchUrl(
+                    Uri.parse("tel://${widget.room.name}"))) {
+                  await launchUrl(Uri.parse("tel://${widget.room.name}"));
+                } else {
+                  throw 'Could not call phone intent.';
+                }
+              },
             ),
-            backgroundColor: AppColor.primaryColor,
-            actions: [
-              IconButton(
-                padding: const EdgeInsets.only(right: 16),
-                icon: const Icon(Icons.phone, size: 24, color: Colors.white),
-                onPressed: () async {
-                  if (await canLaunchUrl(
-                      Uri.parse("tel://${widget.room.name}"))) {
-                    await launchUrl(Uri.parse("tel://${widget.room.name}"));
-                  } else {
-                    throw 'Could not call phone intent.';
-                  }
-                },
-              ),
-            ]),
-        body: StreamBuilder<types.Room>(
+          ]),
+      body: Stack(children: [
+        StreamBuilder<types.Room>(
           initialData: widget.room,
           stream: FirebaseChatCore.instance.room(widget.room.id),
           builder: (context, snapshot) => StreamBuilder<List<types.Message>>(
@@ -100,7 +118,20 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
         ),
-      );
+        StreamBuilder(
+            stream: postBloc.getPostById,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Positioned(
+                    height: 96,
+                    top: 16,
+                    left: 16,
+                    right: 16,
+                    child: ChatPostItem(post: snapshot.data!));
+              }
+              return Container();
+            })
+      ]));
 
   void _handleAtachmentPressed() {
     showModalBottomSheet<void>(

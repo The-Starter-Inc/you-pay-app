@@ -66,6 +66,7 @@ class _PostItemState extends State<PostItem> {
         await navigator.push(
           MaterialPageRoute(
             builder: (context) => ChatPage(
+                postId: widget.post.id,
                 room: types.Room(
                     id: room.id,
                     name: widget.post.phone,
@@ -80,6 +81,7 @@ class _PostItemState extends State<PostItem> {
         await navigator.push(
           MaterialPageRoute(
             builder: (context) => ChatPage(
+              postId: widget.post.id,
               room: types.Room(
                   id: existExchange[0].roomId,
                   name: existExchange[0].post!.phone,
@@ -284,10 +286,14 @@ class _PostItemState extends State<PostItem> {
                 subtitle: Text(
                     widget.post.chargesType == 'percentage'
                         ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
-                        : "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.fixed_amount}",
+                        : "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}",
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Colors.black87,
                         )),
+                trailing:
+                    widget.post.priority != null && widget.post.priority! > 0
+                        ? Image.asset("assets/images/trusted.png", width: 50)
+                        : null,
                 // leading: Image(
                 //     image: CachedNetworkImageProvider(
                 //         widget.post.providers[0].image.url),

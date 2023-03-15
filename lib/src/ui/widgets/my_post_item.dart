@@ -115,7 +115,7 @@ class _MyPostItemState extends State<MyPostItem> {
                       Padding(
                           padding: const EdgeInsets.only(top: 0),
                           child: Text(
-                              MyanNunber.convertMoneyNumber(widget.post.amount),
+                              "${MyanNunber.convertMoneyNumber(widget.post.amount)}",
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
@@ -142,7 +142,7 @@ class _MyPostItemState extends State<MyPostItem> {
                           child: Text(
                               widget.post.chargesType == 'percentage'
                                   ? "${MyanNunber.convertNumber(widget.post.percentage.toString())}%"
-                                  : "${MyanNunber.convertMoneyNumber(widget.post.fees)}",
+                                  : "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk}",
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!

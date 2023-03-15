@@ -160,7 +160,7 @@ class _MarkerWindowState extends State<MarkerWindow> {
                         Text(
                           widget.post.chargesType == 'percentage'
                               ? "${widget.post.percentage}%"
-                              : "${widget.post.fees}",
+                              : "${widget.post.fees} ${AppLocalizations.of(context)!.mmk}",
                           style:
                               Theme.of(context).textTheme.labelMedium!.copyWith(
                                     color: Colors.black45,
@@ -191,29 +191,30 @@ class _MarkerWindowState extends State<MarkerWindow> {
                         )
                       ],
                     ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.distance,
-                          style:
-                              Theme.of(context).textTheme.labelMedium!.copyWith(
-                                    color: Colors.black,
-                                  ),
-                        ),
-                        const SizedBox(
-                          width: 8.0,
-                        ),
-                        Text(
-                          "${widget.post.distance}km",
-                          style:
-                              Theme.of(context).textTheme.labelMedium!.copyWith(
-                                    color: Colors.black45,
-                                  ),
-                        )
-                      ],
-                    ),
+                    // const SizedBox(height: 5),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Text(
+                    //       AppLocalizations.of(context)!.distance,
+                    //       style:
+                    //           Theme.of(context).textTheme.labelMedium!.copyWith(
+                    //                 color: Colors.black,
+                    //               ),
+                    //     ),
+                    //     const SizedBox(
+                    //       width: 8.0,
+                    //     ),
+                    //     Text(
+                    //       "${widget.post.distance}km",
+                    //       style:
+                    //           Theme.of(context).textTheme.labelMedium!.copyWith(
+                    //                 color: Colors.black45,
+                    //               ),
+                    //     )
+                    //   ],
+                    // ),
+                    //
                     const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -347,6 +348,7 @@ class _MarkerWindowState extends State<MarkerWindow> {
                                   await navigator.push(
                                     MaterialPageRoute(
                                       builder: (context) => ChatPage(
+                                          postId: widget.post.id,
                                           room: types.Room(
                                               id: room.id,
                                               name: widget.post.phone,
@@ -364,6 +366,7 @@ class _MarkerWindowState extends State<MarkerWindow> {
                                   await navigator.push(
                                     MaterialPageRoute(
                                       builder: (context) => ChatPage(
+                                        postId: existExchange[0].post!.id,
                                         room: types.Room(
                                             id: existExchange[0].roomId,
                                             name: existExchange[0].post!.phone,
