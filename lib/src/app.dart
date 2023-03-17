@@ -22,6 +22,7 @@ class P2PApp extends StatelessWidget {
       ],
       child: Consumer<AppLocale>(builder: (context, locale, child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
