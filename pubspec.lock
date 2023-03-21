@@ -1346,6 +1346,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  widget_marquee:
+    dependency: "direct main"
+    description:
+      name: widget_marquee
+      sha256: "4d5648b9fabca1a20e523353fa0f34ffc3c1d3c5cd19b2db4760e576959852dc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.5"
   win32:
     dependency: transitive
     description:

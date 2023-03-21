@@ -32,4 +32,20 @@ class FirebaseUtil {
         .doc(roomId)
         .update({'metadata.post_id': postId});
   }
+
+  static Future<void> createUserInFirestore(dynamic user) async {
+    await getFirebaseFirestore()
+        .collection(config.usersCollectionName)
+        .doc(user.id)
+        .set({
+      'createdAt': FieldValue.serverTimestamp(),
+      'name': user.name,
+      'phone': user.phone,
+      'imageUrl': user.imageUrl,
+      'lastSeen': FieldValue.serverTimestamp(),
+      'metadata': user.metadata,
+      'role': user.role?.toShortString(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

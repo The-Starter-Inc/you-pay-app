@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:multi_stream_builder/multi_stream_builder.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:p2p_pay/src/models/post_event.dart';
+import 'package:p2p_pay/src/ui/success_page.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 
 import '../../models/dropdown.dart';
@@ -40,7 +41,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   TextEditingController providerYouController = TextEditingController(text: "");
   TextEditingController providerPayController = TextEditingController();
   TextEditingController amountController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
+  TextEditingController phoneController =
+      TextEditingController(text: AppConstant.currentUser!.phone);
   TextEditingController chargesTypeController =
       TextEditingController(text: "percentage");
   TextEditingController percentageController = TextEditingController();
@@ -95,14 +97,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
         .where(
             (provider) => provider.id.toString() == providerYouController.text)
         .toList();
-    print(originProvidersYou);
     var originProvidersPay = providers
         .where(
             (provider) => provider.id.toString() == providerPayController.text)
         .toList();
-    print(originProvidersPay);
     List<Provider> selectedProviders = originProvidersYou + originProvidersPay;
-    print(selectedProviders);
     return selectedProviders;
   }
 
@@ -132,7 +131,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
       if (phoneController.text.isEmpty) {
         hasError = true;
-        frmError.phone = AppLocalizations.of(context)!.pls_enter_phone;
+        frmError.phone = AppLocalizations.of(context)!.pls_enter_contact_phone;
       }
 
       if (latLngController.text.isEmpty) {
@@ -249,9 +248,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       ]),
 
                       InputText(
-                          label: AppLocalizations.of(context)!.phone,
+                          label: AppLocalizations.of(context)!.contact_phone,
                           placeholder:
-                              AppLocalizations.of(context)!.enter_phone,
+                              AppLocalizations.of(context)!.enter_contact_phone,
                           errorText: frmError.phone,
                           controller: phoneController,
                           keyboardType: TextInputType.phone),
@@ -353,6 +352,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                 "ads_device_id":
                                                     await PlatformDeviceId
                                                         .getDeviceId,
+                                                "ads_user": jsonEncode(
+                                                    AppConstant.currentUser!
+                                                        .toJson())
                                               }
                                             : {
                                                 //New Record
@@ -386,6 +388,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                 "ads_device_id":
                                                     await PlatformDeviceId
                                                         .getDeviceId,
+                                                "ads_user": jsonEncode(
+                                                    AppConstant.currentUser!
+                                                        .toJson())
                                               });
 
                                     await FirebaseAnalytics.instance.logEvent(
@@ -397,7 +402,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                     AppConstant.postCreated
                                         .broadcast(PostEvent(post));
                                     // ignore: use_build_context_synchronously
-                                    Navigator.pop(context, "_createdPost");
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SuccessPage()));
                                   } catch (e) {
                                     print(e);
                                   }

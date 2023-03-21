@@ -1,8 +1,24 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
+import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:localstore/localstore.dart';
+import 'package:p2p_pay/src/ui/login_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:p2p_pay/src/ui/search_page.dart';
+import 'package:platform_device_id/platform_device_id.dart';
+import 'package:p2p_pay/src/models/user.dart' as types;
+import '../firebase_options.dart';
+import 'blocs/auth_bloc.dart';
+import 'constants/app_constant.dart';
+import 'models/token.dart';
 import 'theme/color_theme.dart';
 import 'ui/home_page.dart';
+import 'utils/alert_util.dart';
 
 class AppSplash extends StatefulWidget {
   const AppSplash({Key? key}) : super(key: key);
@@ -13,14 +29,67 @@ class AppSplash extends StatefulWidget {
 
 class _AppSplashState extends State<AppSplash> {
   var _appLocale;
+  final AuthBloc authBloc = AuthBloc();
 
   @override
   void initState() {
     super.initState();
-    Timer(
-        const Duration(seconds: 3),
-        () => Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const HomePage())));
+    initializeFlutterFire();
+    authBloc.fetchToken({
+      "grant_type": "client_credentials",
+      "client_id": AppConstant.clientId,
+      "client_secret": AppConstant.clientSecret
+    });
+    Timer(const Duration(seconds: 3), () async {
+      String? deviceId = await PlatformDeviceId.getDeviceId;
+      await firebaseUserLogin("$deviceId@fk.com");
+      var user = await Localstore.instance
+          .collection('users')
+          .doc(AppConstant.firebaseUser!.uid)
+          .get();
+      if (user != null) {
+        AppConstant.currentUser = types.User.fromMap(user);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const SearchPage()));
+      } else {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const LoginPage()));
+      }
+    });
+  }
+
+  void initializeFlutterFire() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      AlertUtil.showErrorAlert(
+          context, AppLocalizations.of(context)!.no_network);
+      return;
+    }
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+        setState(() {
+          AppConstant.firebaseUser = user;
+        });
+      });
+    } catch (e) {
+      AlertUtil.showErrorAlert(context, e);
+    }
+  }
+
+  Future<void> firebaseUserLogin(String email) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: "123!@#",
+      );
+      if (!mounted) return;
+    } catch (e) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const LoginPage()));
+    }
   }
 
   @override
@@ -55,6 +124,18 @@ class _AppSplashState extends State<AppSplash> {
                   ),
                 ),
               )),
+          StreamBuilder<Token>(
+              stream: authBloc.token,
+              builder: (context, AsyncSnapshot<Token> snapshot) {
+                if (snapshot.hasData) {
+                  AppConstant.accessToken = snapshot.data!.access_token;
+                  return Container();
+                } else {
+                  return Center(
+                    child: Image.asset("assets/images/loading.gif", width: 100),
+                  );
+                }
+              })
         ],
       ),
     );

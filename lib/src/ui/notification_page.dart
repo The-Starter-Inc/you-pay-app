@@ -99,7 +99,8 @@ class _NotificationPagetate extends State<NotificationPage> {
                       .titleMedium!
                       .copyWith(color: Colors.black45));
             }
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+                child: Image.asset("assets/images/loading.gif", width: 100));
           },
         ));
   }

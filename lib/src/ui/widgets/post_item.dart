@@ -13,6 +13,7 @@ import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/models/exchange.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import '../../blocs/post_bloc.dart';
+import '../../theme/color_theme.dart';
 import '../../utils/myan_number.dart';
 import '../chat_page.dart';
 import '../../models/post.dart';
@@ -35,6 +36,11 @@ class _PostItemState extends State<PostItem> {
   final ExchangeBloc exchangeBloc = ExchangeBloc();
 
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void onContact() async {
     try {
@@ -161,268 +167,341 @@ class _PostItemState extends State<PostItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      color: widget.post.priority! > 0 ? Colors.yellow.shade200 : Colors.white,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 0),
+      //color: widget.post.priority! > 0 ? Colors.yellow.shade200 : Colors.white,
+      decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.black12))),
       child: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Column(
+          padding: const EdgeInsets.only(bottom: 0),
+          child: Stack(
             children: [
-              ListTile(
-                title: widget.post.adsUserId != AppConstant.firebaseUser!.uid
-                    ? Row(
-                        children: [
-                          if (widget.post.providers.length > 1)
-                            Row(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black45,
-                                    borderRadius: BorderRadius.circular(32),
-                                  ),
-                                  height: 32,
-                                  width: 32,
-                                  child: const Center(
-                                      child: Text("ယူ",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12))),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.post.adsUser != null)
+                    Container(
+                        margin:
+                            const EdgeInsets.only(left: 16, right: 16, top: 10),
+                        child: Row(
+                          children: [
+                            Container(
+                                width: 40,
+                                height: 40,
+                                margin: const EdgeInsets.only(right: 16),
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow.shade200,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(46)),
                                 ),
-                                Text(widget.post.providers[1].name,
+                                child: Center(
+                                  child: Text(widget.post.adsUser!.name![0],
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge!
+                                          .copyWith(color: Colors.black)),
+                                )),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(widget.post.adsUser!.name!,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge!
                                         .copyWith(
-                                            color: Colors.black, fontSize: 16))
+                                            color: Colors.black, fontSize: 16)),
+                                Text(
+                                    widget.post.priority != null &&
+                                            widget.post.priority! > 0
+                                        ? "Verified"
+                                        : "Unverified",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                            color: AppColor.primaryColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12))
                               ],
-                            ),
-                          if (widget.post.providers.length > 1)
-                            const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4),
-                                child: Icon(Icons.swap_horiz,
-                                    color: Colors.black, size: 22)),
-                          Row(
+                            )
+                          ],
+                        ))
+                  else
+                    const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                          margin: const EdgeInsets.only(left: 16, right: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                margin: const EdgeInsets.only(right: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black45,
-                                  borderRadius: BorderRadius.circular(32),
-                                ),
-                                height: 32,
-                                width: 32,
-                                child: const Center(
-                                    child: Text("ပေး",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12))),
-                              ),
-                              Text(widget.post.providers[0].name,
+                              Text(
+                                  "${MyanNunber.convertMoneyNumber(widget.post.amount)} ${AppLocalizations.of(context)!.mmk}",
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleLarge!
                                       .copyWith(
-                                          color: Colors.black, fontSize: 16))
-                            ],
-                          )
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          Row(children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.black45,
-                                borderRadius: BorderRadius.circular(32),
-                              ),
-                              height: 32,
-                              width: 32,
-                              child: const Center(
-                                  child: Text("ယူ",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12))),
-                            ),
-                            Text(widget.post.providers[0].name,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .copyWith(
-                                        color: Colors.black, fontSize: 16)),
-                          ]),
-                          if (widget.post.providers.length > 1)
-                            const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4),
-                                child: Icon(Icons.swap_horiz,
-                                    color: Colors.black, size: 22)),
-                          if (widget.post.providers.length > 1)
-                            Row(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black45,
-                                    borderRadius: BorderRadius.circular(32),
-                                  ),
-                                  height: 32,
-                                  width: 32,
-                                  child: const Center(
-                                      child: Text("ပေး",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12))),
-                                ),
-                                Text(widget.post.providers[1].name,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge!
-                                        .copyWith(
-                                            color: Colors.black, fontSize: 16))
-                              ],
-                            )
-                        ],
-                      ),
-                subtitle: Text(
-                    widget.post.chargesType == 'percentage'
-                        ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
-                        : "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}",
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black87,
-                        )),
-                trailing:
-                    widget.post.priority != null && widget.post.priority! > 0
-                        ? Image.asset("assets/images/trusted.png", width: 50)
-                        : null,
-                // leading: Image(
-                //     image: CachedNetworkImageProvider(
-                //         widget.post.providers[0].image.url),
-                //     width: 50,
-                //     height: 50),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                      width: 130,
-                      margin: const EdgeInsets.only(left: 16, right: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.amount,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: Colors.black45,
-                                ),
-                          ),
-                          Padding(
-                              padding: const EdgeInsets.only(top: 0),
-                              child: Text(
-                                  MyanNunber.convertMoneyNumber(
-                                      widget.post.amount),
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16)),
+                              Text(
+                                  widget.post.chargesType == 'percentage'
+                                      ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
+                                      : "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}",
                                   style: Theme.of(context)
                                       .textTheme
-                                      .titleMedium!
+                                      .bodySmall!
                                       .copyWith(
-                                        color: Colors.black,
-                                      )))
-                        ],
-                      )),
+                                        color: Colors.black87,
+                                      ))
+                            ],
+                          )),
+                    ],
+                  ),
                   Container(
-                      margin: const EdgeInsets.only(left: 16, right: 16),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (widget.post.adsUserId !=
-                              AppConstant.firebaseUser!.uid)
-                            Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade500,
-                                borderRadius: BorderRadius.circular(36),
-                              ),
-                              height: 36,
-                              width: 36,
-                              child: InkWell(
-                                onTap: () {
-                                  MapUtils.openMap(widget.post.latLng.latitude,
-                                      widget.post.latLng.longitude);
-                                },
-                                borderRadius: BorderRadius.circular(36),
-                                child: const Icon(Icons.directions,
-                                    size: 24, color: Colors.white),
-                              ),
+                      margin: const EdgeInsets.only(
+                          left: 16, right: 16, bottom: 10),
+                      child: widget.post.adsUserId !=
+                              AppConstant.firebaseUser!.uid
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                if (widget.post.providers.length > 1)
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(AppLocalizations.of(context)!.you,
+                                          textAlign: TextAlign.start,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(
+                                                color: Colors.black87,
+                                              )),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 3,
+                                            height: 16,
+                                            margin: const EdgeInsets.only(
+                                                right: 10),
+                                            decoration: BoxDecoration(
+                                                color: Color(int.parse(widget
+                                                        .post
+                                                        .providers[1]
+                                                        .color ??
+                                                    "0xFFCCCCCC"))),
+                                          ),
+                                          Text(widget.post.providers[1].name,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .copyWith(
+                                                      color: Colors.black,
+                                                      fontSize: 16))
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                if (widget.post.providers.length > 1)
+                                  Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 4),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            AppLocalizations.of(context)!.you,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(
+                                                  color: Colors.white,
+                                                ),
+                                          ),
+                                          const Icon(Icons.swap_horiz,
+                                              color: Colors.black, size: 22)
+                                        ],
+                                      )),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(AppLocalizations.of(context)!.pay,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                              color: Colors.black87,
+                                            )),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 3,
+                                          height: 16,
+                                          margin:
+                                              const EdgeInsets.only(right: 10),
+                                          decoration: BoxDecoration(
+                                              color: Color(int.parse(widget.post
+                                                      .providers[0].color ??
+                                                  "0xFFCCCCCC"))),
+                                        ),
+                                        Text(widget.post.providers[0].name,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge!
+                                                .copyWith(
+                                                    color: Colors.black,
+                                                    fontSize: 16))
+                                      ],
+                                    )
+                                  ],
+                                )
+                              ],
                             )
-                          else
-                            Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade500,
-                                borderRadius: BorderRadius.circular(36),
-                              ),
-                              height: 36,
-                              width: 36,
-                              child: InkWell(
-                                onTap: () {
-                                  onDelete();
-                                },
-                                borderRadius: BorderRadius.circular(36),
-                                child: const Icon(Icons.delete,
-                                    size: 24, color: Colors.white),
-                              ),
-                            ),
-                          if (widget.post.adsUserId !=
-                              AppConstant.firebaseUser!.uid)
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade500,
-                                borderRadius: BorderRadius.circular(32),
-                              ),
-                              height: 36,
-                              width: 36,
-                              child: InkWell(
-                                onTap: () {
-                                  onContact();
-                                },
-                                borderRadius: BorderRadius.circular(36),
-                                child: const Icon(Icons.message,
-                                    size: 22, color: Colors.white),
-                              ),
-                            )
-                          else
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.orange.shade500,
-                                borderRadius: BorderRadius.circular(32),
-                              ),
-                              height: 36,
-                              width: 36,
-                              child: InkWell(
-                                onTap: () async {
-                                  String updated = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            CreatePostPage(post: widget.post)),
-                                  );
-                                  if (updated == "_createdPost" &&
-                                      widget.onUpdated != null) {
-                                    widget.onUpdated!();
-                                  }
-                                },
-                                borderRadius: BorderRadius.circular(36),
-                                child: const Icon(Icons.edit,
-                                    size: 22, color: Colors.white),
-                              ),
-                            )
-                        ],
-                      ))
+                          : Row(
+                              children: [
+                                if (widget.post.providers.length > 1)
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(AppLocalizations.of(context)!.you,
+                                          textAlign: TextAlign.start,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(
+                                                color: Colors.black87,
+                                              )),
+                                      Row(children: [
+                                        Container(
+                                          width: 3,
+                                          height: 16,
+                                          margin:
+                                              const EdgeInsets.only(right: 10),
+                                          decoration: BoxDecoration(
+                                              color: Color(int.parse(widget.post
+                                                      .providers[0].color ??
+                                                  "0xFFCCCCCC"))),
+                                        ),
+                                        Text(widget.post.providers[0].name,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge!
+                                                .copyWith(
+                                                    color: Colors.black,
+                                                    fontSize: 16)),
+                                      ]),
+                                    ],
+                                  ),
+                                if (widget.post.providers.length > 1)
+                                  Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 4),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            AppLocalizations.of(context)!.you,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(
+                                                  color: Colors.white,
+                                                ),
+                                          ),
+                                          const Icon(Icons.swap_horiz,
+                                              color: Colors.black, size: 22)
+                                        ],
+                                      )),
+                                if (widget.post.providers.length > 1)
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(AppLocalizations.of(context)!.pay,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(
+                                                color: Colors.black87,
+                                              )),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 3,
+                                            height: 16,
+                                            margin: const EdgeInsets.only(
+                                                right: 10),
+                                            decoration: BoxDecoration(
+                                                color: Color(int.parse(widget
+                                                        .post
+                                                        .providers[1]
+                                                        .color ??
+                                                    "0xFFCCCCCC"))),
+                                          ),
+                                          Text(widget.post.providers[1].name,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .copyWith(
+                                                      color: Colors.black,
+                                                      fontSize: 16))
+                                        ],
+                                      )
+                                    ],
+                                  )
+                              ],
+                            ))
                 ],
-              )
+              ),
+              if (widget.post.priority != null && widget.post.priority! > 0)
+                Positioned(
+                    top: 8,
+                    right: 16,
+                    child: Image.asset("assets/images/trusted.png", width: 55)),
+              Positioned(
+                  top: 80,
+                  right: 16,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (widget.post.adsUserId !=
+                          AppConstant.firebaseUser!.uid) {
+                        onContact();
+                      } else {
+                        String updated = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  CreatePostPage(post: widget.post)),
+                        );
+                        if (updated == "_createdPost" &&
+                            widget.onUpdated != null) {
+                          widget.onUpdated!();
+                        }
+                      }
+                    },
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            AppColor.primaryColor),
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                            AppColor.primaryColor),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32.0),
+                        ))),
+                    child: Text(
+                        (widget.post.adsUserId != AppConstant.firebaseUser!.uid)
+                            ? AppLocalizations.of(context)!.contact
+                            : AppLocalizations.of(context)!.edit,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 14)),
+                  ))
             ],
           )),
     );

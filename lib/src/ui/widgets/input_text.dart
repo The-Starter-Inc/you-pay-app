@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 class InputText extends StatefulWidget {
   final String? label;
   final String? placeholder;
+  final int? maxLength;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
@@ -18,6 +19,7 @@ class InputText extends StatefulWidget {
       {super.key,
       this.label,
       this.placeholder,
+      this.maxLength,
       this.errorText,
       this.keyboardType,
       this.inputFormatters,
@@ -58,6 +60,7 @@ class _InputTextState extends State<InputText> {
               controller: widget.controller,
               keyboardType: widget.keyboardType,
               inputFormatters: widget.inputFormatters,
+              maxLength: widget.maxLength,
               decoration: InputDecoration(
                 contentPadding:
                     const EdgeInsets.only(left: 16, top: 8, bottom: 8),

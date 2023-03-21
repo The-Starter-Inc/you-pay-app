@@ -7,16 +7,13 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:faker/faker.dart';
-import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
-import 'package:platform_device_id/platform_device_id.dart';
+import 'package:p2p_pay/src/ui/maps_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../main.dart';
-import './../blocs/auth_bloc.dart';
-import './../models/token.dart';
+import './../models/post.dart';
 import '../../src/constants/app_constant.dart';
 import '../../src/ui/entry/create_post_page.dart';
 import '../../firebase_options.dart';
@@ -27,7 +24,9 @@ import 'profile_page.dart';
 import 'dashboard_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Provider? you;
+  final Provider? pay;
+  const HomePage({super.key, this.you, this.pay});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -39,9 +38,6 @@ class _HomePageState extends State<HomePage> {
   String? initialMessage;
   bool _resolved = false;
 
-  final List<Widget> screens = [const DashboardPage(), const ProfilePage()];
-  final AuthBloc authBloc = AuthBloc();
-
   late StreamSubscription<ConnectivityResult> subscription;
 
   @override
@@ -51,11 +47,7 @@ class _HomePageState extends State<HomePage> {
         .setCurrentScreen(screenName: "Home Page")
         .whenComplete(() => print("Google Analytic Success"))
         .onError((error, stackTrace) => print(error));
-    authBloc.fetchToken({
-      "grant_type": "client_credentials",
-      "client_id": AppConstant.clientId,
-      "client_secret": AppConstant.clientSecret
-    });
+
     initializeFlutterFire();
     initializeFirebaseFCM();
     super.initState();
@@ -128,35 +120,36 @@ class _HomePageState extends State<HomePage> {
           AppConstant.firebaseUser = user;
         });
       });
-      String? deviceId = await PlatformDeviceId.getDeviceId;
-      if (deviceId != null) {
-        try {
-          final credential =
-              await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: "$deviceId@fk.com",
-            password: "123!@#",
-          );
-          final faker = Faker();
-          await FirebaseChatCore.instance.createUserInFirestore(
-            types.User(
-              firstName: faker.person.firstName(),
-              lastName: faker.person.lastName(),
-              id: credential.user!.uid,
-              imageUrl: 'https://i.pravatar.cc/300?u=$deviceId',
-            ),
-          );
-          firebaseUserLogin("$deviceId@fk.com");
-          if (!mounted) return;
-        } catch (e) {
-          if (e.toString().contains("email-already-in-use")) {
-            firebaseUserLogin("$deviceId@fk.com");
-          } else {
-            showErrorAlert(e);
-          }
-        }
-      } else {
-        showErrorAlert(AppLocalizations.of(context)!.no_device_id);
-      }
+
+      // String? deviceId = await PlatformDeviceId.getDeviceId;
+      // if (deviceId != null) {
+      //   try {
+      //     final credential =
+      //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      //       email: "$deviceId@fk.com",
+      //       password: "123!@#",
+      //     );
+      //     final faker = Faker();
+      //     await FirebaseChatCore.instance.createUserInFirestore(
+      //       types.User(
+      //         firstName: faker.person.firstName(),
+      //         lastName: faker.person.lastName(),
+      //         id: credential.user!.uid,
+      //         imageUrl: 'https://i.pravatar.cc/300?u=$deviceId',
+      //       ),
+      //     );
+      //     firebaseUserLogin("$deviceId@fk.com");
+      //     if (!mounted) return;
+      //   } catch (e) {
+      //     if (e.toString().contains("email-already-in-use")) {
+      //       firebaseUserLogin("$deviceId@fk.com");
+      //     } else {
+      //       showErrorAlert(e);
+      //     }
+      //   }
+      // } else {
+      //   showErrorAlert(AppLocalizations.of(context)!.no_device_id);
+      // }
     } catch (e) {
       showErrorAlert(e);
     }
@@ -201,6 +194,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onItemTapped(int index) {
+    if (index == 2) return;
     setState(() {
       currentTab = index;
     });
@@ -243,7 +237,7 @@ class _HomePageState extends State<HomePage> {
               BottomNavigationBarItem(
                   icon: currentTab == 0
                       ? Container(
-                          width: 64,
+                          width: 50,
                           height: 30,
                           decoration: const BoxDecoration(
                             color: AppColor.primaryLight,
@@ -258,7 +252,60 @@ class _HomePageState extends State<HomePage> {
               BottomNavigationBarItem(
                   icon: currentTab == 1
                       ? Container(
-                          width: 64,
+                          width: 50,
+                          height: 30,
+                          decoration: const BoxDecoration(
+                            color: AppColor.primaryLight,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          child: const Icon(Icons.fmd_good,
+                              color: Colors.black, size: 24),
+                        )
+                      : const Icon(Icons.fmd_good,
+                          color: Color.fromARGB(198, 0, 0, 0)),
+                  label: AppLocalizations.of(context)!.maps),
+              BottomNavigationBarItem(icon: Container(), label: ""),
+              BottomNavigationBarItem(
+                  icon: currentTab == 3
+                      ? Container(
+                          width: 50,
+                          height: 30,
+                          decoration: const BoxDecoration(
+                            color: AppColor.primaryLight,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          child: const Icon(Icons.chat_bubble,
+                              color: Colors.black, size: 24),
+                        )
+                      : Stack(
+                          children: [
+                            const Icon(
+                              Icons.chat_bubble,
+                              color: Color.fromARGB(198, 0, 0, 0),
+                              size: 26,
+                            ),
+                            Container(
+                                width: 24,
+                                height: 24,
+                                transform:
+                                    Matrix4.translationValues(10.0, -10, 0.0),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(24)),
+                                ),
+                                margin: const EdgeInsets.only(right: 0),
+                                child: const Center(
+                                  child: Text("1",
+                                      style: TextStyle(color: Colors.white)),
+                                ))
+                          ],
+                        ),
+                  label: AppLocalizations.of(context)!.exchange_money),
+              BottomNavigationBarItem(
+                  icon: currentTab == 4
+                      ? Container(
+                          width: 50,
                           height: 30,
                           decoration: const BoxDecoration(
                             color: AppColor.primaryLight,
@@ -281,17 +328,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildLayout() {
-    return StreamBuilder<Token>(
-        stream: authBloc.token,
-        builder: (context, AsyncSnapshot<Token> snapshot) {
-          if (snapshot.hasData) {
-            AppConstant.accessToken = snapshot.data!.access_token;
-            return screens.elementAt(currentTab);
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        });
+    if (currentTab == 1) {
+      return MapsPage(you: widget.you, pay: widget.pay);
+    } else if (currentTab == 2) {
+      return Container();
+    } else if (currentTab == 3) {
+      return const NotificationPage();
+    } else if (currentTab == 4) {
+      return const ProfilePage();
+    }
+    return DashboardPage(you: widget.you, pay: widget.pay);
   }
 }

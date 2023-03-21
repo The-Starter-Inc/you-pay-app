@@ -2,6 +2,8 @@
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'user.dart';
+
 class Post {
   int id;
   Type? type;
@@ -16,6 +18,7 @@ class Post {
   int? priority;
   String adsUserId;
   String adsDeviceId;
+  User? adsUser;
   String createdAt;
 
   Post(
@@ -29,6 +32,7 @@ class Post {
       required this.adsUserId,
       required this.adsDeviceId,
       required this.chargesType,
+      this.adsUser,
       this.percentage,
       this.fees,
       this.priority,
@@ -42,7 +46,8 @@ class Post {
           name: parsedJson[i]['name'],
           image: ImageUrl(url: parsedJson[i]['image']['url']),
           marker: ImageUrl(url: parsedJson[i]['marker']['url']),
-          icon: ImageUrl(url: parsedJson[i]['icon']['url'])));
+          icon: ImageUrl(url: parsedJson[i]['icon']['url']),
+          color: parsedJson[i]['color']));
     }
     return providers;
   }
@@ -71,6 +76,9 @@ class Post {
               double.parse((parsedJson[i]['fees'] ?? 0).toString()).toDouble(),
           adsUserId: parsedJson[i]['ads_user_id'],
           adsDeviceId: parsedJson[i]['ads_device_id'],
+          adsUser: parsedJson[i]['ads_user'] != null
+              ? User.fromMap(parsedJson[i]['ads_user'])
+              : null,
           createdAt: parsedJson[i]['created_at']));
     }
     return results;
@@ -94,6 +102,9 @@ class Post {
         fees: double.parse((parsedJson['fees'] ?? 0).toString()).toDouble(),
         adsUserId: parsedJson['ads_user_id'],
         adsDeviceId: parsedJson['ads_device_id'],
+        adsUser: parsedJson['ads_user'] != null
+            ? User.fromMap(parsedJson['ads_user'])
+            : null,
         createdAt: parsedJson['created_at']);
   }
 }
@@ -120,13 +131,15 @@ class Provider {
   ImageUrl image;
   ImageUrl marker;
   ImageUrl icon;
+  String? color;
 
   Provider(
       {required this.id,
       required this.name,
       required this.image,
       required this.marker,
-      required this.icon});
+      required this.icon,
+      this.color});
 
   static fromJson(List<dynamic> parsedJson) {
     List<Provider> results = [];
@@ -137,6 +150,7 @@ class Provider {
         image: ImageUrl(url: parsedJson[i]['image']['url']),
         marker: ImageUrl(url: parsedJson[i]['marker']['url']),
         icon: ImageUrl(url: parsedJson[i]['icon']['url']),
+        color: parsedJson[i]['color'],
       ));
     }
     return results;
@@ -150,7 +164,8 @@ class Provider {
         'name': providers[i].name,
         'image': ImageUrl.toJson(providers[i].image),
         'icon': ImageUrl.toJson(providers[i].icon),
-        'marker': ImageUrl.toJson(providers[i].marker)
+        'marker': ImageUrl.toJson(providers[i].marker),
+        'color': providers[i].color
       });
     }
     return result;
