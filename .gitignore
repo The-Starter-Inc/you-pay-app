@@ -49,3 +49,6 @@ app.*.map.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+macos/Flutter/ephemeral/Flutter-Generated.xcconfig
+macos/Flutter/ephemeral/flutter_export_environment.sh
