@@ -23,140 +23,209 @@ class _ChatPostItemState extends State<ChatPostItem> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
       color: Colors.yellow.shade200,
       child: Padding(
-          padding: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
             children: [
-              ListTile(
-                title: widget.post.adsUserId != AppConstant.firebaseUser!.uid
-                    ? Row(
-                        children: [
-                          if (widget.post.providers.length > 1)
-                            Row(
+              Container(
+                  child: widget.post.adsUserId != AppConstant.firebaseUser!.uid
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            if (widget.post.providers.length > 1)
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(AppLocalizations.of(context)!.you,
+                                      textAlign: TextAlign.start,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(
+                                            color: Colors.black87,
+                                          )),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 3,
+                                        height: 16,
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
+                                        decoration: BoxDecoration(
+                                            color: Color(int.parse(widget
+                                                    .post.providers[1].color ??
+                                                "0xFFCCCCCC"))),
+                                      ),
+                                      Text(widget.post.providers[1].name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge!
+                                              .copyWith(
+                                                  color: Colors.black,
+                                                  fontSize: 16))
+                                    ],
+                                  )
+                                ],
+                              ),
+                            if (widget.post.providers.length > 1)
+                              Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)!.you,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                              color: Colors.yellow.shade200,
+                                            ),
+                                      ),
+                                      const Icon(Icons.swap_horiz,
+                                          color: Colors.black, size: 22)
+                                    ],
+                                  )),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black45,
-                                    borderRadius: BorderRadius.circular(32),
-                                  ),
-                                  height: 32,
-                                  width: 32,
-                                  child: const Center(
-                                      child: Text("ယူ",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12))),
-                                ),
-                                Text(widget.post.providers[1].name,
+                                Text(AppLocalizations.of(context)!.pay,
                                     style: Theme.of(context)
                                         .textTheme
-                                        .titleLarge!
+                                        .bodySmall!
                                         .copyWith(
-                                            color: Colors.black, fontSize: 16))
-                              ],
-                            ),
-                          if (widget.post.providers.length > 1)
-                            const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4),
-                                child: Icon(Icons.swap_horiz,
-                                    color: Colors.black, size: 22)),
-                          Row(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.only(right: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black45,
-                                  borderRadius: BorderRadius.circular(32),
-                                ),
-                                height: 32,
-                                width: 32,
-                                child: const Center(
-                                    child: Text("ပေး",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12))),
-                              ),
-                              Text(widget.post.providers[0].name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .copyWith(
-                                          color: Colors.black, fontSize: 16))
-                            ],
-                          )
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          Row(children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.black45,
-                                borderRadius: BorderRadius.circular(32),
-                              ),
-                              height: 32,
-                              width: 32,
-                              child: const Center(
-                                  child: Text("ယူ",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12))),
-                            ),
-                            Text(widget.post.providers[0].name,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .copyWith(
-                                        color: Colors.black, fontSize: 16)),
-                          ]),
-                          if (widget.post.providers.length > 1)
-                            const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4),
-                                child: Icon(Icons.swap_horiz,
-                                    color: Colors.black, size: 22)),
-                          if (widget.post.providers.length > 1)
-                            Row(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black45,
-                                    borderRadius: BorderRadius.circular(32),
-                                  ),
-                                  height: 32,
-                                  width: 32,
-                                  child: const Center(
-                                      child: Text("ပေး",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12))),
-                                ),
-                                Text(widget.post.providers[1].name,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge!
-                                        .copyWith(
-                                            color: Colors.black, fontSize: 16))
+                                          color: Colors.black87,
+                                        )),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 3,
+                                      height: 16,
+                                      margin: const EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                          color: Color(int.parse(
+                                              widget.post.providers[0].color ??
+                                                  "0xFFCCCCCC"))),
+                                    ),
+                                    Text(widget.post.providers[0].name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .copyWith(
+                                                color: Colors.black,
+                                                fontSize: 16))
+                                  ],
+                                )
                               ],
                             )
-                        ],
-                      ),
-                subtitle: Text(
-                    widget.post.chargesType == 'percentage'
-                        ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
-                        : "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}",
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black87,
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            if (widget.post.providers.length > 1)
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(AppLocalizations.of(context)!.you,
+                                      textAlign: TextAlign.start,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(
+                                              color: Colors.black87,
+                                              fontFamily: 'Pyidaungsu')),
+                                  Row(children: [
+                                    Container(
+                                      width: 3,
+                                      height: 16,
+                                      margin: const EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                          color: Color(int.parse(
+                                              widget.post.providers[0].color ??
+                                                  "0xFFCCCCCC"))),
+                                    ),
+                                    Text(widget.post.providers[0].name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .copyWith(
+                                                color: Colors.black,
+                                                fontSize: 16)),
+                                  ]),
+                                ],
+                              ),
+                            if (widget.post.providers.length > 1)
+                              Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        "",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
+                                      ),
+                                      const Icon(Icons.swap_horiz,
+                                          color: Colors.black, size: 22)
+                                    ],
+                                  )),
+                            if (widget.post.providers.length > 1)
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(AppLocalizations.of(context)!.pay,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(
+                                            color: Colors.black87,
+                                          )),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 3,
+                                        height: 16,
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
+                                        decoration: BoxDecoration(
+                                            color: Color(int.parse(widget
+                                                    .post.providers[1].color ??
+                                                "0xFFCCCCCC"))),
+                                      ),
+                                      Text(widget.post.providers[1].name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge!
+                                              .copyWith(
+                                                  color: Colors.black,
+                                                  fontSize: 16))
+                                    ],
+                                  )
+                                ],
+                              )
+                          ],
                         )),
-                // leading: Image(
-                //     image: CachedNetworkImageProvider(
-                //         widget.post.providers[0].image.url),
-                //     width: 50,
-                //     height: 50),
-              )
+              Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                      widget.post.chargesType == 'percentage'
+                          ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
+                          : widget.post.chargesType == 'fix_amount'
+                              ? "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}"
+                              : "${MyanNunber.convertMoneyNumber(widget.post.exchangeRate)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.exchange_rate}",
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(color: Colors.black54)))
             ],
           )),
     );

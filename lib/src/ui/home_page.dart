@@ -7,6 +7,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:localstore/localstore.dart';
 import 'package:p2p_pay/src/ui/maps_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,6 +20,7 @@ import '../../src/ui/entry/create_post_page.dart';
 import '../../firebase_options.dart';
 import '../theme/color_theme.dart';
 import 'chat_page.dart';
+import 'exchange_page.dart';
 import 'notification_page.dart';
 import 'profile_page.dart';
 import 'dashboard_page.dart';
@@ -26,7 +28,8 @@ import 'dashboard_page.dart';
 class HomePage extends StatefulWidget {
   final Provider? you;
   final Provider? pay;
-  const HomePage({super.key, this.you, this.pay});
+  final int? selectedPage;
+  const HomePage({super.key, this.you, this.pay, this.selectedPage});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -37,11 +40,14 @@ class _HomePageState extends State<HomePage> {
   int currentTab = 0;
   String? initialMessage;
   bool _resolved = false;
+  bool hasNotification = false;
+  int notificationCounts = 0;
 
   late StreamSubscription<ConnectivityResult> subscription;
 
   @override
   void initState() {
+    currentTab = widget.selectedPage ?? 0;
     FirebaseAnalytics analytics = FirebaseAnalytics.instance;
     analytics
         .setCurrentScreen(screenName: "Home Page")
@@ -73,22 +79,19 @@ class _HomePageState extends State<HomePage> {
 
     FirebaseMessaging.onMessage.listen(showFlutterNotification);
 
-    await FirebaseMessaging.instance.subscribeToTopic('general');
+    await FirebaseMessaging.instance.subscribeToTopic('general1');
     await FirebaseMessaging.instance
         .subscribeToTopic(AppConstant.firebaseUser!.uid);
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      print('A new onMessageOpenedApp event was published!');
-      print(message.toString());
       if (message.data['type'] == 'message') {
-        print(message.data['metadata']);
         final userIds = jsonDecode(message.data['userIds']);
         final metadata = jsonDecode(message.data['metadata']);
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => ChatPage(
-                      postId: metadata['post_id'],
+                      postId: int.parse(metadata['post_id']),
                       room: types.Room(
                           id: message.data['roomId'],
                           name: metadata['phone'],
@@ -103,6 +106,37 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => const NotificationPage()));
       }
     });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      Localstore.instance
+          .collection('notifications')
+          .doc(message.messageId)
+          .set(message.toMap());
+      if (message.data['type'] == 'message') {
+        setState(() {
+          AppConstant.hasNotification = true;
+          hasNotification = true;
+          notificationCounts += 1;
+        });
+      }
+    });
+    setState(() {
+      hasNotification = AppConstant.hasNotification;
+    });
+    final notifications =
+        await Localstore.instance.collection('notifications').get();
+    if (notifications != null &&
+        notifications.keys
+            .where((key) => notifications[key]['data']['type'] == 'message')
+            .isNotEmpty) {
+      setState(() {
+        AppConstant.hasNotification = true;
+        hasNotification = AppConstant.hasNotification;
+        notificationCounts = notifications.keys
+            .where((key) => notifications[key] == 'message')
+            .length;
+      });
+    }
   }
 
   void initializeFlutterFire() async {
@@ -120,36 +154,6 @@ class _HomePageState extends State<HomePage> {
           AppConstant.firebaseUser = user;
         });
       });
-
-      // String? deviceId = await PlatformDeviceId.getDeviceId;
-      // if (deviceId != null) {
-      //   try {
-      //     final credential =
-      //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      //       email: "$deviceId@fk.com",
-      //       password: "123!@#",
-      //     );
-      //     final faker = Faker();
-      //     await FirebaseChatCore.instance.createUserInFirestore(
-      //       types.User(
-      //         firstName: faker.person.firstName(),
-      //         lastName: faker.person.lastName(),
-      //         id: credential.user!.uid,
-      //         imageUrl: 'https://i.pravatar.cc/300?u=$deviceId',
-      //       ),
-      //     );
-      //     firebaseUserLogin("$deviceId@fk.com");
-      //     if (!mounted) return;
-      //   } catch (e) {
-      //     if (e.toString().contains("email-already-in-use")) {
-      //       firebaseUserLogin("$deviceId@fk.com");
-      //     } else {
-      //       showErrorAlert(e);
-      //     }
-      //   }
-      // } else {
-      //   showErrorAlert(AppLocalizations.of(context)!.no_device_id);
-      // }
     } catch (e) {
       showErrorAlert(e);
     }
@@ -284,21 +288,22 @@ class _HomePageState extends State<HomePage> {
                               color: Color.fromARGB(198, 0, 0, 0),
                               size: 26,
                             ),
-                            Container(
-                                width: 24,
-                                height: 24,
-                                transform:
-                                    Matrix4.translationValues(10.0, -10, 0.0),
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(24)),
-                                ),
-                                margin: const EdgeInsets.only(right: 0),
-                                child: const Center(
-                                  child: Text("1",
-                                      style: TextStyle(color: Colors.white)),
-                                ))
+                            if (notificationCounts > 0)
+                              Container(
+                                  width: 24,
+                                  height: 24,
+                                  transform:
+                                      Matrix4.translationValues(10.0, -10, 0.0),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(24)),
+                                  ),
+                                  margin: const EdgeInsets.only(right: 0),
+                                  child: const Center(
+                                    child: Text("1",
+                                        style: TextStyle(color: Colors.white)),
+                                  ))
                           ],
                         ),
                   label: AppLocalizations.of(context)!.exchange_money),
@@ -333,7 +338,7 @@ class _HomePageState extends State<HomePage> {
     } else if (currentTab == 2) {
       return Container();
     } else if (currentTab == 3) {
-      return const NotificationPage();
+      return const ExchangePage();
     } else if (currentTab == 4) {
       return const ProfilePage();
     }

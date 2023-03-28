@@ -18,11 +18,13 @@ class AlertUtil {
         content: Text(message,
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
                   color: Colors.black,
+                  fontFamily: 'Pyidaungsu',
                 )),
         title: Text(
           'Error',
           style: Theme.of(context).textTheme.titleMedium!.copyWith(
                 color: Colors.black,
+                fontFamily: 'Pyidaungsu',
               ),
         ),
       ),

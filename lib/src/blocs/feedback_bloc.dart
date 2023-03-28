@@ -8,7 +8,7 @@ class FeedbackBloc {
 
   Stream<List<Feedback>> get feedbacks => exchangeFetcher.stream;
 
-  Future<Feedback> createFeedback(Map<String, dynamic> payload) async {
+  Future<Feedback> createFeedback(payload) async {
     Feedback exchange = await repository.createFeedback(payload);
     return exchange;
   }
@@ -20,8 +20,8 @@ class FeedbackBloc {
     return exchange;
   }
 
-  fetchFeedbacks(String firebaseUserId) async {
-    List<Feedback> exchanges = await repository.fetchFeedbacks(firebaseUserId);
+  fetchFeedbacks(String adsUserId) async {
+    List<Feedback> exchanges = await repository.fetchFeedbacks(adsUserId);
     exchangeFetcher.sink.add(exchanges);
   }
 

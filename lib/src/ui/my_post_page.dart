@@ -26,14 +26,15 @@ class _MyPostPageState extends State<MyPostPage> {
   }
 
   void getMyPosts() {
-    postBloc.fetchPosts(
-        null, "ads_user_id:equal:${AppConstant.firebaseUser!.uid}");
+    postBloc.fetchMyPosts("ads_user_id:equal:${AppConstant.firebaseUser!.uid}");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context)!.my_posts)),
+        appBar: AppBar(
+            title: Text(AppLocalizations.of(context)!.my_posts,
+                style: const TextStyle(color: Colors.black))),
         body: StreamBuilder(
           stream: postBloc.posts,
           builder: (context, AsyncSnapshot<List<Post>> snapshot) {

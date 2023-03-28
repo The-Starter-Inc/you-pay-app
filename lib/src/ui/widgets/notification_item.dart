@@ -1,23 +1,24 @@
 // ignore_for_file: depend_on_referenced_packages
-import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:localstore/localstore.dart';
 import 'package:p2p_pay/src/blocs/exchange_bloc.dart';
-import 'package:p2p_pay/src/models/exchange.dart';
-import '../../constants/app_constant.dart';
-import '../../utils/myan_number.dart';
-import '../chat_page.dart';
+import 'package:p2p_pay/src/models/general_noti.dart';
+import 'package:p2p_pay/src/models/time_ago.dart';
+import 'package:p2p_pay/src/ui/notification_detail_page.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:url_launcher/url_launcher.dart';
 
 // ignore: must_be_immutable
 class NotificationItem extends StatefulWidget {
-  final Exchange exchange;
+  final GeneralNoti generalNoti;
   late bool? hasNotification;
   final Function? onClick;
   NotificationItem(
-      {super.key, required this.exchange, this.hasNotification, this.onClick});
+      {super.key,
+      required this.generalNoti,
+      this.hasNotification,
+      this.onClick});
 
   @override
   State<NotificationItem> createState() => _NotificationItemState();
@@ -25,213 +26,101 @@ class NotificationItem extends StatefulWidget {
 
 class _NotificationItemState extends State<NotificationItem> {
   final ExchangeBloc exchangeBloc = ExchangeBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    timeago.setLocaleMessages('en', TimeAgoMessages());
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-        color: widget.hasNotification! ? Colors.yellow.shade200 : Colors.white,
-        margin: const EdgeInsets.only(bottom: 0),
-        child: Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: GestureDetector(
-                onTap: () async {
-                  try {
-                    final notifications = await Localstore.instance
-                        .collection('notifications')
-                        .get();
-                    if (notifications != null) {
-                      notifications.forEach((key, value) {
-                        RemoteMessage message = RemoteMessage.fromMap(value);
-                        final metadata = jsonDecode(message.data['metadata']);
-                        if ("${metadata['post_id']}" ==
-                            "${widget.exchange.adsPostId}") {
-                          Localstore.instance
-                              .collection('notifications')
-                              .doc(message.messageId)
-                              .delete();
-                        }
-                      });
-                      setState(() {
-                        widget.hasNotification = false;
-                        widget.onClick!();
-                      });
+    return Column(
+      children: [
+        ListTile(
+            onTap: () async {
+              try {
+                final notifications =
+                    await Localstore.instance.collection('notifications').get();
+                if (notifications != null) {
+                  notifications.forEach((key, value) {
+                    RemoteMessage message = RemoteMessage.fromMap(value);
+                    if ("${message.notification!.android!.tag}" ==
+                        "topic_key_${widget.generalNoti.messageId}") {
+                      Localstore.instance
+                          .collection('notifications')
+                          .doc(message.messageId)
+                          .delete();
                     }
-                    // ignore: use_build_context_synchronously
-                    final navigator = Navigator.of(context);
-                    await navigator.push(
-                      MaterialPageRoute(
-                        builder: (context) => ChatPage(
-                          postId: widget.exchange.post!.id,
-                          room: types.Room(
-                              id: widget.exchange.roomId,
-                              name: widget.exchange.post!.phone,
-                              users: [
-                                types.User(id: widget.exchange.adsUserId),
-                                types.User(id: widget.exchange.exUserId)
-                              ],
-                              type: types.RoomType.direct),
-                        ),
-                      ),
-                    );
-                  } catch (e) {
-                    debugPrint(e.toString());
+                    setState(() {
+                      widget.hasNotification = false;
+                    });
+                  });
+                }
+                if (widget.generalNoti.linkToRedirect != null) {
+                  Uri redirectUrl =
+                      Uri.parse(widget.generalNoti.linkToRedirect!);
+                  if (await canLaunchUrl(redirectUrl)) {
+                    await launchUrl(redirectUrl);
+                  } else {
+                    throw 'Could not open the link.';
                   }
-                },
-                child: Column(
-                  children: [
-                    ListTile(
-                        title: widget.exchange.post!.adsUserId !=
-                                AppConstant.firebaseUser!.uid
-                            ? Row(
-                                children: [
-                                  if (widget.exchange.post!.providers.length >
-                                      1)
-                                    Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              const EdgeInsets.only(right: 4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black45,
-                                            borderRadius:
-                                                BorderRadius.circular(32),
-                                          ),
-                                          height: 32,
-                                          width: 32,
-                                          child: const Center(
-                                              child: Text("ယူ",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12))),
-                                        ),
-                                        Text(
-                                            widget.exchange.post!.providers[1]
-                                                .name,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge!
-                                                .copyWith(
-                                                    color: Colors.black,
-                                                    fontSize: 16))
-                                      ],
-                                    ),
-                                  if (widget.exchange.post!.providers.length >
-                                      1)
-                                    const Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        child: Icon(Icons.swap_horiz,
-                                            color: Colors.black, size: 22)),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.only(right: 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black45,
-                                          borderRadius:
-                                              BorderRadius.circular(32),
-                                        ),
-                                        height: 32,
-                                        width: 32,
-                                        child: const Center(
-                                            child: Text("ပေး",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12))),
-                                      ),
-                                      Text(
-                                          widget
-                                              .exchange.post!.providers[0].name,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .copyWith(
-                                                  color: Colors.black,
-                                                  fontSize: 16))
-                                    ],
-                                  )
-                                ],
-                              )
-                            : Row(
-                                children: [
-                                  Row(children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(right: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black45,
-                                        borderRadius: BorderRadius.circular(32),
-                                      ),
-                                      height: 32,
-                                      width: 32,
-                                      child: const Center(
-                                          child: Text("ယူ",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12))),
-                                    ),
-                                    Text(
-                                        widget.exchange.post!.providers[0].name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontSize: 16)),
-                                  ]),
-                                  if (widget.exchange.post!.providers.length >
-                                      1)
-                                    const Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        child: Icon(Icons.swap_horiz,
-                                            color: Colors.black, size: 22)),
-                                  if (widget.exchange.post!.providers.length >
-                                      1)
-                                    Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              const EdgeInsets.only(right: 4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black45,
-                                            borderRadius:
-                                                BorderRadius.circular(32),
-                                          ),
-                                          height: 32,
-                                          width: 32,
-                                          child: const Center(
-                                              child: Text("ပေး",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12))),
-                                        ),
-                                        Text(
-                                            widget.exchange.post!.providers[1]
-                                                .name,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge!
-                                                .copyWith(
-                                                    color: Colors.black,
-                                                    fontSize: 16))
-                                      ],
-                                    )
-                                ],
-                              ),
-                        subtitle: Text(
-                            widget.exchange.post!.chargesType == 'percentage'
-                                ? "${MyanNunber.convertNumber(widget.exchange.post!.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
-                                : "${MyanNunber.convertMoneyNumber(widget.exchange.post!.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  color: Colors.black87,
-                                )),
-                        trailing: widget.hasNotification!
-                            ? const Icon(Icons.circle,
-                                size: 10, color: Colors.red)
-                            : null)
-                  ],
-                ))));
+                } else {
+                  // ignore: use_build_context_synchronously
+                  final navigator = Navigator.of(context);
+                  await navigator.push(MaterialPageRoute(
+                    builder: (context) =>
+                        NotificationDetailPage(generalNoti: widget.generalNoti),
+                  ));
+                }
+              } catch (e) {
+                debugPrint(e.toString());
+              }
+            },
+            leading: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.yellow.shade200,
+                borderRadius: const BorderRadius.all(Radius.circular(48)),
+              ),
+              child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: widget.generalNoti.type! == 'system'
+                      ? const Center(child: Icon(Icons.construction))
+                      : const Center(child: Icon(Icons.mail_outline))),
+            ),
+            title: Text(widget.generalNoti.title!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium!
+                    .copyWith(color: Colors.black87, fontFamily: 'Pyidaungsu')),
+            subtitle: Text(widget.generalNoti.subtitle!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .copyWith(color: Colors.black87, fontFamily: 'Pyidaungsu')),
+            trailing: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  timeago.format(DateTime.parse(widget.generalNoti.createdAt)),
+                  style: const TextStyle(color: Colors.black54),
+                ),
+                const SizedBox(height: 16),
+                widget.hasNotification!
+                    ? const Icon(Icons.circle, size: 8, color: Colors.red)
+                    : const Icon(Icons.circle, size: 8, color: Colors.white)
+              ],
+            )),
+        const Divider(
+          color: Colors.black45,
+        )
+      ],
+    );
   }
 }

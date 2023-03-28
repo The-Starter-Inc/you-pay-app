@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:p2p_pay/src/blocs/exchange_bloc.dart';
 import 'package:p2p_pay/src/blocs/post_bloc.dart';
 import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
@@ -21,6 +22,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/firebase_util.dart';
+import '../utils/map_util.dart';
+import 'feedbacks_page.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.room, required this.postId});
@@ -35,6 +38,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   bool _isAttachmentUploading = false;
   final PostBloc postBloc = PostBloc();
+  final ExchangeBloc exchangeBloc = ExchangeBloc();
 
   @override
   void initState() {
@@ -43,6 +47,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         widget.room.id, AppConstant.firebaseUser!.uid, true);
     FirebaseUtil.updatePostId(widget.room.id, "${widget.postId}");
     postBloc.fetchPostById(widget.postId);
+    exchangeBloc.fetchExchagesByQuery(
+        "ads_post_id:equal:${widget.postId}|room_id:equal:${widget.room.id}");
     super.initState();
   }
 
@@ -70,24 +76,107 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-          title: Text(
-            widget.room.name ?? "",
-            style: const TextStyle(color: Colors.white),
-          ),
+          title: StreamBuilder(
+              stream: exchangeBloc.exchange,
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  var exchange = snapshot.data![0];
+                  var user = AppConstant.firebaseUser!.uid == exchange.adsUserId
+                      ? exchange.exUser
+                      : exchange.adsUser;
+                  return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FeedbacksPage(user: user)),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          // Container(
+                          //     width: 40,
+                          //     height: 40,
+                          //     margin: const EdgeInsets.only(right: 16),
+                          //     decoration: BoxDecoration(
+                          //       color: Colors.yellow.shade200,
+                          //       borderRadius:
+                          //           const BorderRadius.all(Radius.circular(46)),
+                          //     ),
+                          //     child: Center(
+                          //       child: Text(user!.name![0],
+                          //           style: Theme.of(context)
+                          //               .textTheme
+                          //               .titleLarge!
+                          //               .copyWith(color: Colors.black)),
+                          //     )),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(user!.name!,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge!
+                                      .copyWith(
+                                          color: Colors.black, fontSize: 16)),
+                              Text(user.phone!,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12))
+                            ],
+                          )
+                        ],
+                      ));
+                }
+                return Container();
+              }),
           backgroundColor: AppColor.primaryColor,
           actions: [
-            IconButton(
-              padding: const EdgeInsets.only(right: 16),
-              icon: const Icon(Icons.phone, size: 24, color: Colors.white),
-              onPressed: () async {
-                if (await canLaunchUrl(
-                    Uri.parse("tel://${widget.room.name}"))) {
-                  await launchUrl(Uri.parse("tel://${widget.room.name}"));
-                } else {
-                  throw 'Could not call phone intent.';
-                }
-              },
-            ),
+            StreamBuilder(
+                stream: postBloc.getPostById,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return IconButton(
+                      padding: const EdgeInsets.only(right: 16),
+                      icon: const Icon(Icons.directions,
+                          size: 28, color: Colors.black),
+                      onPressed: () async {
+                        MapUtils.openMap(snapshot.data!.latLng.latitude,
+                            snapshot.data!.latLng.longitude);
+                      },
+                    );
+                  }
+                  return Container();
+                }),
+            StreamBuilder(
+                stream: exchangeBloc.exchange,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    var exchange = snapshot.data![0];
+                    var user =
+                        AppConstant.firebaseUser!.uid == exchange.adsUserId
+                            ? exchange.exUser
+                            : exchange.adsUser;
+                    return IconButton(
+                      padding: const EdgeInsets.only(right: 16),
+                      icon: const Icon(Icons.phone,
+                          size: 26, color: Colors.black),
+                      onPressed: () async {
+                        if (await canLaunchUrl(
+                            Uri.parse("tel://${user!.phone}"))) {
+                          await launchUrl(Uri.parse("tel://${user.phone}"));
+                        } else {
+                          throw 'Could not call phone intent.';
+                        }
+                      },
+                    );
+                  }
+                  return Container();
+                })
           ]),
       body: Stack(children: [
         StreamBuilder<types.Room>(
@@ -123,7 +212,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Positioned(
-                    height: 96,
                     top: 16,
                     left: 16,
                     right: 16,

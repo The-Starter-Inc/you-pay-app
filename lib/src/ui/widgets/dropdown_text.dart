@@ -42,14 +42,14 @@ class _DropDownTextState extends State<DropDownText> {
                 children: [
                   Text(widget.label!,
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: Colors.black,
-                          ))
+                          color: Colors.black, fontFamily: 'Pyidaungsu'))
                 ],
               ),
             )
           ],
           Container(
               decoration: BoxDecoration(
+                  color: Colors.white70,
                   border: Border.all(
                       color: widget.errorText != null
                           ? Colors.red.shade800
@@ -62,7 +62,9 @@ class _DropDownTextState extends State<DropDownText> {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: const TextStyle(
-                            color: Colors.black54, fontSize: 16)),
+                            color: Colors.black54,
+                            fontSize: 16,
+                            fontFamily: 'Pyidaungsu')),
                     value: widget.controller!.text.isNotEmpty
                         ? widget.controller!.text
                         : null,
@@ -75,7 +77,9 @@ class _DropDownTextState extends State<DropDownText> {
                           child: Text(
                             item.name,
                             style: const TextStyle(
-                                color: Colors.black, fontSize: 16),
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontFamily: 'Pyidaungsu'),
                           )))
                     ],
                     style: const TextStyle(color: Colors.black54),

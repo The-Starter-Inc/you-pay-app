@@ -27,6 +27,21 @@ class ExchangeApiProvider {
     }
   }
 
+  Future<List<Exchange>> fetchExchangesByQuery(String query) async {
+    final response = await client.get(
+        Uri.parse(
+            "${AppConstant.host}/api/exchange?search=$query&sort=id&order=desc&rows=99999"),
+        headers: headers);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      return Exchange.fromJson(json.decode(response.body));
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception(response.body);
+    }
+  }
+
   Future<List<Exchange>> checkExchangeExist(
       String adsPostid, String exUserId) async {
     final response = await client.get(
@@ -52,6 +67,20 @@ class ExchangeApiProvider {
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
       return Exchange.fromJsonObj(json.decode(response.body));
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception(response.body);
+    }
+  }
+
+  Future<dynamic> deleteExchange(id) async {
+    final response = await client.delete(
+        Uri.parse("${AppConstant.host}/api/exchange/$id"),
+        headers: headers);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      return response.body;
     } else {
       // If that call was not successful, throw an error.
       throw Exception(response.body);

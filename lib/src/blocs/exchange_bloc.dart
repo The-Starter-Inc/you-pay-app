@@ -25,6 +25,15 @@ class ExchangeBloc {
     exchangeFetcher.sink.add(exchanges);
   }
 
+  fetchExchagesByQuery(String query) async {
+    List<Exchange> exchanges = await repository.fetchExchangesByQuery(query);
+    exchangeFetcher.sink.add(exchanges);
+  }
+
+  Future<dynamic> deleteExchange(id) async {
+    return await repository.deleteExchange(id);
+  }
+
   dispose() {
     exchangeFetcher.close();
   }

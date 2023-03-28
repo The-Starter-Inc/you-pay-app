@@ -26,9 +26,18 @@ class P2PApp extends StatelessWidget {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
+            appBarTheme: const AppBarTheme(
+                titleTextStyle: TextStyle(
+                    fontFamily: 'Pyidaungsu',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+                backgroundColor: AppColor.primaryColor,
+                foregroundColor: Colors.black //here you can give the text color
+                ),
             unselectedWidgetColor: Colors.black54,
             primaryColor: AppColor.primaryColor,
             scaffoldBackgroundColor: Colors.white,
+            fontFamily: 'Pyidaungsu',
             textTheme: ThemeText.getTextTheme(),
             colorScheme: ColorScheme.fromSwatch()
                 .copyWith(primary: AppColor.primaryColor),

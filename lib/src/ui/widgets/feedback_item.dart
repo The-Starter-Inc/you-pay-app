@@ -1,5 +1,4 @@
 // ignore_for_file: depend_on_referenced_packages
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -21,14 +20,12 @@ class _FeedbackItemState extends State<FeedbackItem> {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: ListTile(
               title: Text(
                   "${widget.feedback.exUser.name} ${widget.feedback.response == 'positive' ? AppLocalizations.of(context)!.is_positive_feedback : AppLocalizations.of(context)!.is_negative_feedback}",
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(color: Colors.black45)),
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      color: Colors.black45, fontFamily: "Pyidaungsu")),
               trailing: widget.feedback.response == 'positive'
                   ? const Icon(Icons.sentiment_satisfied_alt,
                       size: 32, color: Colors.green)

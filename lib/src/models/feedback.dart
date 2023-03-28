@@ -1,22 +1,22 @@
 import 'user.dart';
 
 class Feedback {
-  int id;
+  int? id;
   String adsUserId;
   User adsUser;
   String exUserId;
   User exUser;
   String response;
-  String createdAt;
+  String? createdAt;
 
   Feedback(
-      {required this.id,
+      {this.id,
       required this.adsUserId,
       required this.adsUser,
       required this.exUserId,
       required this.exUser,
       required this.response,
-      required this.createdAt});
+      this.createdAt});
 
   static fromMapArray(parsedJson) {
     List<Feedback> results = [];
@@ -37,15 +37,13 @@ class Feedback {
         createdAt: parsedJson['created_at']);
   }
 
-  Map<String, dynamic> toMap() {
+  toJson() {
     return {
-      'id': id,
-      'adsUserId': adsUserId,
-      'adsUser': adsUser.toMap(),
-      'exUserId': exUserId,
-      'exUser': exUser.toMap(),
+      'ads_user_id': adsUserId,
+      'ads_user': adsUser.toJson(),
+      'ex_user_id': exUserId,
+      'ex_user': exUser.toJson(),
       'response': response,
-      'createdAt': createdAt
     };
   }
 }

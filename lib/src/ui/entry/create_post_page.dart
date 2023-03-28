@@ -47,6 +47,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       TextEditingController(text: "percentage");
   TextEditingController percentageController = TextEditingController();
   TextEditingController fixAmountController = TextEditingController();
+  TextEditingController exchangeRateController = TextEditingController();
   TextEditingController latLngController = TextEditingController();
 
   late bool checkFormError = false;
@@ -87,6 +88,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     chargesTypeController.text = widget.post!.chargesType;
     percentageController.text = "${widget.post!.percentage}";
     fixAmountController.text = "${widget.post!.fees}";
+    exchangeRateController.text = "${widget.post!.exchangeRate}";
     phoneController.text = widget.post!.phone;
     _currentPosition = widget.post!.latLng;
     _getAddressFromLatLng(_currentPosition!);
@@ -147,9 +149,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.post != null
-            ? AppLocalizations.of(context)!.edit_post
-            : AppLocalizations.of(context)!.add_new_post),
+        title: Text(
+            widget.post != null
+                ? AppLocalizations.of(context)!.edit_post
+                : AppLocalizations.of(context)!.add_new_post,
+            style: const TextStyle(color: Colors.black)),
         backgroundColor: AppColor.primaryColor,
       ),
       body: Padding(
@@ -193,12 +197,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         ],
                       ),
                       InputText(
-                          label: AppLocalizations.of(context)!.amount,
-                          placeholder:
-                              AppLocalizations.of(context)!.enter_amount,
-                          errorText: frmError.amount,
-                          controller: amountController,
-                          keyboardType: TextInputType.number),
+                        label: AppLocalizations.of(context)!.amount,
+                        placeholder: AppLocalizations.of(context)!.enter_amount,
+                        errorText: frmError.amount,
+                        controller: amountController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                      ),
                       Row(children: [
                         Flexible(
                             child: DropDownText(
@@ -212,6 +217,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 AppLocalizations.of(context)!.percentage),
                             DropDown("fix_amount",
                                 AppLocalizations.of(context)!.fixed_amount),
+                            DropDown("exchange_rate",
+                                AppLocalizations.of(context)!.exchange_rate),
                           ],
                         )),
                         const SizedBox(width: 16),
@@ -230,7 +237,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'^\d+\.?\d{0,2}')),
                               ]))
-                        else
+                        else if (chargesTypeController.text == 'fix_amount')
                           Flexible(
                               child: InputText(
                                   label: AppLocalizations.of(context)!
@@ -238,6 +245,21 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   placeholder: AppLocalizations.of(context)!
                                       .enter_fixed_amount,
                                   controller: fixAmountController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                  inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ]))
+                        else
+                          Flexible(
+                              child: InputText(
+                                  label: AppLocalizations.of(context)!
+                                      .exchange_rate,
+                                  placeholder: AppLocalizations.of(context)!
+                                      .enter_exchange_rate,
+                                  controller: exchangeRateController,
                                   keyboardType:
                                       const TextInputType.numberWithOptions(
                                           decimal: true),
@@ -336,6 +358,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                         .text.isEmpty
                                                     ? "0"
                                                     : fixAmountController.text,
+                                                "exchange_rate":
+                                                    exchangeRateController
+                                                            .text.isEmpty
+                                                        ? "0"
+                                                        : exchangeRateController
+                                                            .text,
                                                 "phone": phoneController.text,
                                                 "providers": jsonEncode(
                                                     Provider.toJsonArray(
@@ -354,7 +382,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                         .getDeviceId,
                                                 "ads_user": jsonEncode(
                                                     AppConstant.currentUser!
-                                                        .toJson())
+                                                        .toJson()),
+                                                "status":
+                                                    "${widget.post!.status}"
                                               }
                                             : {
                                                 //New Record
@@ -372,6 +402,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                         .text.isEmpty
                                                     ? "0"
                                                     : fixAmountController.text,
+                                                "exchange_rate":
+                                                    exchangeRateController
+                                                            .text.isEmpty
+                                                        ? "0"
+                                                        : exchangeRateController
+                                                            .text,
                                                 "phone": phoneController.text,
                                                 "providers": jsonEncode(
                                                     Provider.toJsonArray(
@@ -390,7 +426,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                         .getDeviceId,
                                                 "ads_user": jsonEncode(
                                                     AppConstant.currentUser!
-                                                        .toJson())
+                                                        .toJson()),
+                                                "status": 'true'
                                               });
 
                                     await FirebaseAnalytics.instance.logEvent(

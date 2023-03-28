@@ -48,8 +48,7 @@ class _InputTextState extends State<InputText> {
                 children: [
                   Text(widget.label!,
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: Colors.black,
-                          ))
+                          color: Colors.black, fontFamily: 'Pyidaungsu'))
                 ],
               ),
             )
@@ -73,6 +72,7 @@ class _InputTextState extends State<InputText> {
                 errorText: widget.errorText,
                 floatingLabelBehavior: FloatingLabelBehavior.never,
                 prefixIcon: widget.prefixIcon,
+                fillColor: Colors.white70,
                 suffixIcon: widget.isClearText == true
                     ? IconButton(
                         icon: const Icon(Icons.cancel),
@@ -90,7 +90,8 @@ class _InputTextState extends State<InputText> {
                   widget.errorText = null;
                 });
               },
-              style: const TextStyle(color: Colors.black)),
+              style: const TextStyle(
+                  color: Colors.black, fontFamily: 'Pyidaungsu')),
         ],
       ),
     );

@@ -142,30 +142,28 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.yellow.shade200,
         body: Stack(
           children: [
-            Positioned(
-                top: 0,
-                left: 0,
-                child: Image.asset("assets/images/you-pay-left-top.png")),
-            Positioned(
-                right: 0,
-                bottom: 70,
-                child: Image.asset("assets/images/you-pay-bottom-right.png")),
+            // Positioned(
+            //     top: 0,
+            //     left: 0,
+            //     child: Image.asset("assets/images/you-pay-left-top.png")),
+            // Positioned(
+            //     right: 0,
+            //     bottom: 70,
+            //     child: Image.asset("assets/images/you-pay-bottom-right.png")),
             ListView(
               children: [
                 Align(
                   alignment: Alignment.center,
                   child: Container(
                       margin: const EdgeInsets.only(top: 120),
-                      width: 90,
-                      height: 90,
-                      decoration: const BoxDecoration(
-                        color: AppColor.secondaryColor,
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                      ),
-                      child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Image.asset("assets/images/you-pay.png",
-                              width: 50))),
+                      width: 120,
+                      height: 120,
+                      // decoration: const BoxDecoration(
+                      //   color: AppColor.secondaryColor,
+                      //   borderRadius: BorderRadius.all(Radius.circular(8)),
+                      // ),
+                      child:
+                          Image.asset("assets/images/you-pay.png", width: 120)),
                 ),
                 const SizedBox(height: 24),
                 Align(
@@ -235,7 +233,8 @@ class _LoginPageState extends State<LoginPage> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      const SearchPage()));
+                                                      const SearchPage(
+                                                          isPop: false)));
                                         }
                                       },
                                       style: ButtonStyle(
@@ -258,7 +257,7 @@ class _LoginPageState extends State<LoginPage> {
                                       child: Text(
                                           AppLocalizations.of(context)!.start,
                                           style: const TextStyle(
-                                              color: Colors.white)),
+                                              color: Colors.black)),
                                     )))
                           ],
                         ),

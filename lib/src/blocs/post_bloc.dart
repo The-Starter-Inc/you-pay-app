@@ -15,6 +15,11 @@ class PostBloc {
     postFetcher.sink.add(posts);
   }
 
+  fetchMyPosts(String? search) async {
+    List<Post> posts = await repository.fetchMyPosts(search);
+    postFetcher.sink.add(posts);
+  }
+
   fetchPostById(id) async {
     Post post = await repository.getAdsPost(id);
     getPostById.sink.add(post);
@@ -22,6 +27,11 @@ class PostBloc {
 
   Future<dynamic> createAdsPost(payload) async {
     Post post = await repository.createAdsPost(payload);
+    return post;
+  }
+
+  Future<dynamic> updateAdsPost(id, payload) async {
+    Post post = await repository.updateAdsPost(id, payload);
     return post;
   }
 

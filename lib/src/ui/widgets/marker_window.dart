@@ -1,15 +1,11 @@
 // ignore_for_file: depend_on_referenced_packages
 
-import 'dart:convert';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clippy_flutter/triangle.dart';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import '../../blocs/exchange_bloc.dart';
@@ -17,9 +13,9 @@ import '../../blocs/post_bloc.dart';
 import '../../constants/app_constant.dart';
 import '../../models/exchange.dart';
 import '../../models/post.dart';
+import '../../utils/alert_util.dart';
 import '../../utils/map_util.dart';
 import '../chat_page.dart';
-import '../entry/create_post_page.dart';
 
 class MarkerWindow extends StatefulWidget {
   final Post post;
@@ -68,22 +64,28 @@ class _MarkerWindowState extends State<MarkerWindow> {
                             size: 18, color: Colors.black45),
                       ),
                     ),
-                    Center(
-                      child: Image(
-                          image: CachedNetworkImageProvider(
-                              widget.post.adsUserId !=
-                                      AppConstant.firebaseUser!.uid
-                                  ? widget.post.providers[1].image.url
-                                  : widget.post.providers[0].image.url),
-                          width: 50,
-                          height: 50),
-                    ),
+                    if (widget.post.adsUser != null)
+                      Center(
+                        child: Container(
+                            width: 56,
+                            height: 56,
+                            decoration: const BoxDecoration(
+                              color: AppColor.primaryLight,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                            ),
+                            child: Center(
+                              child: Text(widget.post.adsUser!.name![0],
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge!
+                                      .copyWith(color: Colors.black)),
+                            )),
+                      ),
                     const SizedBox(height: 10),
                     Center(
                       child: Text(
-                        widget.post.adsUserId != AppConstant.firebaseUser!.uid
-                            ? "${widget.post.providers[1].name} ယူ"
-                            : "${widget.post.providers[0].name} ယူ",
+                        widget.post.adsUser!.name!,
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium!
@@ -92,6 +94,36 @@ class _MarkerWindowState extends State<MarkerWindow> {
                                 fontWeight: FontWeight.bold),
                       ),
                     ),
+                    if (widget.post.providers.isNotEmpty)
+                      const SizedBox(height: 10),
+                    if (widget.post.providers.isNotEmpty)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.you,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .copyWith(
+                                  color: Colors.black,
+                                ),
+                          ),
+                          const SizedBox(
+                            width: 8.0,
+                          ),
+                          Text(
+                            widget.post.providers[1].name,
+                            textAlign: TextAlign.right,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .copyWith(
+                                  color: Colors.black45,
+                                ),
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -107,9 +139,7 @@ class _MarkerWindowState extends State<MarkerWindow> {
                           width: 8.0,
                         ),
                         Text(
-                          widget.post.adsUserId != AppConstant.firebaseUser!.uid
-                              ? widget.post.providers[0].name
-                              : widget.post.providers[1].name,
+                          widget.post.providers[0].name,
                           textAlign: TextAlign.right,
                           style:
                               Theme.of(context).textTheme.labelMedium!.copyWith(
@@ -148,7 +178,9 @@ class _MarkerWindowState extends State<MarkerWindow> {
                         Text(
                           widget.post.chargesType == 'percentage'
                               ? AppLocalizations.of(context)!.percentage
-                              : AppLocalizations.of(context)!.fixed_amount,
+                              : widget.post.chargesType == 'fix_amount'
+                                  ? AppLocalizations.of(context)!.fixed_amount
+                                  : AppLocalizations.of(context)!.exchange_rate,
                           style:
                               Theme.of(context).textTheme.labelMedium!.copyWith(
                                     color: Colors.black,
@@ -160,7 +192,9 @@ class _MarkerWindowState extends State<MarkerWindow> {
                         Text(
                           widget.post.chargesType == 'percentage'
                               ? "${widget.post.percentage}%"
-                              : "${widget.post.fees} ${AppLocalizations.of(context)!.mmk}",
+                              : widget.post.chargesType == 'fix_amount'
+                                  ? "${widget.post.fees} ${AppLocalizations.of(context)!.mmk}"
+                                  : "${widget.post.exchangeRate} ${AppLocalizations.of(context)!.mmk}",
                           style:
                               Theme.of(context).textTheme.labelMedium!.copyWith(
                                     color: Colors.black45,
@@ -219,209 +253,117 @@ class _MarkerWindowState extends State<MarkerWindow> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (widget.post.adsUserId !=
-                            AppConstant.firebaseUser!.uid)
-                          OutlinedButton(
-                            onPressed: () {
-                              MapUtils.openMap(widget.post.latLng.latitude,
-                                  widget.post.latLng.longitude);
-                            },
-                            child: const Icon(Icons.directions, size: 24),
-                          )
-                        else
-                          OutlinedButton(
-                            onPressed: () async {
-                              await showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text(
-                                            AppLocalizations.of(context)!
-                                                .cancel,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium!
-                                                .copyWith(
-                                                  color: Colors.black,
-                                                ))),
-                                    TextButton(
-                                      onPressed: () async {
-                                        Navigator.of(context).pop();
-                                        if (isLoading) return;
-                                        setState(() {
-                                          isLoading = true;
-                                        });
-                                        String deletedPost =
-                                            await postBloc.deleteAdsPost(
-                                                widget.post.id.toString());
-                                        Fluttertoast.showToast(
-                                            msg: jsonDecode(
-                                                deletedPost)["message"],
-                                            toastLength: Toast.LENGTH_LONG,
-                                            gravity: ToastGravity.CENTER,
-                                            textColor: Colors.white,
-                                            fontSize: 16.0);
-                                        setState(() {
-                                          isLoading = false;
-                                        });
-                                        widget.onDeleted!();
-                                      },
-                                      child: Text(
-                                          AppLocalizations.of(context)!.delete),
-                                    ),
-                                  ],
-                                  content: Text(
-                                      AppLocalizations.of(context)!
-                                          .delete_confirm_msg,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(
-                                            color: Colors.black,
-                                          )),
-                                  title: Text(
-                                    AppLocalizations.of(context)!.confirm,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                          color: Colors.black,
-                                        ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text(AppLocalizations.of(context)!.delete),
-                          ),
+                        OutlinedButton(
+                          onPressed: () {
+                            MapUtils.openMap(widget.post.latLng.latitude,
+                                widget.post.latLng.longitude);
+                          },
+                          child: const Icon(Icons.directions, size: 24),
+                        ),
                         const SizedBox(width: 16),
-                        if (widget.post.adsUserId !=
-                            AppConstant.firebaseUser!.uid)
-                          OutlinedButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  isLoading
-                                      ? Colors.black45
-                                      : AppColor.secondaryColor),
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  isLoading
-                                      ? Colors.black45
-                                      : AppColor.secondaryColor),
-                            ),
-                            onPressed: () async {
-                              try {
-                                if (isLoading) return;
-                                setState(() {
-                                  isLoading = true;
+                        OutlinedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                isLoading
+                                    ? Colors.black45
+                                    : AppColor.secondaryColor),
+                            foregroundColor: MaterialStateProperty.all<Color>(
+                                isLoading
+                                    ? Colors.black45
+                                    : AppColor.secondaryColor),
+                          ),
+                          onPressed: () async {
+                            try {
+                              if (widget.post.adsUserId ==
+                                  AppConstant.firebaseUser!.uid) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            AppLocalizations.of(context)!
+                                                .can_not_contact)));
+                                return;
+                              }
+                              if (isLoading) return;
+                              setState(() {
+                                isLoading = true;
+                              });
+
+                              final navigator = Navigator.of(context);
+
+                              List<Exchange> existExchange =
+                                  await exchangeBloc.checkExchangeExist(
+                                      widget.post.id.toString(),
+                                      AppConstant.firebaseUser!.uid);
+                              if (existExchange.isEmpty) {
+                                var meta = <String, dynamic>{};
+                                meta["post_id"] = widget.post.id;
+                                meta["phone"] = widget.post.phone;
+                                meta["amount"] = widget.post.amount;
+                                final room = await FirebaseChatCore.instance
+                                    .createRoom(
+                                        types.User(id: widget.post.adsUserId),
+                                        metadata: meta);
+
+                                await exchangeBloc.createExchange({
+                                  "ads_post_id": widget.post.id.toString(),
+                                  "ads_user_id":
+                                      widget.post.adsUserId.toString(),
+                                  "ex_user_id": AppConstant.firebaseUser!.uid,
+                                  "ex_device_id":
+                                      await PlatformDeviceId.getDeviceId,
+                                  "room_id": room.id,
+                                  "amount": "0",
+                                  "status": "initiated"
                                 });
-
-                                final navigator = Navigator.of(context);
-
-                                List<Exchange> existExchange =
-                                    await exchangeBloc.checkExchangeExist(
-                                        widget.post.id.toString(),
-                                        AppConstant.firebaseUser!.uid);
-                                if (existExchange.isEmpty) {
-                                  var meta = <String, dynamic>{};
-                                  meta["post_id"] = widget.post.id;
-                                  meta["phone"] = widget.post.phone;
-                                  meta["amount"] = widget.post.amount;
-                                  final room = await FirebaseChatCore.instance
-                                      .createRoom(
-                                          types.User(id: widget.post.adsUserId),
-                                          metadata: meta);
-
-                                  await exchangeBloc.createExchange({
-                                    "ads_post_id": widget.post.id.toString(),
-                                    "ads_user_id":
-                                        widget.post.adsUserId.toString(),
-                                    "ex_user_id": AppConstant.firebaseUser!.uid,
-                                    "ex_device_id":
-                                        await PlatformDeviceId.getDeviceId,
-                                    "room_id": room.id,
-                                    "amount": "0",
-                                    "status": "initiated"
-                                  });
-                                  await navigator.push(
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatPage(
-                                          postId: widget.post.id,
-                                          room: types.Room(
-                                              id: room.id,
-                                              name: widget.post.phone,
-                                              users: [
-                                                types.User(
-                                                    id: widget.post.adsUserId),
-                                                types.User(
-                                                    id: AppConstant
-                                                        .firebaseUser!.uid)
-                                              ],
-                                              type: types.RoomType.direct)),
-                                    ),
-                                  );
-                                } else {
-                                  await navigator.push(
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatPage(
-                                        postId: existExchange[0].post!.id,
+                                await navigator.push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatPage(
+                                        postId: widget.post.id,
                                         room: types.Room(
-                                            id: existExchange[0].roomId,
-                                            name: existExchange[0].post!.phone,
+                                            id: room.id,
+                                            name: widget.post.phone,
                                             users: [
                                               types.User(
-                                                  id: existExchange[0]
-                                                      .adsUserId),
+                                                  id: widget.post.adsUserId),
                                               types.User(
-                                                  id: existExchange[0].exUserId)
+                                                  id: AppConstant
+                                                      .firebaseUser!.uid)
                                             ],
-                                            type: types.RoomType.direct),
-                                      ),
+                                            type: types.RoomType.direct)),
+                                  ),
+                                );
+                              } else {
+                                await navigator.push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatPage(
+                                      postId: existExchange[0].post!.id,
+                                      room: types.Room(
+                                          id: existExchange[0].roomId,
+                                          name: existExchange[0].post!.phone,
+                                          users: [
+                                            types.User(
+                                                id: existExchange[0].adsUserId),
+                                            types.User(
+                                                id: existExchange[0].exUserId)
+                                          ],
+                                          type: types.RoomType.direct),
                                     ),
-                                  );
-                                }
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              } catch (e) {
-                                setState(() {
-                                  isLoading = false;
-                                });
-                                debugPrint(e.toString());
+                                  ),
+                                );
                               }
-                            },
-                            child: Text(AppLocalizations.of(context)!.contact,
-                                style: const TextStyle(color: Colors.white)),
-                          )
-                        else
-                          OutlinedButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  isLoading
-                                      ? Colors.black45
-                                      : AppColor.secondaryColor),
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  isLoading
-                                      ? Colors.black45
-                                      : AppColor.secondaryColor),
-                            ),
-                            onPressed: () async {
-                              String updated = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        CreatePostPage(post: widget.post)),
-                              );
-                              if (updated == "_createdPost" &&
-                                  widget.onUpdated != null) {
-                                widget.onUpdated!();
-                              }
-                            },
-                            child: Text(AppLocalizations.of(context)!.edit,
-                                style: const TextStyle(color: Colors.white)),
-                          )
+                              setState(() {
+                                isLoading = false;
+                              });
+                            } catch (e) {
+                              setState(() {
+                                isLoading = false;
+                              });
+                              debugPrint(e.toString());
+                            }
+                          },
+                          child: Text(AppLocalizations.of(context)!.contact,
+                              style: const TextStyle(color: Colors.white)),
+                        )
                       ],
                     )
                   ],

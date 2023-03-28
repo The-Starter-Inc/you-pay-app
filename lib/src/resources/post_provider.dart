@@ -19,7 +19,7 @@ class PostApiProvider {
               "${AppConstant.host}/api/adspost?keyword=$keywords&search=$search&sort=percentage&order=asc&rows=9999"),
           headers: headers);
       if (response.statusCode == 200) {
-        return Post.fromJson(json.decode(response.body));
+        return Post.fromMapArray(json.decode(response.body));
       } else {
         throw Exception('Failed to load post');
       }
@@ -34,7 +34,7 @@ class PostApiProvider {
                 "${AppConstant.host}/api/adspost?keyword=\"$keywords\"&sort=percentage&order=asc&rows=9999"),
             headers: headers);
         if (response.statusCode == 200) {
-          return Post.fromJson(json.decode(response.body));
+          return Post.fromMapArray(json.decode(response.body));
         } else {
           throw Exception('Failed to load post');
         }
@@ -46,7 +46,7 @@ class PostApiProvider {
             headers: headers);
 
         if (response.statusCode == 200) {
-          return Post.fromJson(json.decode(response.body));
+          return Post.fromMapArray(json.decode(response.body));
         } else {
           throw Exception('Failed to load post');
         }
@@ -58,10 +58,24 @@ class PostApiProvider {
               "${AppConstant.host}/api/adspost?sort=percentage&order=asc&rows=9999"),
           headers: headers);
       if (response.statusCode == 200) {
-        return Post.fromJson(json.decode(response.body));
+        return Post.fromMapArray(json.decode(response.body));
       } else {
         throw Exception('Failed to load post');
       }
+    }
+  }
+
+  Future<List<Post>> fetchMyPosts(String? search) async {
+    // If search filter with
+    final response = await client.get(
+        Uri.parse(
+            "${AppConstant.host}/api/adspost?search=$search&sort=id&order=desc&rows=9999"),
+        headers: headers);
+
+    if (response.statusCode == 200) {
+      return Post.fromMapArray(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load post');
     }
   }
 
@@ -72,7 +86,7 @@ class PostApiProvider {
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
-      return Post.fromJsonObj(json.decode(response.body));
+      return Post.fromMap(json.decode(response.body));
     } else {
       // If that call was not successful, throw an error.
       throw Exception(response.body);
@@ -87,7 +101,23 @@ class PostApiProvider {
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
-      return Post.fromJsonObj(json.decode(response.body));
+      return Post.fromMap(json.decode(response.body));
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception(response.body);
+    }
+  }
+
+  Future<Post> updateAdsPost(id, payload) async {
+    print(payload);
+    final response = await client.put(
+        Uri.parse("${AppConstant.host}/api/adspost/$id"),
+        headers: headers,
+        body: payload);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      return Post.fromMap(json.decode(response.body));
     } else {
       // If that call was not successful, throw an error.
       throw Exception(response.body);

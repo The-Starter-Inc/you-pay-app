@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:localstore/localstore.dart';
 import 'package:p2p_pay/src/blocs/post_bloc.dart';
+import 'package:p2p_pay/src/blocs/sponsor_bloc.dart';
 import 'package:p2p_pay/src/models/notification_event.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import 'package:p2p_pay/src/ui/notification_page.dart';
@@ -21,9 +22,9 @@ import '../constants/app_constant.dart';
 import '../models/post.dart';
 
 class MapsPage extends StatefulWidget {
-  final Provider? you;
-  final Provider? pay;
-  const MapsPage({super.key, this.you, this.pay});
+  late Provider? you;
+  late Provider? pay;
+  MapsPage({super.key, this.you, this.pay});
 
   @override
   State<MapsPage> createState() => _MapsPageState();
@@ -35,6 +36,7 @@ class _MapsPageState extends State<MapsPage> {
   late LatLng _center = const LatLng(16.79729673247046, 96.13215959983089);
   final Event notiEvent = Event<NotificationEvent>();
   final ProviderBloc providerBloc = ProviderBloc();
+  final SponsorBloc sponsorBloc = SponsorBloc();
   final PostBloc postBloc = PostBloc();
   final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
@@ -57,28 +59,38 @@ class _MapsPageState extends State<MapsPage> {
 
   initData() async {
     _getCurrentPosition();
+    AppConstant.you = widget.you ?? AppConstant.you;
+    AppConstant.pay = widget.pay ?? AppConstant.pay;
     providerBloc.fetchProviders();
-    postBloc.fetchPosts(null, null);
+    postBloc.fetchPosts(null, "status:equal:true");
+    sponsorBloc.fetchSponsors("marquee");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       Localstore.instance
           .collection('notifications')
           .doc(message.messageId)
           .set(message.toMap());
       setState(() {
-        AppConstant.hasNotification = true;
-        hasNotification = true;
-        notificationCounts += 1;
+        //AppConstant.hasNotification = true;
+        if (message.data['type'] != 'message') {
+          hasNotification = true;
+          notificationCounts += 1;
+        }
       });
     });
-    setState(() {
-      hasNotification = AppConstant.hasNotification;
-    });
+    // setState(() {
+    //   hasNotification = AppConstant.hasNotification;
+    // });
     final notifications = await db.collection('notifications').get();
-    if (notifications!.isNotEmpty) {
+    if (notifications != null &&
+        notifications.keys
+            .where((key) => notifications[key]['data']['type'] != 'message')
+            .isNotEmpty) {
       setState(() {
-        AppConstant.hasNotification = true;
-        hasNotification = AppConstant.hasNotification;
-        notificationCounts = notifications.length;
+        //AppConstant.hasNotification = true;
+        hasNotification = true;
+        notificationCounts = notifications.keys
+            .where((key) => notifications[key]['data']['type'] != 'message')
+            .length;
       });
     }
   }
@@ -110,8 +122,8 @@ class _MapsPageState extends State<MapsPage> {
                   ? posts[i].providers[1].name
                   : posts[i].providers[0].name,
               posts[i].adsUserId != AppConstant.firebaseUser!.uid
-                  ? posts[i].providers[1].marker.url
-                  : posts[i].providers[0].marker.url)),
+                  ? posts[i].providers[1].marker!.url
+                  : posts[i].providers[0].marker!.url)),
           position: posts[i].latLng,
           consumeTapEvents: true,
           onTap: () {
@@ -127,22 +139,6 @@ class _MapsPageState extends State<MapsPage> {
               MarkerWindow(
                 post: posts[i],
                 infoWindowController: _customInfoWindowController,
-                onDeleted: () {
-                  _customInfoWindowController.hideInfoWindow!();
-                  postBloc.fetchPosts(
-                      filterProviders.isNotEmpty
-                          ? filterProviders.join(" ")
-                          : null,
-                      null);
-                },
-                onUpdated: () {
-                  _customInfoWindowController.hideInfoWindow!();
-                  postBloc.fetchPosts(
-                      filterProviders.isNotEmpty
-                          ? filterProviders.join(" ")
-                          : null,
-                      null);
-                },
               ),
               posts[i].latLng,
             );
@@ -269,14 +265,23 @@ class _MapsPageState extends State<MapsPage> {
                 stream: postBloc.posts,
                 builder: (context, AsyncSnapshot<List<Post>> snapshot) {
                   if (snapshot.hasData) {
-                    posts = snapshot.data!
-                        .where((post) =>
-                            post.providers.length > 1 &&
-                            widget.you != null &&
-                            widget.pay != null &&
-                            post.providers[0].name == widget.you!.name &&
-                            post.providers[1].name == widget.pay!.name)
-                        .toList();
+                    posts = AppConstant.pay!.name != 'All'
+                        ? snapshot.data!
+                            .where((post) =>
+                                post.providers.length > 1 &&
+                                widget.you != null &&
+                                widget.pay != null &&
+                                post.providers[1].name ==
+                                    AppConstant.you!.name &&
+                                post.providers[0].name == AppConstant.pay!.name)
+                            .toList()
+                        : snapshot.data!
+                            .where((post) =>
+                                post.providers.length > 1 &&
+                                widget.you != null &&
+                                widget.pay != null &&
+                                post.providers[1].name == AppConstant.you!.name)
+                            .toList();
                     addMarkers();
                     return _mapsOrList();
                   }
@@ -284,7 +289,7 @@ class _MapsPageState extends State<MapsPage> {
                 }),
             CustomInfoWindow(
               controller: _customInfoWindowController,
-              height: 366,
+              height: 350,
               width: 250,
               offset: 50,
             ),
@@ -300,105 +305,141 @@ class _MapsPageState extends State<MapsPage> {
                               borderRadius: BorderRadius.circular(32),
                               side: const BorderSide(
                                   color: Colors.white24, width: 1)),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            width: double.infinity,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 5, 10, 5),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () async {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const SearchPage()));
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        const Icon(
-                                          Icons.search,
-                                          size: 24,
-                                          color: Colors.black45,
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .tap_search,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(
-                                                color: Colors.black45,
-                                              ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Stack(
+                          child: InkWell(
+                              onTap: () async {
+                                List<dynamic> result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SearchPage(isPop: true)));
+
+                                AppConstant.you = result[0];
+                                AppConstant.pay = result[1];
+                                postBloc.fetchPosts(null, "status:equal:true");
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(32),
+                                ),
+                                width: double.infinity,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 5, 10, 5),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black12,
-                                          borderRadius:
-                                              BorderRadius.circular(32),
-                                        ),
-                                        height: 32,
-                                        width: 32,
-                                        child: InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              notificationCounts = 0;
-                                              hasNotification = false;
-                                            });
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const NotificationPage()));
-                                          },
-                                          child: const Icon(Icons.notifications,
-                                              size: 24, color: Colors.black),
-                                        ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.search,
+                                            size: 24,
+                                            color: Colors.black45,
+                                          ),
+                                          const SizedBox(width: 16),
+                                          if (widget.you != null)
+                                            Text(
+                                              "${AppConstant.you!.name}, ${AppConstant.pay!.name}",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium!
+                                                  .copyWith(
+                                                      color: Colors.black,
+                                                      fontFamily: 'Pyidaungsu'),
+                                            )
+                                          else
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .tap_search,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium!
+                                                  .copyWith(
+                                                      color: Colors.black45,
+                                                      fontFamily: 'Pyidaungsu'),
+                                            )
+                                        ],
                                       ),
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.black12,
+                                              borderRadius:
+                                                  BorderRadius.circular(32),
+                                            ),
+                                            height: 32,
+                                            width: 32,
+                                            child: InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  notificationCounts = 0;
+                                                  hasNotification = false;
+                                                });
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const NotificationPage()));
+                                              },
+                                              child: const Icon(
+                                                  Icons.notifications,
+                                                  size: 24,
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        ],
+                                      )
                                     ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          )),
+                                  ),
+                                ),
+                              ))),
                     ),
                     const SizedBox(height: 8),
                     // Provider List
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 0),
-                      decoration: BoxDecoration(
-                        color: Colors.indigo.shade100,
+                      decoration: const BoxDecoration(
+                        color: Color.fromARGB(119, 23, 52, 64),
                       ),
                       height: 40,
-                      child: Marquee(
-                        gap: 24,
-                        loopDuration: const Duration(milliseconds: 6000),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/images/speaker.png", width: 24),
-                            const SizedBox(width: 16),
-                            const Text(
-                                'You Pay App လေးကိုအသုံးပြုပြီး လူကြီးမင်း၏ Community ကိုတိုးချဲ့လိုက်ပါ',
-                                style: TextStyle(
-                                    color: Colors.indigoAccent,
-                                    fontWeight: FontWeight.bold))
-                          ],
-                        ),
-                      ),
+                      child: StreamBuilder(
+                          stream: sponsorBloc.sponsors,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              int durations = snapshot.data!
+                                  .fold(0, (a, b) => a + b.timeout);
+                              List<Widget> sponsors = snapshot.data!
+                                  .map((e) => Container(
+                                      margin: const EdgeInsets.only(right: 16),
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                              "assets/images/marketing.png",
+                                              width: 24),
+                                          const SizedBox(width: 16),
+                                          Text(e.title!,
+                                              style: const TextStyle(
+                                                  color:
+                                                      AppColor.secondaryColor,
+                                                  fontFamily: 'Pyidaungsu'))
+                                        ],
+                                      )))
+                                  .toList();
+
+                              return Marquee(
+                                gap: 24,
+                                loopDuration: Duration(milliseconds: durations),
+                                child: Row(
+                                  children: sponsors,
+                                ),
+                              );
+                            }
+                            return Container();
+                          }),
                     ),
                   ],
                 )),
@@ -471,25 +512,7 @@ class _MapsPageState extends State<MapsPage> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   // clipBehavior: Clip.none,
-                  children: [
-                    ...posts.map((post) => PostItem(
-                          post: post,
-                          onDeleted: () {
-                            postBloc.fetchPosts(
-                                filterProviders.isNotEmpty
-                                    ? filterProviders.join(" ")
-                                    : null,
-                                null);
-                          },
-                          onUpdated: () {
-                            postBloc.fetchPosts(
-                                filterProviders.isNotEmpty
-                                    ? filterProviders.join(" ")
-                                    : null,
-                                null);
-                          },
-                        ))
-                  ],
+                  children: [...posts.map((post) => PostItem(post: post))],
                 ),
               );
   }

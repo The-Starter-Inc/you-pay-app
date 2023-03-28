@@ -17,7 +17,6 @@ import 'blocs/auth_bloc.dart';
 import 'constants/app_constant.dart';
 import 'models/token.dart';
 import 'theme/color_theme.dart';
-import 'ui/home_page.dart';
 import 'utils/alert_util.dart';
 
 class AppSplash extends StatefulWidget {
@@ -35,11 +34,14 @@ class _AppSplashState extends State<AppSplash> {
   void initState() {
     super.initState();
     initializeFlutterFire();
-    authBloc.fetchToken({
-      "grant_type": "client_credentials",
-      "client_id": AppConstant.clientId,
-      "client_secret": AppConstant.clientSecret
+    Timer(const Duration(seconds: 2), () async {
+      authBloc.fetchToken({
+        "grant_type": "client_credentials",
+        "client_id": AppConstant.clientId,
+        "client_secret": AppConstant.clientSecret
+      });
     });
+
     Timer(const Duration(seconds: 3), () async {
       String? deviceId = await PlatformDeviceId.getDeviceId;
       await firebaseUserLogin("$deviceId@fk.com");
@@ -49,8 +51,10 @@ class _AppSplashState extends State<AppSplash> {
           .get();
       if (user != null) {
         AppConstant.currentUser = types.User.fromMap(user);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const SearchPage()));
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const SearchPage(isPop: false)));
       } else {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const LoginPage()));
@@ -98,12 +102,12 @@ class _AppSplashState extends State<AppSplash> {
       color: AppColor.secondaryColor,
       child: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: Center(
-              child: Image.asset('assets/images/you-pay.png', width: 150),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(0.0),
+          //   child: Center(
+          //     child: Image.asset('assets/images/you-pay.png', width: 150),
+          //   ),
+          // ),
           Positioned(
               bottom: 24.0,
               left: 0.0,
@@ -114,7 +118,8 @@ class _AppSplashState extends State<AppSplash> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text("The Community Exchange Supported by",
+                      Text("The Community Exchange\nSupported by",
+                          textAlign: TextAlign.center,
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall!
@@ -129,10 +134,20 @@ class _AppSplashState extends State<AppSplash> {
               builder: (context, AsyncSnapshot<Token> snapshot) {
                 if (snapshot.hasData) {
                   AppConstant.accessToken = snapshot.data!.access_token;
-                  return Container();
+                  return Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                        margin: const EdgeInsets.only(bottom: 100),
+                        child: Image.asset('assets/images/you-pay.png',
+                            width: 150)),
+                  );
                 } else {
-                  return Center(
-                    child: Image.asset("assets/images/loading.gif", width: 100),
+                  return Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                        margin: const EdgeInsets.only(bottom: 100),
+                        child: Image.asset('assets/images/loading.gif',
+                            width: 150)),
                   );
                 }
               })

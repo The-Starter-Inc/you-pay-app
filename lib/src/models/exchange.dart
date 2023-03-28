@@ -1,10 +1,13 @@
 import 'post.dart';
+import 'user.dart';
 
 class Exchange {
   int id;
   int adsPostId;
   String adsUserId;
+  User? adsUser;
   String exUserId;
+  User? exUser;
   String roomId;
   double amount;
   String? status;
@@ -18,6 +21,8 @@ class Exchange {
       required this.exUserId,
       required this.roomId,
       required this.amount,
+      this.adsUser,
+      this.exUser,
       this.status,
       this.post,
       required this.createdAt});
@@ -30,8 +35,14 @@ class Exchange {
             id: parsedJson[i]['id'],
             adsPostId: parsedJson[i]['ads_post_id'],
             adsUserId: parsedJson[i]['ads_user_id'],
+            adsUser: parsedJson[i]['ads_user'] != null
+                ? User.fromMap(parsedJson[i]['ads_user'])
+                : null,
             exUserId: parsedJson[i]['ex_user_id'],
-            post: Post.fromJsonObj(parsedJson[i]['post']),
+            exUser: parsedJson[i]['ex_user'] != null
+                ? User.fromMap(parsedJson[i]['ex_user'])
+                : null,
+            post: Post.fromMap(parsedJson[i]['post']),
             amount: double.parse((parsedJson[i]['amount'] ?? 0).toString())
                 .toDouble(),
             status: parsedJson[i]['status'],
@@ -47,7 +58,13 @@ class Exchange {
         id: parsedJson['id'],
         adsPostId: parsedJson['ads_post_id'],
         adsUserId: parsedJson['ads_user_id'],
+        adsUser: parsedJson['ads_user'] != null
+            ? User.fromMap(parsedJson['ads_user'])
+            : null,
         exUserId: parsedJson['ex_user_id'],
+        exUser: parsedJson['ex_user'] != null
+            ? User.fromMap(parsedJson['ex_user'])
+            : null,
         //post: parsedJson['post'] ? Post.fromJsonObj(parsedJson['post']) : null,
         amount: double.parse((parsedJson['amount'] ?? 0).toString()).toDouble(),
         status: parsedJson['status'],
