@@ -174,7 +174,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       //   items: dataList[0],
                       // ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Flexible(
                               child: DropDownText(
@@ -214,11 +215,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           errorText: frmError.chargesType,
                           items: [
                             DropDown("percentage",
-                                AppLocalizations.of(context)!.percentage),
-                            DropDown("fix_amount",
-                                AppLocalizations.of(context)!.fixed_amount),
-                            DropDown("exchange_rate",
-                                AppLocalizations.of(context)!.exchange_rate),
+                                AppLocalizations.of(context)!.percentage, null),
+                            DropDown(
+                                "fix_amount",
+                                AppLocalizations.of(context)!.fixed_amount,
+                                null),
+                            DropDown(
+                                "exchange_rate",
+                                AppLocalizations.of(context)!.exchange_rate,
+                                null),
                           ],
                         )),
                         const SizedBox(width: 16),

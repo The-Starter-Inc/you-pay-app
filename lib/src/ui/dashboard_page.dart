@@ -102,7 +102,7 @@ class _DashboardPageState extends State<DashboardPage> {
               if (snapshot.hasData) {
                 print(snapshot.data!.length);
                 if (AppConstant.you != null) {
-                  posts = AppConstant.pay!.name != 'All'
+                  posts = AppConstant.pay!.name != 'All Provider'
                       ? snapshot.data!
                           .where((post) =>
                               post.providers.length > 1 &&
@@ -125,7 +125,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       .where((post) =>
                           post.providers.length > 1 &&
                           widget.you != null &&
-                          widget.pay != null &&
                           post.adsUser != null)
                       .toList();
                 }

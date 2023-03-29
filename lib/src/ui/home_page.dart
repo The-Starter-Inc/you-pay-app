@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
 
     FirebaseMessaging.onMessage.listen(showFlutterNotification);
 
-    await FirebaseMessaging.instance.subscribeToTopic('general1');
+    await FirebaseMessaging.instance.subscribeToTopic('general');
     await FirebaseMessaging.instance
         .subscribeToTopic(AppConstant.firebaseUser!.uid);
 

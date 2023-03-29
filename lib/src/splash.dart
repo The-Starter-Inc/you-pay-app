@@ -28,17 +28,27 @@ class AppSplash extends StatefulWidget {
 
 class _AppSplashState extends State<AppSplash> {
   var _appLocale;
+  bool isLoading = true;
   final AuthBloc authBloc = AuthBloc();
 
   @override
   void initState() {
     super.initState();
+
     initializeFlutterFire();
-    Timer(const Duration(seconds: 2), () async {
-      authBloc.fetchToken({
-        "grant_type": "client_credentials",
-        "client_id": AppConstant.clientId,
-        "client_secret": AppConstant.clientSecret
+    getStarted();
+  }
+
+  void getStarted() async {
+    Token token = await authBloc.fetchToken({
+      "grant_type": "client_credentials",
+      "client_id": AppConstant.clientId,
+      "client_secret": AppConstant.clientSecret
+    });
+    AppConstant.accessToken = token.access_token;
+    Timer(const Duration(seconds: 2), () {
+      setState(() {
+        isLoading = false;
       });
     });
 
@@ -129,28 +139,20 @@ class _AppSplashState extends State<AppSplash> {
                   ),
                 ),
               )),
-          StreamBuilder<Token>(
-              stream: authBloc.token,
-              builder: (context, AsyncSnapshot<Token> snapshot) {
-                if (snapshot.hasData) {
-                  AppConstant.accessToken = snapshot.data!.access_token;
-                  return Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                        margin: const EdgeInsets.only(bottom: 100),
-                        child: Image.asset('assets/images/you-pay.png',
-                            width: 150)),
-                  );
-                } else {
-                  return Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                        margin: const EdgeInsets.only(bottom: 100),
-                        child: Image.asset('assets/images/loading.gif',
-                            width: 150)),
-                  );
-                }
-              })
+          if (isLoading)
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                  margin: const EdgeInsets.only(bottom: 100),
+                  child: Image.asset('assets/images/loading.gif', width: 150)),
+            )
+          else
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                  margin: const EdgeInsets.only(bottom: 100),
+                  child: Image.asset('assets/images/you-pay.png', width: 150)),
+            )
         ],
       ),
     );

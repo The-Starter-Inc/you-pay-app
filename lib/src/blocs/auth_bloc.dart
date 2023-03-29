@@ -8,9 +8,9 @@ class AuthBloc {
 
   Stream<Token> get token => tokenFetcher.stream;
 
-  fetchToken(payload) async {
+  Future<Token> fetchToken(payload) async {
     Token token = await repository.fetchToken(payload);
-    tokenFetcher.sink.add(token);
+    return token;
   }
 
   dispose() {

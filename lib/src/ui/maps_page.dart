@@ -265,7 +265,7 @@ class _MapsPageState extends State<MapsPage> {
                 stream: postBloc.posts,
                 builder: (context, AsyncSnapshot<List<Post>> snapshot) {
                   if (snapshot.hasData) {
-                    posts = AppConstant.pay!.name != 'All'
+                    posts = AppConstant.pay!.name != 'All Provider'
                         ? snapshot.data!
                             .where((post) =>
                                 post.providers.length > 1 &&
@@ -279,7 +279,6 @@ class _MapsPageState extends State<MapsPage> {
                             .where((post) =>
                                 post.providers.length > 1 &&
                                 widget.you != null &&
-                                widget.pay != null &&
                                 post.providers[1].name == AppConstant.you!.name)
                             .toList();
                     addMarkers();

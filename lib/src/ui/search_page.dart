@@ -177,13 +177,18 @@ class _SearchPageState extends State<SearchPage> {
                             streams: [providerBloc.providers],
                             builder: (context, dataList) {
                               if (dataList[0] != null) {
-                                providers = [Provider(id: 0, name: "All")] +
+                                providers = [
+                                      Provider(id: 0, name: "All Provider")
+                                    ] +
                                     dataList[0];
                                 return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Flexible(
                                             child: DropDownText(
@@ -310,7 +315,7 @@ class _SearchPageState extends State<SearchPage> {
                                         .where((x) => x.name == 'Cash')
                                         .toList()[0];
                                     AppConstant.pay = providers
-                                        .where((x) => x.name == 'All')
+                                        .where((x) => x.name == 'All Provider')
                                         .toList()[0];
                                     Navigator.pushReplacement(
                                         context,

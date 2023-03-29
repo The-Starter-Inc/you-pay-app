@@ -13,7 +13,6 @@ import '../../blocs/post_bloc.dart';
 import '../../constants/app_constant.dart';
 import '../../models/exchange.dart';
 import '../../models/post.dart';
-import '../../utils/alert_util.dart';
 import '../../utils/map_util.dart';
 import '../chat_page.dart';
 
