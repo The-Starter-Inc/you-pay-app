@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
             isLoading = false;
           });
-          AlertUtil.showErrorAlert(context, e);
+          AlertUtil.showErrorAlert(context, e.toString());
         }
       }
     } else {
@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       if (!mounted) return;
     } catch (e) {
-      AlertUtil.showErrorAlert(context, e);
+      AlertUtil.showErrorAlert(context, e.toString());
     }
   }
 

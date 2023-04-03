@@ -50,10 +50,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                       Navigator.of(context).pop();
                     },
                     child: Text(AppLocalizations.of(context)!.cancel,
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  color: Colors.black,
-                                ))),
+                        style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold
+                        ))),
                 TextButton(
                   onPressed: () async {
                     Navigator.of(context).pop();
@@ -78,16 +78,16 @@ class _ExchangeItemState extends State<ExchangeItem> {
                 ),
               ],
               content: Text(AppLocalizations.of(context)!.delete_confirm_msg,
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Colors.black,
-                        fontFamily: 'Pyidaungsu',
-                      )),
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold
+                  )),
               title: Text(
                 AppLocalizations.of(context)!.confirm,
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Colors.black,
-                      fontFamily: 'Pyidaungsu',
-                    ),
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold
+                ),
               ),
             ));
   }
@@ -177,10 +177,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                   .exchange.adsUser!.name![0]
                                               : widget
                                                   .exchange.exUser!.name![0],
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .copyWith(color: Colors.black)),
+                                          style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold
+                                          )),
                                     )),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,12 +190,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                 AppConstant.currentUser!.id
                                             ? widget.exchange.adsUser!.name!
                                             : widget.exchange.exUser!.name!,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontSize: 16)),
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold
+                                        )),
                                     Text(
                                         widget.exchange.post!.priority !=
                                                     null &&
@@ -204,13 +202,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                     0
                                             ? "Verified"
                                             : "Unverified",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium!
-                                            .copyWith(
-                                                color: Colors.green,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12))
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold
+                                        ))
                                   ],
                                 )
                               ],
@@ -228,13 +223,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                 children: [
                                   Text(
                                       "${MyanNunber.convertMoneyNumber(widget.exchange.post!.amount)} ${AppLocalizations.of(context)!.mmk}",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge!
-                                          .copyWith(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16)),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold
+                                      )),
                                   Text(
                                       widget.exchange.post!.chargesType ==
                                               'percentage'
@@ -243,12 +235,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                   'fix_amount'
                                               ? "${MyanNunber.convertMoneyNumber(widget.exchange.post!.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}"
                                               : "${MyanNunber.convertMoneyNumber(widget.exchange.post!.exchangeRate)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.exchange_rate}",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: Colors.black87,
-                                          ))
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold
+                                      ))
                                 ],
                               )),
                         ],
@@ -272,12 +262,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                           Text(
                                               AppLocalizations.of(context)!.you,
                                               textAlign: TextAlign.start,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .copyWith(
-                                                    color: Colors.black87,
-                                                  )),
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold
+                                              )),
                                           Row(
                                             children: [
                                               Container(
@@ -297,12 +285,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                               Text(
                                                   widget.exchange.post!
                                                       .providers[1].name,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleLarge!
-                                                      .copyWith(
-                                                          color: Colors.black,
-                                                          fontSize: 16))
+                                                  style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold
+                                                  ))
                                             ],
                                           )
                                         ],
@@ -334,12 +320,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(AppLocalizations.of(context)!.pay,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall!
-                                                .copyWith(
-                                                  color: Colors.black87,
-                                                )),
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold
+                                            )),
                                         Row(
                                           children: [
                                             Container(
@@ -358,12 +342,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                             Text(
                                                 widget.exchange.post!
                                                     .providers[0].name,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleLarge!
-                                                    .copyWith(
-                                                        color: Colors.black,
-                                                        fontSize: 16))
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold
+                                                ))
                                           ],
                                         )
                                       ],
@@ -383,12 +365,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                           Text(
                                               AppLocalizations.of(context)!.you,
                                               textAlign: TextAlign.start,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .copyWith(
-                                                    color: Colors.black87,
-                                                  )),
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold
+                                              )),
                                           Row(children: [
                                             Container(
                                               width: 3,
@@ -406,12 +386,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                             Text(
                                                 widget.exchange.post!
                                                     .providers[0].name,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleLarge!
-                                                    .copyWith(
-                                                        color: Colors.black,
-                                                        fontSize: 16)),
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold
+                                                )),
                                           ]),
                                         ],
                                       ),
@@ -431,8 +409,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                       color: Colors.white,
                                                     ),
                                               ),
-                                              const Icon(Icons.swap_horiz,
-                                                  color: Colors.black, size: 22)
+                                              const Icon(Icons.swap_horiz,  size: 22)
                                             ],
                                           )),
                                     if (widget.exchange.post!.providers.length >
@@ -445,12 +422,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                         children: [
                                           Text(
                                               AppLocalizations.of(context)!.pay,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .copyWith(
-                                                    color: Colors.black87,
-                                                  )),
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold
+                                              )),
                                           Row(
                                             children: [
                                               Container(
@@ -470,12 +445,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                               Text(
                                                   widget.exchange.post!
                                                       .providers[1].name,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleLarge!
-                                                      .copyWith(
-                                                          color: Colors.black,
-                                                          fontSize: 16))
+                                                  style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold
+                                                  ))
                                             ],
                                           )
                                         ],
@@ -495,7 +468,6 @@ class _ExchangeItemState extends State<ExchangeItem> {
                               child: Icon(
                             Icons.more_horiz,
                             size: 24,
-                            color: Colors.black54,
                           ))),
                       itemBuilder: (context) {
                         return [
@@ -507,7 +479,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                   color: Colors.red),
                               title: Text(
                                 AppLocalizations.of(context)!.delete,
-                                style: const TextStyle(color: Colors.black54),
+                                style: const TextStyle(color: Colors.grey),
                               ),
                             ),
                           )

@@ -84,11 +84,11 @@ class _SearchPageState extends State<SearchPage> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("Not Now",
-                          style:
-                              Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    color: Colors.black,
-                                  ))),
+                      child: const Text("Not Now",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold
+                          ))),
                 TextButton(
                   onPressed: () async {
                     Uri redirectUrl = Uri.parse(
@@ -102,17 +102,18 @@ class _SearchPageState extends State<SearchPage> {
                   child: const Text("Update Now"),
                 ),
               ],
-              title: Text(
+              title: const Text(
                 "Version Update",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(color: Colors.black, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold
+                ),
               ),
               content: Text("Pelase update for $versionName version.",
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Colors.black,
-                      )),
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold
+                  )),
             ),
           );
         });
@@ -146,7 +147,6 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.yellow.shade200,
         body: Stack(
           children: [
             // Positioned(
@@ -230,14 +230,6 @@ class _SearchPageState extends State<SearchPage> {
                                                 height: 50,
                                                 child: ElevatedButton(
                                                   style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStateProperty
-                                                              .all<Color>(AppColor
-                                                                  .primaryColor),
-                                                      foregroundColor:
-                                                          MaterialStateProperty
-                                                              .all<Color>(AppColor
-                                                                  .primaryColor),
                                                       shape: MaterialStateProperty.all<
                                                               RoundedRectangleBorder>(
                                                           RoundedRectangleBorder(
@@ -283,9 +275,7 @@ class _SearchPageState extends State<SearchPage> {
                                                   child: Text(
                                                       AppLocalizations.of(
                                                               context)!
-                                                          .search,
-                                                      style: const TextStyle(
-                                                          color: Colors.black)),
+                                                          .search,),
                                                 )))
                                       ],
                                     )
@@ -336,9 +326,7 @@ class _SearchPageState extends State<SearchPage> {
                                             BorderRadius.circular(32.0),
                                       ))),
                                   child: Text(
-                                      AppLocalizations.of(context)!.human_atm,
-                                      style: const TextStyle(
-                                          color: AppColor.secondaryColor)),
+                                      AppLocalizations.of(context)!.human_atm),
                                 ),
                               ),
                             ),
@@ -387,15 +375,10 @@ class _SearchPageState extends State<SearchPage> {
                                                     AppLocalizations.of(
                                                             context)!
                                                         .new_post,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge!
-                                                        .copyWith(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16,
-                                                            fontFamily:
-                                                                'Pyidaungsu')),
+                                                    style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.bold
+                                                    )),
                                               ),
                                               const SizedBox(height: 22),
                                               ListTile(
@@ -429,15 +412,10 @@ class _SearchPageState extends State<SearchPage> {
                                                     AppLocalizations.of(
                                                             context)!
                                                         .my_posts,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge!
-                                                        .copyWith(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16,
-                                                            fontFamily:
-                                                                'Pyidaungsu')),
+                                                    style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.bold
+                                                    )),
                                               ),
                                               const SizedBox(height: 22)
                                             ],
@@ -454,9 +432,7 @@ class _SearchPageState extends State<SearchPage> {
                                       borderRadius: BorderRadius.circular(32.0),
                                     ))),
                                 child: Text(
-                                    AppLocalizations.of(context)!.new_post,
-                                    style: const TextStyle(
-                                        color: AppColor.secondaryColor)),
+                                    AppLocalizations.of(context)!.new_post),
                               ),
                             )),
                           ],

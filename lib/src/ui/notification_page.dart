@@ -45,9 +45,8 @@ class _NotificationPagetate extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.notifications,
-                style: const TextStyle(color: Colors.black)),
-            backgroundColor: AppColor.primaryColor),
+            title: Text(AppLocalizations.of(context)!.notifications),
+            ),
         //body: const RipplesAnimation(),
         body: StreamBuilder<List<GeneralNoti>>(
           stream: generalNotiBloc.generalNotis,
@@ -57,10 +56,10 @@ class _NotificationPagetate extends State<NotificationPage> {
               if (snapshot.data!.isEmpty) {
                 return Center(
                     child: Text(AppLocalizations.of(context)!.no_data,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(color: Colors.black45)));
+                        style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold
+                        )));
               }
 
               return ListView.builder(
@@ -92,10 +91,10 @@ class _NotificationPagetate extends State<NotificationPage> {
               );
             } else if (snapshot.hasError) {
               return Text(snapshot.error.toString(),
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(color: Colors.black45));
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold
+                  ));
             }
             return Center(
                 child: Image.asset("assets/images/loading.gif", width: 100));

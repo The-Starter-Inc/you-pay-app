@@ -126,9 +126,10 @@ class _PostItemState extends State<PostItem> {
                 Navigator.of(context).pop();
               },
               child: Text(AppLocalizations.of(context)!.cancel,
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Colors.black,
-                      ))),
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold
+                  ))),
           TextButton(
             onPressed: () async {
               Navigator.of(context).pop();
@@ -153,14 +154,16 @@ class _PostItemState extends State<PostItem> {
           ),
         ],
         content: Text(AppLocalizations.of(context)!.delete_confirm_msg,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: Colors.black,
-                )),
+            style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold
+            )),
         title: Text(
           AppLocalizations.of(context)!.confirm,
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Colors.black,
-              ),
+          style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold
+          ),
         ),
       ),
     );
@@ -168,129 +171,165 @@ class _PostItemState extends State<PostItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 0),
-      //color: widget.post.priority! > 0 ? Colors.yellow.shade200 : Colors.white,
-      decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.black12))),
-      child: Padding(
-          padding: const EdgeInsets.only(bottom: 0),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (widget.post.adsUser != null)
-                    Container(
-                        margin:
-                            const EdgeInsets.only(left: 16, right: 16, top: 10),
-                        child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FeedbacksPage(
-                                        user: widget.post.adsUser!)),
-                              );
-                            },
-                            child: Row(
-                              children: [
-                                Container(
-                                    width: 40,
-                                    height: 40,
-                                    margin: const EdgeInsets.only(right: 16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.yellow.shade200,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(46)),
-                                    ),
-                                    child: Center(
-                                      child: Text(widget.post.adsUser!.name![0],
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .copyWith(color: Colors.black)),
-                                    )),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(widget.post.adsUser!.name!,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontSize: 16)),
-                                    Text(
-                                        widget.post.priority != null &&
-                                                widget.post.priority! > 0
-                                            ? "Verified"
-                                            : "Unverified",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium!
-                                            .copyWith(
-                                                color: Colors.green,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12))
-                                  ],
-                                )
-                              ],
-                            )))
-                  else
-                    const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+    return Card(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 0),
+        //color: widget.post.priority! > 0 ? Colors.yellow.shade200 : Colors.white,
+        decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.black12))),
+        child: Padding(
+            padding: const EdgeInsets.only(bottom: 0),
+            child: Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (widget.post.adsUser != null)
                       Container(
-                          margin: const EdgeInsets.only(left: 16, right: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  "${MyanNunber.convertMoneyNumber(widget.post.amount)} ${AppLocalizations.of(context)!.mmk}",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16)),
-                              Text(
-                                  widget.post.chargesType == 'percentage'
-                                      ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
-                                      : widget.post.chargesType == 'fix_amount'
-                                          ? "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}"
-                                          : "${MyanNunber.convertMoneyNumber(widget.post.exchangeRate)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.exchange_rate}",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                        color: Colors.black87,
-                                      ))
-                            ],
-                          )),
-                    ],
-                  ),
-                  Container(
-                      margin: const EdgeInsets.only(
-                          left: 16, right: 16, bottom: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          if (widget.post.providers.length > 1)
+                          margin:
+                          const EdgeInsets.only(left: 16, right: 16, top: 10),
+                          child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => FeedbacksPage(
+                                          user: widget.post.adsUser!)),
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                      width: 40,
+                                      height: 40,
+                                      margin: const EdgeInsets.only(right: 16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.yellow.shade200,
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(46)),
+                                      ),
+                                      child: Center(
+                                        child: Text(widget.post.adsUser!.name![0],
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold
+                                            )),
+                                      )),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(widget.post.adsUser!.name!,
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold
+                                          )),
+                                      Text(
+                                          widget.post.priority != null &&
+                                              widget.post.priority! > 0
+                                              ? "Verified"
+                                              : "Unverified",
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold
+                                          ))
+                                    ],
+                                  )
+                                ],
+                              )))
+                    else
+                      const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                            margin: const EdgeInsets.only(left: 16, right: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    "${MyanNunber.convertMoneyNumber(widget.post.amount)} ${AppLocalizations.of(context)!.mmk}",
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold
+                                    )),
+                                Text(
+                                    widget.post.chargesType == 'percentage'
+                                        ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
+                                        : widget.post.chargesType == 'fix_amount'
+                                        ? "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}"
+                                        : "${MyanNunber.convertMoneyNumber(widget.post.exchangeRate)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.exchange_rate}",
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold
+                                    ))
+                              ],
+                            )),
+                      ],
+                    ),
+                    Container(
+                        margin: const EdgeInsets.only(
+                            left: 16, right: 16, bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            if (widget.post.providers.length > 1)
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(AppLocalizations.of(context)!.you,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold
+                                      )),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 3,
+                                        height: 16,
+                                        margin: const EdgeInsets.only(right: 10),
+                                        decoration: BoxDecoration(
+                                            color: Color(int.parse(
+                                                widget.post.providers[1].color ??
+                                                    "0xFFCCCCCC"))),
+                                      ),
+                                      Text(widget.post.providers[1].name,
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold
+                                          ))
+                                    ],
+                                  )
+                                ],
+                              ),
+                            if (widget.post.providers.length > 1)
+                              Padding(
+                                  padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        "",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const Icon(Icons.swap_horiz,  size: 22)
+                                    ],
+                                  )),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(AppLocalizations.of(context)!.you,
-                                    textAlign: TextAlign.start,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall!
-                                        .copyWith(
-                                          color: Colors.black87,
-                                        )),
+                                Text(AppLocalizations.of(context)!.pay,
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold
+                                    )),
                                 Row(
                                   children: [
                                     Container(
@@ -299,111 +338,58 @@ class _PostItemState extends State<PostItem> {
                                       margin: const EdgeInsets.only(right: 10),
                                       decoration: BoxDecoration(
                                           color: Color(int.parse(
-                                              widget.post.providers[1].color ??
+                                              widget.post.providers[0].color ??
                                                   "0xFFCCCCCC"))),
                                     ),
-                                    Text(widget.post.providers[1].name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontSize: 16))
+                                    Text(widget.post.providers[0].name,
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold
+                                        ))
                                   ],
                                 )
                               ],
-                            ),
-                          if (widget.post.providers.length > 1)
-                            Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      "",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: Colors.white,
-                                          ),
-                                    ),
-                                    const Icon(Icons.swap_horiz,
-                                        color: Colors.black, size: 22)
-                                  ],
-                                )),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(AppLocalizations.of(context)!.pay,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                        color: Colors.black87,
-                                      )),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 3,
-                                    height: 16,
-                                    margin: const EdgeInsets.only(right: 10),
-                                    decoration: BoxDecoration(
-                                        color: Color(int.parse(
-                                            widget.post.providers[0].color ??
-                                                "0xFFCCCCCC"))),
-                                  ),
-                                  Text(widget.post.providers[0].name,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge!
-                                          .copyWith(
-                                              color: Colors.black,
-                                              fontSize: 16))
-                                ],
-                              )
-                            ],
-                          )
-                        ],
-                      ))
-                ],
-              ),
-              if (widget.post.priority != null && widget.post.priority! > 0)
+                            )
+                          ],
+                        ))
+                  ],
+                ),
+                if (widget.post.priority != null && widget.post.priority! > 0)
+                  Positioned(
+                      top: 8,
+                      right: 16,
+                      child: Image.asset("assets/images/trusted.png", width: 55)),
                 Positioned(
-                    top: 8,
+                    top: 80,
                     right: 16,
-                    child: Image.asset("assets/images/trusted.png", width: 55)),
-              Positioned(
-                  top: 80,
-                  right: 16,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (widget.post.adsUserId !=
-                          AppConstant.firebaseUser!.uid) {
-                        onContact();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(AppLocalizations.of(context)!
-                                .can_not_contact)));
-                      }
-                    },
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            AppColor.secondaryColor),
-                        foregroundColor: MaterialStateProperty.all<Color>(
-                            AppColor.secondaryColor),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32.0),
-                        ))),
-                    child: Text(AppLocalizations.of(context)!.contact,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 14)),
-                  ))
-            ],
-          )),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (widget.post.adsUserId !=
+                            AppConstant.firebaseUser!.uid) {
+                          onContact();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(AppLocalizations.of(context)!
+                                  .can_not_contact)));
+                        }
+                      },
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              AppColor.secondaryColor),
+                          foregroundColor: MaterialStateProperty.all<Color>(
+                              AppColor.secondaryColor),
+                          shape:
+                          MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32.0),
+                              ))),
+                      child: Text(AppLocalizations.of(context)!.contact,
+                          style:
+                          const TextStyle(color: Colors.white, fontSize: 14)),
+                    ))
+              ],
+            )),
+      ),
     );
   }
 }

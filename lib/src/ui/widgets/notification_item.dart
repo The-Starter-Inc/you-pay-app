@@ -93,28 +93,27 @@ class _NotificationItemState extends State<NotificationItem> {
             title: Text(widget.generalNoti.title!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(color: Colors.black87, fontFamily: 'Pyidaungsu')),
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold
+                )),
             subtitle: Text(widget.generalNoti.subtitle!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.black87, fontFamily: 'Pyidaungsu')),
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold
+                )),
             trailing: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   timeago.format(DateTime.parse(widget.generalNoti.createdAt)),
-                  style: const TextStyle(color: Colors.black54),
                 ),
                 const SizedBox(height: 16),
                 widget.hasNotification!
                     ? const Icon(Icons.circle, size: 8, color: Colors.red)
-                    : const Icon(Icons.circle, size: 8, color: Colors.white)
+                    : const Icon(Icons.circle, size: 8, color: Colors.grey)
               ],
             )),
         const Divider(

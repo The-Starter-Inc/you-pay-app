@@ -247,11 +247,9 @@ class _HomePageState extends State<HomePage> {
                             color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
-                          child: const Icon(Icons.dashboard,
-                              color: Colors.black, size: 24),
+                          child: const Icon(Icons.dashboard,  size: 24),
                         )
-                      : const Icon(Icons.dashboard,
-                          color: Color.fromARGB(198, 0, 0, 0)),
+                      : const Icon(Icons.dashboard),
                   label: AppLocalizations.of(context)!.home),
               BottomNavigationBarItem(
                   icon: currentTab == 1
@@ -262,11 +260,9 @@ class _HomePageState extends State<HomePage> {
                             color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
-                          child: const Icon(Icons.fmd_good,
-                              color: Colors.black, size: 24),
+                          child: const Icon(Icons.fmd_good,  size: 24),
                         )
-                      : const Icon(Icons.fmd_good,
-                          color: Color.fromARGB(198, 0, 0, 0)),
+                      : const Icon(Icons.fmd_good),
                   label: AppLocalizations.of(context)!.maps),
               BottomNavigationBarItem(icon: Container(), label: ""),
               BottomNavigationBarItem(
@@ -278,14 +274,12 @@ class _HomePageState extends State<HomePage> {
                             color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
-                          child: const Icon(Icons.chat_bubble,
-                              color: Colors.black, size: 24),
+                          child: const Icon(Icons.chat_bubble, size: 24),
                         )
                       : Stack(
                           children: [
                             const Icon(
                               Icons.chat_bubble,
-                              color: Color.fromARGB(198, 0, 0, 0),
                               size: 26,
                             ),
                             if (notificationCounts > 0)
@@ -316,17 +310,13 @@ class _HomePageState extends State<HomePage> {
                             color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
-                          child: const Icon(Icons.person,
-                              color: Colors.black, size: 24),
+                          child: const Icon(Icons.person,  size: 24),
                         )
-                      : const Icon(Icons.person,
-                          color: Color.fromARGB(198, 0, 0, 0)),
+                      : const Icon(Icons.person ),
                   label: AppLocalizations.of(context)!.profile)
             ],
-            backgroundColor: Colors.white,
             type: BottomNavigationBarType.fixed,
             currentIndex: currentTab,
-            selectedItemColor: Colors.black,
             iconSize: 30,
             onTap: _onItemTapped,
             elevation: 5));

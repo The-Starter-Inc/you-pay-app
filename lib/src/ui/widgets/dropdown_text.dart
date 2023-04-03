@@ -42,19 +42,20 @@ class _DropDownTextState extends State<DropDownText> {
               child: Row(
                 children: [
                   Text(widget.label!,
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black, fontFamily: 'Pyidaungsu'))
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold
+                      ))
                 ],
               ),
             )
           ],
           Container(
               decoration: BoxDecoration(
-                  color: Colors.white70,
                   border: Border.all(
                       color: widget.errorText != null
                           ? Colors.red.shade800
-                          : Colors.black45),
+                          : Colors.grey),
                   borderRadius: BorderRadius.circular(30)),
               child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -66,9 +67,9 @@ class _DropDownTextState extends State<DropDownText> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: const TextStyle(
-                                color: Colors.black54,
                                 fontSize: 16,
-                                fontFamily: 'Pyidaungsu'))),
+                                fontWeight: FontWeight.bold
+                            ))),
                     value: widget.controller!.text.isNotEmpty
                         ? widget.controller!.text
                         : null,
@@ -93,9 +94,9 @@ class _DropDownTextState extends State<DropDownText> {
                                     softWrap: false,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
-                                        color: Colors.black,
                                         fontSize: 16,
-                                        fontFamily: 'Pyidaungsu'),
+                                        fontWeight: FontWeight.bold
+                                    ),
                                   ))
                                 ])
                               : Padding(
@@ -103,12 +104,11 @@ class _DropDownTextState extends State<DropDownText> {
                                   child: Text(
                                     item.name,
                                     style: const TextStyle(
-                                        color: Colors.black,
                                         fontSize: 16,
-                                        fontFamily: 'Pyidaungsu'),
+                                        fontWeight: FontWeight.bold
+                                    ),
                                   ))))
                     ],
-                    style: const TextStyle(color: Colors.black54),
                     onChanged: (value) {
                       setState(() {
                         widget.controller!.text = "$value";

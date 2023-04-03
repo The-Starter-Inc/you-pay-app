@@ -114,19 +114,15 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(user!.name!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .copyWith(
-                                          color: Colors.black, fontSize: 16)),
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold
+                                  )),
                               Text(user.phone!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12))
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold
+                                  ))
                             ],
                           )
                         ],
@@ -134,7 +130,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 }
                 return Container();
               }),
-          backgroundColor: AppColor.primaryColor,
           actions: [
             StreamBuilder(
                 stream: postBloc.getPostById,
@@ -143,7 +138,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                     return IconButton(
                       padding: const EdgeInsets.only(right: 16),
                       icon: const Icon(Icons.directions,
-                          size: 28, color: Colors.black),
+                          size: 28),
                       onPressed: () async {
                         MapUtils.openMap(snapshot.data!.latLng.latitude,
                             snapshot.data!.latLng.longitude);
@@ -164,7 +159,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                     return IconButton(
                       padding: const EdgeInsets.only(right: 16),
                       icon: const Icon(Icons.phone,
-                          size: 26, color: Colors.black),
+                          size: 26),
                       onPressed: () async {
                         if (await canLaunchUrl(
                             Uri.parse("tel://${user!.phone}"))) {
