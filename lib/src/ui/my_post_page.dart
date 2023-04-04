@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../blocs/post_bloc.dart';
 import '../constants/app_constant.dart';
 import '../models/post.dart';
+import '../theme/text_size.dart';
 import 'widgets/my_post_item.dart';
 
 class MyPostPage extends StatefulWidget {
@@ -33,8 +34,7 @@ class _MyPostPageState extends State<MyPostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.my_posts,
-                style: const TextStyle(color: Colors.black))),
+            title: Text(AppLocalizations.of(context)!.my_posts)),
         body: StreamBuilder(
           stream: postBloc.posts,
           builder: (context, AsyncSnapshot<List<Post>> snapshot) {
@@ -42,10 +42,7 @@ class _MyPostPageState extends State<MyPostPage> {
               if (snapshot.data!.isEmpty) {
                 return Center(
                     child: Text(AppLocalizations.of(context)!.no_data,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(color: Colors.black45)));
+                        style: TextSize.size16));
               }
               return ListView.builder(
                 itemCount: snapshot.data!.length,
@@ -66,10 +63,7 @@ class _MyPostPageState extends State<MyPostPage> {
               );
             } else if (snapshot.hasError) {
               return Text(snapshot.error.toString(),
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(color: Colors.black45));
+                  style: TextSize.size16);
             }
             return const Center(child: CircularProgressIndicator());
           },

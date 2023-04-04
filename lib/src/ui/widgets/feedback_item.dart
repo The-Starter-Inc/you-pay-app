@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:p2p_pay/src/blocs/post_bloc.dart';
 import '../../models/feedback.dart' as types;
+import '../../theme/text_size.dart';
 
 class FeedbackItem extends StatefulWidget {
   final types.Feedback feedback;
@@ -24,8 +25,7 @@ class _FeedbackItemState extends State<FeedbackItem> {
           child: ListTile(
               title: Text(
                   "${widget.feedback.exUser.name} ${widget.feedback.response == 'positive' ? AppLocalizations.of(context)!.is_positive_feedback : AppLocalizations.of(context)!.is_negative_feedback}",
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Colors.black45, fontFamily: "Pyidaungsu")),
+                  style: TextSize.size18),
               trailing: widget.feedback.response == 'positive'
                   ? const Icon(Icons.sentiment_satisfied_alt,
                       size: 32, color: Colors.green)

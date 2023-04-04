@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:p2p_pay/src/blocs/general_noti_bloc.dart';
 import 'package:p2p_pay/src/models/general_noti.dart';
 import '../theme/color_theme.dart';
+import '../theme/text_size.dart';
 import '../ui/widgets/notification_item.dart';
 
 class NotificationPage extends StatefulWidget {
@@ -56,10 +57,7 @@ class _NotificationPagetate extends State<NotificationPage> {
               if (snapshot.data!.isEmpty) {
                 return Center(
                     child: Text(AppLocalizations.of(context)!.no_data,
-                        style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold
-                        )));
+                        style: TextSize.size16));
               }
 
               return ListView.builder(
@@ -91,10 +89,7 @@ class _NotificationPagetate extends State<NotificationPage> {
               );
             } else if (snapshot.hasError) {
               return Text(snapshot.error.toString(),
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold
-                  ));
+                  style: TextSize.size16);
             }
             return Center(
                 child: Image.asset("assets/images/loading.gif", width: 100));

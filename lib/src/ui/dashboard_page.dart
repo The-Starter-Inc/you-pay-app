@@ -16,6 +16,7 @@ import 'package:event/event.dart';
 import '../blocs/sponsor_bloc.dart';
 import '../constants/app_constant.dart';
 import '../models/post.dart';
+import '../theme/text_size.dart';
 
 class DashboardPage extends StatefulWidget {
   late Provider? you;
@@ -318,10 +319,7 @@ class _DashboardPageState extends State<DashboardPage> {
             )
           : Center(
               child: Text(AppLocalizations.of(context)!.no_data,
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
-                  )),
+                  style: TextSize.size18),
             ),
     );
   }

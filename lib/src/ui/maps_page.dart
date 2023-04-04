@@ -420,11 +420,7 @@ class _MapsPageState extends State<MapsPage> {
                                               "assets/images/marketing.png",
                                               width: 24),
                                           const SizedBox(width: 16),
-                                          Text(e.title!,
-                                              style: const TextStyle(
-                                                  color:
-                                                      AppColor.secondaryColor,
-                                                  fontFamily: 'Pyidaungsu'))
+                                          Text(e.title!)
                                         ],
                                       )))
                                   .toList();

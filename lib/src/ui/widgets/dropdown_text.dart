@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../theme/text_size.dart';
+
 class DropDownText extends StatefulWidget {
   final String? label;
   final String? placeholder;
@@ -42,10 +44,7 @@ class _DropDownTextState extends State<DropDownText> {
               child: Row(
                 children: [
                   Text(widget.label!,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold
-                      ))
+                      style: TextSize.size16)
                 ],
               ),
             )
@@ -66,10 +65,7 @@ class _DropDownTextState extends State<DropDownText> {
                         child: Text(widget.placeholder!,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold
-                            ))),
+                            style: TextSize.size16)),
                     value: widget.controller!.text.isNotEmpty
                         ? widget.controller!.text
                         : null,
@@ -93,20 +89,14 @@ class _DropDownTextState extends State<DropDownText> {
                                     maxLines: 1,
                                     softWrap: false,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold
-                                    ),
+                                    style: TextSize.size16,
                                   ))
                                 ])
                               : Padding(
                                   padding: const EdgeInsets.only(left: 6),
                                   child: Text(
                                     item.name,
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold
-                                    ),
+                                    style: TextSize.size16,
                                   ))))
                     ],
                     onChanged: (value) {

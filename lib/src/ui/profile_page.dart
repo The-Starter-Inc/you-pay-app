@@ -1,5 +1,4 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:p2p_pay/src/blocs/verified_user_bloc.dart';
@@ -13,6 +12,7 @@ import '../theme/color_theme.dart';
 import '../constants/app_constant.dart';
 import '../blocs/post_bloc.dart';
 import '../models/feedback.dart' as types;
+import '../theme/text_size.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -63,27 +63,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: Center(
                       child: Text(AppConstant.currentUser!.name![0],
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(
-                                  color: Colors.black,
-                                  fontFamily: 'Pyidaungsu')),
+                          style: TextSize.profileIcon),
                     )),
                 title: Text(AppConstant.currentUser!.name!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
-                    )),
+                    style: TextSize.size18),
                 subtitle: Text(AppConstant.currentUser!.phone!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold
-                    )),
+                    style: TextSize.size14),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -112,19 +101,13 @@ class _ProfilePageState extends State<ProfilePage> {
                             return Column(
                               children: [
                                 Text(AppLocalizations.of(context)!.feedbacks,
-                                    style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold
-                                    )),
+                                    style: TextSize.size12),
                                 Row(mainAxisSize: MainAxisSize.min, children: [
                                   const Icon(Icons.sentiment_satisfied_alt,
                                       weight: 24, color: Colors.green),
                                   const SizedBox(width: 8),
                                   Text("$positive",
-                                      style: const TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold
-                                      )),
+                                      style: TextSize.size10),
                                   const SizedBox(width: 10),
                                   const Icon(
                                       Icons.sentiment_dissatisfied_outlined,
@@ -132,10 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       color: Colors.red),
                                   const SizedBox(width: 8),
                                   Text("$negative",
-                                      style: const TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold
-                                      )),
+                                      style: TextSize.size10),
                                 ])
                               ],
                             );
@@ -170,10 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               title: Text(AppLocalizations.of(context)!.feedbacks,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold
-                  )),
+                  style: TextSize.size16),
             ),
             const SizedBox(height: 10),
             ListTile(
@@ -196,10 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               title: Text(AppLocalizations.of(context)!.my_posts,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold
-                  )),
+                  style: TextSize.size16),
             ),
             const SizedBox(height: 10),
             ListTile(
@@ -215,17 +189,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Center(child: Icon(Icons.dark_mode)),
                 ),
               ),
-              trailing: CupertinoSwitch(
+              trailing: Switch(
                 value: theme.currentTheme=="dark",
                 onChanged: (bool val) {
                   theme.setTheme(theme.currentTheme == "dark"?"light":"dark");
                 },
               ),
               title: Text(AppLocalizations.of(context)!.dark_mode,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold
-                  )),
+                  style: TextSize.size16),
             )
           ],
         ),

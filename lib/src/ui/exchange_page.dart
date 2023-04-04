@@ -9,6 +9,7 @@ import 'package:localstore/localstore.dart';
 import 'package:p2p_pay/src/blocs/exchange_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../theme/color_theme.dart';
+import '../theme/text_size.dart';
 import './../constants/app_constant.dart';
 import './../models/exchange.dart';
 import 'widgets/exchange_item.dart';
@@ -57,9 +58,7 @@ class _ExchangePagetate extends State<ExchangePage> {
               if (snapshot.data!.isEmpty) {
                 return Center(
                     child: Text(AppLocalizations.of(context)!.no_data,
-                        style: const TextStyle(
-                            fontSize: 16,
-                        )));
+                        style: TextSize.size16));
               }
 
               return ListView.builder(
@@ -99,10 +98,7 @@ class _ExchangePagetate extends State<ExchangePage> {
               );
             } else if (snapshot.hasError) {
               return Text(snapshot.error.toString(),
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold
-                  ));
+                  style: TextSize.size14);
             }
             return Center(
                 child: Image.asset("assets/images/loading.gif", width: 100));

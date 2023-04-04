@@ -8,6 +8,7 @@ import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/models/app_version.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../theme/text_size.dart';
 import './../ui/entry/create_post_page.dart';
 import './../ui/my_post_page.dart';
 import '../theme/color_theme.dart';
@@ -84,11 +85,8 @@ class _SearchPageState extends State<SearchPage> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text("Not Now",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold
-                          ))),
+                      child: Text("Not Now",
+                          style: TextSize.size16)),
                 TextButton(
                   onPressed: () async {
                     Uri redirectUrl = Uri.parse(
@@ -99,21 +97,15 @@ class _SearchPageState extends State<SearchPage> {
                       throw 'Could not open the link.';
                     }
                   },
-                  child: const Text("Update Now"),
+                  child: Text("Update Now", style: TextSize.size16,),
                 ),
               ],
-              title: const Text(
+              title: Text(
                 "Version Update",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold
-                ),
+                style: TextSize.size16,
               ),
               content: Text("Pelase update for $versionName version.",
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold
-                  )),
+                  style: TextSize.size14),
             ),
           );
         });
@@ -275,7 +267,7 @@ class _SearchPageState extends State<SearchPage> {
                                                   child: Text(
                                                       AppLocalizations.of(
                                                               context)!
-                                                          .search,),
+                                                          .search, style: TextSize.size18,),
                                                 )))
                                       ],
                                     )
@@ -375,10 +367,7 @@ class _SearchPageState extends State<SearchPage> {
                                                     AppLocalizations.of(
                                                             context)!
                                                         .new_post,
-                                                    style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.bold
-                                                    )),
+                                                    style: TextSize.size16),
                                               ),
                                               const SizedBox(height: 22),
                                               ListTile(
@@ -412,10 +401,7 @@ class _SearchPageState extends State<SearchPage> {
                                                     AppLocalizations.of(
                                                             context)!
                                                         .my_posts,
-                                                    style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.bold
-                                                    )),
+                                                    style: TextSize.size16),
                                               ),
                                               const SizedBox(height: 22)
                                             ],

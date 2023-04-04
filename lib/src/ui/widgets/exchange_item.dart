@@ -10,6 +10,7 @@ import 'package:p2p_pay/src/blocs/exchange_bloc.dart';
 import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/models/exchange.dart';
 import '../../blocs/post_bloc.dart';
+import '../../theme/text_size.dart';
 import '../../utils/myan_number.dart';
 import '../chat_page.dart';
 
@@ -50,10 +51,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                       Navigator.of(context).pop();
                     },
                     child: Text(AppLocalizations.of(context)!.cancel,
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold
-                        ))),
+                        style: TextSize.size16)),
                 TextButton(
                   onPressed: () async {
                     Navigator.of(context).pop();
@@ -74,20 +72,15 @@ class _ExchangeItemState extends State<ExchangeItem> {
                     });
                     widget.onDeleted!();
                   },
-                  child: Text(AppLocalizations.of(context)!.delete),
+                  child: Text(AppLocalizations.of(context)!.delete,
+                      style: TextSize.size16),
                 ),
               ],
               content: Text(AppLocalizations.of(context)!.delete_confirm_msg,
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
-                  )),
+                  style: TextSize.size14),
               title: Text(
                 AppLocalizations.of(context)!.confirm,
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold
-                ),
+                style: TextSize.size18,
               ),
             ));
   }
@@ -177,10 +170,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                   .exchange.adsUser!.name![0]
                                               : widget
                                                   .exchange.exUser!.name![0],
-                                          style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold
-                                          )),
+                                          style: TextSize.profileIcon),
                                     )),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,10 +180,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                 AppConstant.currentUser!.id
                                             ? widget.exchange.adsUser!.name!
                                             : widget.exchange.exUser!.name!,
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold
-                                        )),
+                                        style: TextSize.size16),
                                     Text(
                                         widget.exchange.post!.priority !=
                                                     null &&
@@ -202,10 +189,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                     0
                                             ? "Verified"
                                             : "Unverified",
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold
-                                        ))
+                                        style: TextSize.size12)
                                   ],
                                 )
                               ],
@@ -223,10 +207,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                 children: [
                                   Text(
                                       "${MyanNunber.convertMoneyNumber(widget.exchange.post!.amount)} ${AppLocalizations.of(context)!.mmk}",
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold
-                                      )),
+                                      style: TextSize.size16),
                                   Text(
                                       widget.exchange.post!.chargesType ==
                                               'percentage'
@@ -235,10 +216,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                   'fix_amount'
                                               ? "${MyanNunber.convertMoneyNumber(widget.exchange.post!.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}"
                                               : "${MyanNunber.convertMoneyNumber(widget.exchange.post!.exchangeRate)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.exchange_rate}",
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold
-                                      ))
+                                      style: TextSize.size14)
                                 ],
                               )),
                         ],
@@ -262,10 +240,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                           Text(
                                               AppLocalizations.of(context)!.you,
                                               textAlign: TextAlign.start,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold
-                                              )),
+                                              style: TextSize.size14),
                                           Row(
                                             children: [
                                               Container(
@@ -285,10 +260,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                               Text(
                                                   widget.exchange.post!
                                                       .providers[1].name,
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold
-                                                  ))
+                                                  style: TextSize.size16)
                                             ],
                                           )
                                         ],
@@ -309,8 +281,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                                       color: Colors.white,
                                                     ),
                                               ),
-                                              const Icon(Icons.swap_horiz,
-                                                  color: Colors.black, size: 22)
+                                              const Icon(Icons.swap_horiz,  size: 22)
                                             ],
                                           )),
                                     Column(
@@ -320,10 +291,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(AppLocalizations.of(context)!.pay,
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold
-                                            )),
+                                            style: TextSize.size14),
                                         Row(
                                           children: [
                                             Container(
@@ -342,10 +310,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                             Text(
                                                 widget.exchange.post!
                                                     .providers[0].name,
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold
-                                                ))
+                                                style: TextSize.size16)
                                           ],
                                         )
                                       ],
@@ -365,10 +330,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                           Text(
                                               AppLocalizations.of(context)!.you,
                                               textAlign: TextAlign.start,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold
-                                              )),
+                                              style: TextSize.size14),
                                           Row(children: [
                                             Container(
                                               width: 3,
@@ -386,10 +348,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                             Text(
                                                 widget.exchange.post!
                                                     .providers[0].name,
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold
-                                                )),
+                                                style: TextSize.size16),
                                           ]),
                                         ],
                                       ),
@@ -422,10 +381,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                         children: [
                                           Text(
                                               AppLocalizations.of(context)!.pay,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold
-                                              )),
+                                              style: TextSize.size14),
                                           Row(
                                             children: [
                                               Container(
@@ -445,10 +401,7 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                               Text(
                                                   widget.exchange.post!
                                                       .providers[1].name,
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold
-                                                  ))
+                                                  style: TextSize.size16)
                                             ],
                                           )
                                         ],
@@ -479,7 +432,6 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                   color: Colors.red),
                               title: Text(
                                 AppLocalizations.of(context)!.delete,
-                                style: const TextStyle(color: Colors.grey),
                               ),
                             ),
                           )

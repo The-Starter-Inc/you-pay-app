@@ -14,6 +14,7 @@ import 'package:p2p_pay/src/utils/alert_util.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import '../../blocs/post_bloc.dart';
 import '../../theme/color_theme.dart';
+import '../../theme/text_size.dart';
 import '../../utils/myan_number.dart';
 import '../chat_page.dart';
 import '../../models/post.dart';
@@ -126,10 +127,7 @@ class _PostItemState extends State<PostItem> {
                 Navigator.of(context).pop();
               },
               child: Text(AppLocalizations.of(context)!.cancel,
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
-                  ))),
+                  style: TextSize.size16)),
           TextButton(
             onPressed: () async {
               Navigator.of(context).pop();
@@ -150,20 +148,14 @@ class _PostItemState extends State<PostItem> {
               });
               widget.onDeleted!();
             },
-            child: Text(AppLocalizations.of(context)!.delete),
+            child: Text(AppLocalizations.of(context)!.delete, style: TextSize.size16,),
           ),
         ],
         content: Text(AppLocalizations.of(context)!.delete_confirm_msg,
-            style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold
-            )),
+            style: TextSize.size14),
         title: Text(
           AppLocalizations.of(context)!.confirm,
-          style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold
-          ),
+          style: TextSize.size16,
         ),
       ),
     );
@@ -210,10 +202,7 @@ class _PostItemState extends State<PostItem> {
                                       ),
                                       child: Center(
                                         child: Text(widget.post.adsUser!.name![0],
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold
-                                            )),
+                                            style: TextSize.profileIcon),
                                       )),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,10 +217,7 @@ class _PostItemState extends State<PostItem> {
                                               widget.post.priority! > 0
                                               ? "Verified"
                                               : "Unverified",
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold
-                                          ))
+                                          style: TextSize.size12)
                                     ],
                                   )
                                 ],
@@ -248,20 +234,14 @@ class _PostItemState extends State<PostItem> {
                               children: [
                                 Text(
                                     "${MyanNunber.convertMoneyNumber(widget.post.amount)} ${AppLocalizations.of(context)!.mmk}",
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold
-                                    )),
+                                    style: TextSize.size16),
                                 Text(
                                     widget.post.chargesType == 'percentage'
                                         ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
                                         : widget.post.chargesType == 'fix_amount'
                                         ? "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}"
                                         : "${MyanNunber.convertMoneyNumber(widget.post.exchangeRate)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.exchange_rate}",
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold
-                                    ))
+                                    style: TextSize.size14)
                               ],
                             )),
                       ],
@@ -279,10 +259,7 @@ class _PostItemState extends State<PostItem> {
                                 children: [
                                   Text(AppLocalizations.of(context)!.you,
                                       textAlign: TextAlign.start,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold
-                                      )),
+                                      style: TextSize.size14),
                                   Row(
                                     children: [
                                       Container(
@@ -295,10 +272,7 @@ class _PostItemState extends State<PostItem> {
                                                     "0xFFCCCCCC"))),
                                       ),
                                       Text(widget.post.providers[1].name,
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold
-                                          ))
+                                          style: TextSize.size16)
                                     ],
                                   )
                                 ],
@@ -326,10 +300,7 @@ class _PostItemState extends State<PostItem> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(AppLocalizations.of(context)!.pay,
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold
-                                    )),
+                                    style: TextSize.size14),
                                 Row(
                                   children: [
                                     Container(
@@ -342,10 +313,7 @@ class _PostItemState extends State<PostItem> {
                                                   "0xFFCCCCCC"))),
                                     ),
                                     Text(widget.post.providers[0].name,
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold
-                                        ))
+                                        style: TextSize.size16)
                                   ],
                                 )
                               ],
@@ -374,18 +342,13 @@ class _PostItemState extends State<PostItem> {
                         }
                       },
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              AppColor.secondaryColor),
-                          foregroundColor: MaterialStateProperty.all<Color>(
-                              AppColor.secondaryColor),
                           shape:
                           MaterialStateProperty.all<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32.0),
                               ))),
                       child: Text(AppLocalizations.of(context)!.contact,
-                          style:
-                          const TextStyle(color: Colors.white, fontSize: 14)),
+                          style: TextSize.size14),
                     ))
               ],
             )),
