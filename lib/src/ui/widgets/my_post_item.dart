@@ -9,6 +9,7 @@ import 'package:p2p_pay/src/utils/myan_number.dart';
 import 'package:p2p_pay/src/theme/color_theme.dart';
 import '../../constants/app_constant.dart';
 import '../../models/post.dart';
+import '../../theme/text_size.dart';
 import '../entry/create_post_page.dart';
 
 class MyPostItem extends StatefulWidget {
@@ -57,9 +58,7 @@ class _MyPostItemState extends State<MyPostItem> {
                 Navigator.of(context).pop();
               },
               child: Text(AppLocalizations.of(context)!.cancel,
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Colors.black,
-                      ))),
+                  style: TextSize.size16)),
           TextButton(
             onPressed: () async {
               Navigator.of(context).pop();
@@ -80,20 +79,14 @@ class _MyPostItemState extends State<MyPostItem> {
               });
               widget.onDeleted!();
             },
-            child: Text(AppLocalizations.of(context)!.delete),
+            child: Text(AppLocalizations.of(context)!.delete, style: TextSize.size16,),
           ),
         ],
         content: Text(AppLocalizations.of(context)!.delete_confirm_msg,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: Colors.black,
-                  fontFamily: 'Pyidaungsu',
-                )),
+            style: TextSize.size14),
         title: Text(
           AppLocalizations.of(context)!.confirm,
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Colors.black,
-                fontFamily: 'Pyidaungsu',
-              ),
+          style: TextSize.size16,
         ),
       ),
     );
@@ -121,12 +114,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                 children: [
                                   Text(AppLocalizations.of(context)!.you,
                                       textAlign: TextAlign.start,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: Colors.black87,
-                                          )),
+                                      style: TextSize.size12),
                                   Row(
                                     children: [
                                       Container(
@@ -140,12 +128,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                                 "0xFFCCCCCC"))),
                                       ),
                                       Text(widget.post.providers[1].name,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .copyWith(
-                                                  color: Colors.black,
-                                                  fontSize: 16))
+                                          style: TextSize.size16)
                                     ],
                                   )
                                 ],
@@ -158,15 +141,9 @@ class _MyPostItemState extends State<MyPostItem> {
                                     children: [
                                       Text(
                                         AppLocalizations.of(context)!.you,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(
-                                              color: Colors.white,
-                                            ),
+                                        style: TextSize.size12,
                                       ),
-                                      const Icon(Icons.swap_horiz,
-                                          color: Colors.black, size: 22)
+                                      const Icon(Icons.swap_horiz,  size: 22)
                                     ],
                                   )),
                             Column(
@@ -174,12 +151,7 @@ class _MyPostItemState extends State<MyPostItem> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(AppLocalizations.of(context)!.pay,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall!
-                                        .copyWith(
-                                          color: Colors.black87,
-                                        )),
+                                    style: TextSize.size12),
                                 Row(
                                   children: [
                                     Container(
@@ -192,12 +164,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                                   "0xFFCCCCCC"))),
                                     ),
                                     Text(widget.post.providers[0].name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontSize: 16))
+                                        style: TextSize.size16)
                                   ],
                                 )
                               ],
@@ -213,12 +180,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                 children: [
                                   Text(AppLocalizations.of(context)!.you,
                                       textAlign: TextAlign.start,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: Colors.black87,
-                                          )),
+                                      style: TextSize.size12),
                                   Row(children: [
                                     Container(
                                       width: 3,
@@ -230,12 +192,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                                   "0xFFCCCCCC"))),
                                     ),
                                     Text(widget.post.providers[0].name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontSize: 16)),
+                                        style: TextSize.size16),
                                   ]),
                                 ],
                               ),
@@ -247,15 +204,9 @@ class _MyPostItemState extends State<MyPostItem> {
                                     children: [
                                       Text(
                                         AppLocalizations.of(context)!.you,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(
-                                              color: Colors.white,
-                                            ),
+                                        style: TextSize.size12,
                                       ),
-                                      const Icon(Icons.swap_horiz,
-                                          color: Colors.black, size: 22)
+                                      const Icon(Icons.swap_horiz,  size: 22)
                                     ],
                                   )),
                             if (widget.post.providers.length > 1)
@@ -264,12 +215,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(AppLocalizations.of(context)!.pay,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: Colors.black87,
-                                          )),
+                                      style: TextSize.size12),
                                   Row(
                                     children: [
                                       Container(
@@ -283,12 +229,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                                 "0xFFCCCCCC"))),
                                       ),
                                       Text(widget.post.providers[1].name,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge!
-                                              .copyWith(
-                                                  color: Colors.black,
-                                                  fontSize: 16))
+                                          style: TextSize.size16)
                                     ],
                                   )
                                 ],
@@ -307,23 +248,13 @@ class _MyPostItemState extends State<MyPostItem> {
                         children: [
                           Text(
                             AppLocalizations.of(context)!.amount,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: Colors.black45,
-                                ),
+                            style: TextSize.size14,
                           ),
                           Padding(
                               padding: const EdgeInsets.only(top: 0),
                               child: Text(
                                   "${MyanNunber.convertMoneyNumber(widget.post.amount)}",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(
-                                        color: Colors.black,
-                                      )))
+                                  style: TextSize.size14))
                         ],
                       )),
                   Container(
@@ -338,12 +269,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                     ? AppLocalizations.of(context)!.fixed_amount
                                     : AppLocalizations.of(context)!
                                         .exchange_rate,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: Colors.black45,
-                                ),
+                            style: TextSize.size14,
                           ),
                           Padding(
                               padding: const EdgeInsets.only(top: 0),
@@ -353,12 +279,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                       : widget.post.chargesType == 'fix_amount'
                                           ? "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk}"
                                           : "${MyanNunber.convertMoneyNumber(widget.post.exchangeRate)} ${AppLocalizations.of(context)!.mmk}",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(
-                                        color: Colors.black,
-                                      )))
+                                  style: TextSize.size14))
                         ],
                       )),
                 ],
@@ -376,7 +297,6 @@ class _MyPostItemState extends State<MyPostItem> {
                       child: Icon(
                     Icons.more_horiz,
                     size: 24,
-                    color: Colors.black54,
                   ))),
               itemBuilder: (context) {
                 return [
@@ -387,7 +307,7 @@ class _MyPostItemState extends State<MyPostItem> {
                       leading: const Icon(Icons.edit, color: Colors.orange),
                       title: Text(
                         AppLocalizations.of(context)!.edit,
-                        style: const TextStyle(color: Colors.black54),
+                        style: TextSize.size14,
                       ),
                     ),
                   ),
@@ -401,7 +321,7 @@ class _MyPostItemState extends State<MyPostItem> {
                         widget.post.status != null && widget.post.status!
                             ? AppLocalizations.of(context)!.hide_post
                             : AppLocalizations.of(context)!.show_post,
-                        style: const TextStyle(color: Colors.black54),
+                        style: TextSize.size14,
                       ),
                     ),
                   ),
@@ -413,7 +333,7 @@ class _MyPostItemState extends State<MyPostItem> {
                           color: Colors.red),
                       title: Text(
                         AppLocalizations.of(context)!.delete,
-                        style: const TextStyle(color: Colors.black54),
+                        style: TextSize.size14,
                       ),
                     ),
                   )
@@ -451,7 +371,7 @@ class _MyPostItemState extends State<MyPostItem> {
     scaffold.showSnackBar(
       SnackBar(
         content:
-            Text(message, style: const TextStyle(fontFamily: 'Pyidaungsu')),
+            Text(message, style: TextSize.size14),
         action: SnackBarAction(
             label: 'Okay', onPressed: scaffold.hideCurrentSnackBar),
       ),

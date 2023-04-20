@@ -36,8 +36,12 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>You Pay want to use your location to show nearest users.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>You Pay want to use your location to show nearest users.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>You Pay requires access to the photo library to share photos on chat.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -64,7 +68,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>You Pay requires access to the photo library to share photos on chat.</string>
 </dict>
 </plist>

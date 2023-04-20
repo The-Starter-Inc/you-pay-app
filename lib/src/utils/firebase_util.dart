@@ -46,6 +46,7 @@ class FirebaseUtil {
       'metadata': user.metadata,
       'role': user.role?.toShortString(),
       'updatedAt': FieldValue.serverTimestamp(),
+      'darkMode': false
     });
   }
 }

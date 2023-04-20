@@ -15,6 +15,7 @@ import 'package:platform_device_id/platform_device_id.dart';
 
 import '../../firebase_options.dart';
 import '../constants/app_constant.dart';
+import '../theme/text_size.dart';
 import '../utils/alert_util.dart';
 import 'widgets/input_text.dart';
 
@@ -87,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
             isLoading = false;
           });
-          AlertUtil.showErrorAlert(context, e);
+          AlertUtil.showErrorAlert(context, e.toString());
         }
       }
     } else {
@@ -107,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       if (!mounted) return;
     } catch (e) {
-      AlertUtil.showErrorAlert(context, e);
+      AlertUtil.showErrorAlert(context, e.toString());
     }
   }
 
@@ -139,7 +140,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.yellow.shade200,
         body: Stack(
           children: [
             // Positioned(
@@ -170,9 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.center,
                     child: Text(
                       AppLocalizations.of(context)!.get_started,
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                            color: Colors.black,
-                          ),
+                      style: TextSize.size20,
                     )),
                 Align(
                   alignment: Alignment.center,

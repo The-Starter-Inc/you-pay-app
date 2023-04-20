@@ -21,6 +21,7 @@ import 'package:p2p_pay/src/ui/widgets/chat_post_item.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../theme/text_size.dart';
 import '../utils/firebase_util.dart';
 import '../utils/map_util.dart';
 import 'feedbacks_page.dart';
@@ -114,19 +115,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(user!.name!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .copyWith(
-                                          color: Colors.black, fontSize: 16)),
+                                  style: TextSize.size14),
                               Text(user.phone!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12))
+                                  style: TextSize.size12)
                             ],
                           )
                         ],
@@ -134,7 +125,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 }
                 return Container();
               }),
-          backgroundColor: AppColor.primaryColor,
           actions: [
             StreamBuilder(
                 stream: postBloc.getPostById,
@@ -143,7 +133,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                     return IconButton(
                       padding: const EdgeInsets.only(right: 16),
                       icon: const Icon(Icons.directions,
-                          size: 28, color: Colors.black),
+                          size: 28),
                       onPressed: () async {
                         MapUtils.openMap(snapshot.data!.latLng.latitude,
                             snapshot.data!.latLng.longitude);
@@ -164,7 +154,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                     return IconButton(
                       padding: const EdgeInsets.only(right: 16),
                       icon: const Icon(Icons.phone,
-                          size: 26, color: Colors.black),
+                          size: 26),
                       onPressed: () async {
                         if (await canLaunchUrl(
                             Uri.parse("tel://${user!.phone}"))) {
@@ -232,9 +222,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             children: <Widget>[
               ListTile(
                 title: Text(AppLocalizations.of(context)!.send_with_media,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black45,
-                        )),
+                    style: TextSize.size16),
               ),
               ListTile(
                 onTap: () {
@@ -242,9 +230,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   _handleImageSelection();
                 },
                 title: Text(AppLocalizations.of(context)!.choose_photo,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black,
-                        )),
+                    style: TextSize.size16),
               ),
               ListTile(
                 onTap: () {
@@ -252,18 +238,14 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   _handleFileSelection();
                 },
                 title: Text(AppLocalizations.of(context)!.choose_file,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black,
-                        )),
+                    style: TextSize.size16),
               ),
               ListTile(
                 onTap: () {
                   Navigator.pop(context);
                 },
                 title: Text(AppLocalizations.of(context)!.cancel,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black54,
-                        )),
+                    style: TextSize.size16),
               ),
             ],
           ),

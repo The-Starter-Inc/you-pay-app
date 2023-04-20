@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/text_size.dart';
+
 class AlertUtil {
   AlertUtil._();
 
@@ -16,16 +18,10 @@ class AlertUtil {
           ),
         ],
         content: Text(message,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: Colors.black,
-                  fontFamily: 'Pyidaungsu',
-                )),
+            style: TextSize.size14),
         title: Text(
           'Error',
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Colors.black,
-                fontFamily: 'Pyidaungsu',
-              ),
+          style: TextSize.size18,
         ),
       ),
     );

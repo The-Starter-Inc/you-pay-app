@@ -4,6 +4,7 @@ import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/ui/home_page.dart';
 import 'package:p2p_pay/src/ui/search_page.dart';
 import '../theme/color_theme.dart';
+import '../theme/text_size.dart';
 
 class SuccessPage extends StatefulWidget {
   const SuccessPage({super.key});
@@ -17,7 +18,6 @@ class _SuccessPageState extends State<SuccessPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.yellow.shade200,
         body: Stack(
           children: [
             // Positioned(
@@ -51,12 +51,7 @@ class _SuccessPageState extends State<SuccessPage> {
                         child: Text(
                           AppLocalizations.of(context)!.success_post,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(
-                                  color: Colors.black,
-                                  fontFamily: 'Pyidaungsu'),
+                          style: TextSize.size20,
                         ))),
                 const SizedBox(height: 50),
                 Align(
@@ -70,12 +65,6 @@ class _SuccessPageState extends State<SuccessPage> {
                                     height: 50,
                                     child: ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all<Color>(
-                                                  AppColor.primaryColor),
-                                          foregroundColor:
-                                              MaterialStateProperty.all<Color>(
-                                                  AppColor.primaryColor),
                                           shape: MaterialStateProperty.all<
                                                   RoundedRectangleBorder>(
                                               RoundedRectangleBorder(
@@ -104,8 +93,7 @@ class _SuccessPageState extends State<SuccessPage> {
                                       },
                                       child: Text(
                                           AppLocalizations.of(context)!.ok,
-                                          style: const TextStyle(
-                                              color: Colors.white)),
+                                          style: TextSize.size16),
                                     )))
                           ],
                         ))),

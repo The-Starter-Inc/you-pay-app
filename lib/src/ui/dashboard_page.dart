@@ -16,6 +16,7 @@ import 'package:event/event.dart';
 import '../blocs/sponsor_bloc.dart';
 import '../constants/app_constant.dart';
 import '../models/post.dart';
+import '../theme/text_size.dart';
 
 class DashboardPage extends StatefulWidget {
   DashboardPage({super.key});
@@ -264,10 +265,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                       Image.asset("assets/images/marketing.png",
                                           width: 24),
                                       const SizedBox(width: 16),
-                                      Text(e.title!,
-                                          style: const TextStyle(
-                                              color: AppColor.secondaryColor,
-                                              fontFamily: 'Pyidaungsu'))
+                                      Text(e.title!)
                                     ],
                                   )))
                               .toList();
@@ -327,10 +325,7 @@ class _DashboardPageState extends State<DashboardPage> {
             )
           : Center(
               child: Text(AppLocalizations.of(context)!.no_data,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(color: Colors.black45)),
+                  style: TextSize.size18),
             ),
     );
   }

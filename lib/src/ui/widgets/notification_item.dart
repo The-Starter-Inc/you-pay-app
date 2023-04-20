@@ -9,6 +9,8 @@ import 'package:p2p_pay/src/ui/notification_detail_page.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../theme/text_size.dart';
+
 // ignore: must_be_immutable
 class NotificationItem extends StatefulWidget {
   final GeneralNoti generalNoti;
@@ -93,28 +95,21 @@ class _NotificationItemState extends State<NotificationItem> {
             title: Text(widget.generalNoti.title!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(color: Colors.black87, fontFamily: 'Pyidaungsu')),
+                style: TextSize.size16),
             subtitle: Text(widget.generalNoti.subtitle!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.black87, fontFamily: 'Pyidaungsu')),
+                style: TextSize.size14),
             trailing: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   timeago.format(DateTime.parse(widget.generalNoti.createdAt)),
-                  style: const TextStyle(color: Colors.black54),
                 ),
                 const SizedBox(height: 16),
                 widget.hasNotification!
                     ? const Icon(Icons.circle, size: 8, color: Colors.red)
-                    : const Icon(Icons.circle, size: 8, color: Colors.white)
+                    : const Icon(Icons.circle, size: 8, color: Colors.grey)
               ],
             )),
         const Divider(

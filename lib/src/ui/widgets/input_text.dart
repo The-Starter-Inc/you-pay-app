@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../theme/text_size.dart';
+
 class InputText extends StatefulWidget {
   final String? label;
   final String? placeholder;
@@ -47,8 +49,7 @@ class _InputTextState extends State<InputText> {
               child: Row(
                 children: [
                   Text(widget.label!,
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Colors.black, fontFamily: 'Pyidaungsu'))
+                      style: TextSize.size14)
                 ],
               ),
             )
@@ -73,6 +74,7 @@ class _InputTextState extends State<InputText> {
                 floatingLabelBehavior: FloatingLabelBehavior.never,
                 prefixIcon: widget.prefixIcon,
                 fillColor: Colors.white70,
+                suffixIconColor: Colors.grey,
                 suffixIcon: widget.isClearText == true
                     ? IconButton(
                         icon: const Icon(Icons.cancel),
@@ -90,8 +92,7 @@ class _InputTextState extends State<InputText> {
                   widget.errorText = null;
                 });
               },
-              style: const TextStyle(
-                  color: Colors.black, fontFamily: 'Pyidaungsu')),
+              style: TextSize.size16),
         ],
       ),
     );

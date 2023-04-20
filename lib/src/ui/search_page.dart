@@ -13,9 +13,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import '../../main.dart';
+import '../theme/text_size.dart';
 import './../ui/entry/create_post_page.dart';
 import './../ui/my_post_page.dart';
-import '../theme/color_theme.dart';
 import './../blocs/provider_bloc.dart';
 import '../models/post.dart';
 import 'chat_page.dart';
@@ -163,11 +163,7 @@ class _SearchPageState extends State<SearchPage> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("Not Now",
-                          style:
-                              Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    color: Colors.black,
-                                  ))),
+                      child: Text("Not Now", style: TextSize.size16)),
                 TextButton(
                   onPressed: () async {
                     Uri redirectUrl = Uri.parse(
@@ -178,20 +174,18 @@ class _SearchPageState extends State<SearchPage> {
                       throw 'Could not open the link.';
                     }
                   },
-                  child: const Text("Update Now"),
+                  child: Text(
+                    "Update Now",
+                    style: TextSize.size16,
+                  ),
                 ),
               ],
               title: Text(
                 "Version Update",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(color: Colors.black, fontWeight: FontWeight.bold),
+                style: TextSize.size16,
               ),
               content: Text("Pelase update for $versionName version.",
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Colors.black,
-                      )),
+                  style: TextSize.size14),
             ),
           );
         });
@@ -225,379 +219,326 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.yellow.shade200,
         body: Stack(
+      children: [
+        // Positioned(
+        //     top: 0,
+        //     left: 0,
+        //     child: Image.asset("assets/images/you-pay-left-top.png")),
+        // Positioned(
+        //     right: 0,
+        //     bottom: 70,
+        //     child: Image.asset("assets/images/you-pay-bottom-right.png")),
+        Positioned(
+            top: 55,
+            right: 22,
+            child: InkWell(
+                onTap: () {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HomePage(
+                              you: AppConstant.you,
+                              pay: AppConstant.pay,
+                              selectedPage: 3)));
+                },
+                child: Stack(
+                  alignment: Alignment.centerRight,
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        height: 40,
+                        width: 40,
+                        child: const Icon(
+                          Icons.chat_bubble,
+                          color: Colors.black54,
+                          size: 24,
+                        )),
+                    if (notificationCounts > 0)
+                      Container(
+                          width: 24,
+                          height: 24,
+                          transform: Matrix4.translationValues(10.0, -10, 0.0),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.all(Radius.circular(24)),
+                          ),
+                          margin: const EdgeInsets.only(right: 0),
+                          child: Center(
+                            child: Text("$notificationCounts",
+                                style: const TextStyle(color: Colors.white)),
+                          ))
+                  ],
+                ))),
+        Column(
           children: [
-            // Positioned(
-            //     top: 0,
-            //     left: 0,
-            //     child: Image.asset("assets/images/you-pay-left-top.png")),
-            // Positioned(
-            //     right: 0,
-            //     bottom: 70,
-            //     child: Image.asset("assets/images/you-pay-bottom-right.png")),
-            Positioned(
-                top: 55,
-                right: 22,
-                child: InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HomePage(
-                                  you: AppConstant.you,
-                                  pay: AppConstant.pay,
-                                  selectedPage: 3)));
-                    },
-                    child: Stack(
-                      alignment: Alignment.centerRight,
-                      children: [
-                        Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black12,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            height: 40,
-                            width: 40,
-                            child: const Icon(
-                              Icons.chat_bubble,
-                              color: Colors.black54,
-                              size: 24,
-                            )),
-                        if (notificationCounts > 0)
-                          Container(
-                              width: 24,
-                              height: 24,
-                              transform:
-                                  Matrix4.translationValues(10.0, -10, 0.0),
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(24)),
-                              ),
-                              margin: const EdgeInsets.only(right: 0),
-                              child: Center(
-                                child: Text("$notificationCounts",
-                                    style:
-                                        const TextStyle(color: Colors.white)),
-                              ))
-                      ],
-                    ))),
-            Column(
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                      margin: const EdgeInsets.only(top: 120),
-                      width: 120,
-                      height: 120,
-                      child:
-                          Image.asset("assets/images/you-pay.png", width: 120)),
-                ),
-                const SizedBox(height: 100),
-                Align(
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                        width: 340,
-                        child: MultiStreamBuilder(
-                            streams: [providerBloc.providers],
-                            builder: (context, dataList) {
-                              if (dataList[0] != null) {
-                                providers = [
-                                      Provider(id: 0, name: "All Provider")
-                                    ] +
-                                    dataList[0];
-                                return Column(
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                  margin: const EdgeInsets.only(top: 120),
+                  width: 120,
+                  height: 120,
+                  child: Image.asset("assets/images/you-pay.png", width: 120)),
+            ),
+            const SizedBox(height: 100),
+            Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                    width: 340,
+                    child: MultiStreamBuilder(
+                        streams: [providerBloc.providers],
+                        builder: (context, dataList) {
+                          if (dataList[0] != null) {
+                            providers = [
+                                  Provider(id: 0, name: "All Provider")
+                                ] +
+                                dataList[0];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Flexible(
-                                            child: DropDownText(
-                                          label:
-                                              AppLocalizations.of(context)!.you,
-                                          placeholder:
-                                              AppLocalizations.of(context)!
-                                                  .choose_you,
-                                          controller: providerYouController,
-                                          errorText: frmError.you,
-                                          items: [
-                                                Provider(
-                                                    id: 0, name: "All Provider")
-                                              ] +
-                                              dataList[0],
-                                        )),
-                                        const SizedBox(width: 16),
-                                        Flexible(
-                                            child: DropDownText(
-                                                label: AppLocalizations.of(
-                                                        context)!
-                                                    .pay,
-                                                placeholder:
-                                                    AppLocalizations.of(
-                                                            context)!
-                                                        .choose_pay,
-                                                controller:
-                                                    providerPayController,
-                                                errorText: frmError.pay,
-                                                items: [
-                                                      Provider(
-                                                          id: 0,
-                                                          name: "All Provider")
-                                                    ] +
-                                                    dataList[0]
-                                                        .where((x) =>
-                                                            x.id.toString() !=
-                                                            providerYouController
-                                                                .text)
-                                                        .toList()))
-                                      ],
-                                    ),
-                                    const SizedBox(height: 72),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                            child: SizedBox(
-                                                height: 50,
-                                                child: ElevatedButton(
-                                                  style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStateProperty
-                                                              .all<Color>(AppColor
-                                                                  .primaryColor),
-                                                      foregroundColor:
-                                                          MaterialStateProperty
-                                                              .all<Color>(AppColor
-                                                                  .primaryColor),
-                                                      shape: MaterialStateProperty.all<
-                                                              RoundedRectangleBorder>(
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(32.0),
-                                                      ))),
-                                                  onPressed: () {
-                                                    checkFormError = true;
-                                                    if (!validationError()) {
-                                                      List<Provider> you = providers
-                                                          .where((x) =>
-                                                              x.id.toString() ==
-                                                              providerYouController
-                                                                  .text)
-                                                          .toList();
-                                                      List<Provider> pay = providers
-                                                          .where((x) =>
-                                                              x.id.toString() ==
-                                                              providerPayController
-                                                                  .text)
-                                                          .toList();
-                                                      if (widget.isPop!) {
-                                                        Navigator.pop(context,
-                                                            [you[0], pay[0]]);
-                                                      } else {
-                                                        AppConstant.you =
-                                                            you[0];
-                                                        AppConstant.pay =
-                                                            pay[0];
-                                                        Navigator.pushReplacement(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder: (context) =>
-                                                                    HomePage(
-                                                                        you: you[
-                                                                            0],
-                                                                        pay: pay[
-                                                                            0])));
-                                                      }
-                                                    }
-                                                  },
-                                                  child: Text(
-                                                      AppLocalizations.of(
-                                                              context)!
-                                                          .search,
-                                                      style: const TextStyle(
-                                                          color: Colors.black)),
-                                                )))
-                                      ],
-                                    )
+                                    Flexible(
+                                        child: DropDownText(
+                                      label: AppLocalizations.of(context)!.you,
+                                      placeholder: AppLocalizations.of(context)!
+                                          .choose_you,
+                                      controller: providerYouController,
+                                      errorText: frmError.you,
+                                      items: [
+                                            Provider(
+                                                id: 0, name: "All Provider")
+                                          ] +
+                                          dataList[0],
+                                    )),
+                                    const SizedBox(width: 16),
+                                    Flexible(
+                                        child: DropDownText(
+                                            label: AppLocalizations.of(context)!
+                                                .pay,
+                                            placeholder:
+                                                AppLocalizations.of(context)!
+                                                    .choose_pay,
+                                            controller: providerPayController,
+                                            errorText: frmError.pay,
+                                            items: [
+                                                  Provider(
+                                                      id: 0,
+                                                      name: "All Provider")
+                                                ] +
+                                                dataList[0]
+                                                    .where((x) =>
+                                                        x.id.toString() !=
+                                                        providerYouController
+                                                            .text)
+                                                    .toList()))
                                   ],
-                                );
-                              }
-                              return Container();
-                            }))),
-              ],
-            ),
-            Positioned(
-                left: 0,
-                right: 0,
-                bottom: 24,
-                child: Align(
-                    child: SizedBox(
-                        width: 340,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              child: SizedBox(
-                                height: 50,
-                                child: OutlinedButton(
-                                  onPressed: () {
-                                    AppConstant.you = providers
-                                        .where((x) => x.name == 'Cash')
-                                        .toList()[0];
-                                    AppConstant.pay = providers
-                                        .where((x) => x.name == 'All Provider')
-                                        .toList()[0];
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => HomePage(
-                                                you: AppConstant.you,
-                                                pay: AppConstant.pay,
-                                                selectedPage: 1)));
-                                  },
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all(
-                                              Colors.transparent),
-                                      shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(32.0),
-                                      ))),
-                                  child: Text(
-                                      AppLocalizations.of(context)!.human_atm,
-                                      style: const TextStyle(
-                                          color: AppColor.secondaryColor)),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                                child: SizedBox(
-                              height: 50,
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) {
-                                      return Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 22, horizontal: 0),
-                                          child: Wrap(
-                                            children: [
-                                              const SizedBox(height: 22),
-                                              ListTile(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const CreatePostPage()),
-                                                  );
-                                                },
-                                                leading: Container(
-                                                  width: 48,
-                                                  height: 48,
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        Colors.yellow.shade200,
-                                                    borderRadius:
-                                                        const BorderRadius.all(
-                                                            Radius.circular(
-                                                                48)),
-                                                  ),
-                                                  child: const Padding(
-                                                    padding: EdgeInsets.all(4),
-                                                    child: Center(
-                                                        child: Icon(Icons.add)),
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                    AppLocalizations.of(
-                                                            context)!
-                                                        .new_post,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge!
-                                                        .copyWith(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16,
-                                                            fontFamily:
-                                                                'Pyidaungsu')),
+                                const SizedBox(height: 72),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        child: SizedBox(
+                                            height: 50,
+                                            child: ElevatedButton(
+                                              style: ButtonStyle(
+                                                  shape: MaterialStateProperty
+                                                      .all<RoundedRectangleBorder>(
+                                                          RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(32.0),
+                                              ))),
+                                              onPressed: () {
+                                                checkFormError = true;
+                                                if (!validationError()) {
+                                                  List<Provider> you = providers
+                                                      .where((x) =>
+                                                          x.id.toString() ==
+                                                          providerYouController
+                                                              .text)
+                                                      .toList();
+                                                  List<Provider> pay = providers
+                                                      .where((x) =>
+                                                          x.id.toString() ==
+                                                          providerPayController
+                                                              .text)
+                                                      .toList();
+                                                  if (widget.isPop!) {
+                                                    Navigator.pop(context,
+                                                        [you[0], pay[0]]);
+                                                  } else {
+                                                    AppConstant.you = you[0];
+                                                    AppConstant.pay = pay[0];
+                                                    Navigator.pushReplacement(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                HomePage(
+                                                                    you: you[0],
+                                                                    pay: pay[
+                                                                        0])));
+                                                  }
+                                                }
+                                              },
+                                              child: Text(
+                                                AppLocalizations.of(context)!
+                                                    .search,
+                                                style: TextSize.size18,
                                               ),
-                                              const SizedBox(height: 22),
-                                              ListTile(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const MyPostPage()),
-                                                  );
-                                                },
-                                                leading: Container(
-                                                  width: 48,
-                                                  height: 48,
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        Colors.yellow.shade200,
-                                                    borderRadius:
-                                                        const BorderRadius.all(
-                                                            Radius.circular(
-                                                                48)),
-                                                  ),
-                                                  child: const Padding(
-                                                    padding: EdgeInsets.all(4),
-                                                    child: Center(
-                                                        child: Icon(Icons
-                                                            .post_add_outlined)),
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                    AppLocalizations.of(
-                                                            context)!
-                                                        .my_posts,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge!
-                                                        .copyWith(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16,
-                                                            fontFamily:
-                                                                'Pyidaungsu')),
-                                              ),
-                                              const SizedBox(height: 22)
-                                            ],
-                                          ));
-                                    },
-                                  );
-                                },
-                                style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
-                                        Colors.transparent),
-                                    shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(32.0),
-                                    ))),
-                                child: Text(
-                                    AppLocalizations.of(context)!.new_post,
-                                    style: const TextStyle(
-                                        color: AppColor.secondaryColor)),
-                              ),
-                            )),
-                          ],
-                        ))))
+                                            )))
+                                  ],
+                                )
+                              ],
+                            );
+                          }
+                          return Container();
+                        }))),
           ],
-        ));
+        ),
+        Positioned(
+            left: 0,
+            right: 0,
+            bottom: 24,
+            child: Align(
+                child: SizedBox(
+                    width: 340,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                AppConstant.you = providers
+                                    .where((x) => x.name == 'Cash')
+                                    .toList()[0];
+                                AppConstant.pay = providers
+                                    .where((x) => x.name == 'All Provider')
+                                    .toList()[0];
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => HomePage(
+                                            you: AppConstant.you,
+                                            pay: AppConstant.pay,
+                                            selectedPage: 1)));
+                              },
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      Colors.transparent),
+                                  shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(32.0),
+                                  ))),
+                              child:
+                                  Text(AppLocalizations.of(context)!.human_atm),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                            child: SizedBox(
+                          height: 50,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 22, horizontal: 0),
+                                      child: Wrap(
+                                        children: [
+                                          const SizedBox(height: 22),
+                                          ListTile(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const CreatePostPage()),
+                                              );
+                                            },
+                                            leading: Container(
+                                              width: 48,
+                                              height: 48,
+                                              decoration: BoxDecoration(
+                                                color: Colors.yellow.shade200,
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(48)),
+                                              ),
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(4),
+                                                child: Center(
+                                                    child: Icon(Icons.add)),
+                                              ),
+                                            ),
+                                            title: Text(
+                                                AppLocalizations.of(context)!
+                                                    .new_post,
+                                                style: TextSize.size16),
+                                          ),
+                                          const SizedBox(height: 22),
+                                          ListTile(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const MyPostPage()),
+                                              );
+                                            },
+                                            leading: Container(
+                                              width: 48,
+                                              height: 48,
+                                              decoration: BoxDecoration(
+                                                color: Colors.yellow.shade200,
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(48)),
+                                              ),
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(4),
+                                                child: Center(
+                                                    child: Icon(Icons
+                                                        .post_add_outlined)),
+                                              ),
+                                            ),
+                                            title: Text(
+                                                AppLocalizations.of(context)!
+                                                    .my_posts,
+                                                style: TextSize.size16),
+                                          ),
+                                          const SizedBox(height: 22)
+                                        ],
+                                      ));
+                                },
+                              );
+                            },
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    Colors.transparent),
+                                shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(32.0),
+                                ))),
+                            child: Text(AppLocalizations.of(context)!.new_post),
+                          ),
+                        )),
+                      ],
+                    ))))
+      ],
+    ));
   }
 }
 

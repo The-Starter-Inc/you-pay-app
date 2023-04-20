@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:p2p_pay/src/blocs/feedback_bloc.dart';
 import 'package:p2p_pay/src/blocs/verified_user_bloc.dart';
+import 'package:p2p_pay/src/theme/text_size.dart';
 import 'package:p2p_pay/src/ui/widgets/feedback_item.dart';
 
 import '../constants/app_constant.dart';
@@ -69,8 +70,7 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.feedbacks,
-                style: const TextStyle(color: Colors.black))),
+            title: Text(AppLocalizations.of(context)!.feedbacks)),
         body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Stack(
@@ -88,25 +88,16 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                             ),
                             child: Center(
                               child: Text(widget.user.name![0],
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .copyWith(color: Colors.black)),
+                                  style: TextSize.profileIcon),
                             )),
                         title: Text(widget.user.name!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(color: Colors.black)),
+                            style: TextSize.size18),
                         subtitle: Text(widget.user.phone!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(color: Colors.black45)),
+                            style: TextSize.size14),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -141,12 +132,7 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                                         Text(
                                             AppLocalizations.of(context)!
                                                 .feedbacks,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleSmall!
-                                                .copyWith(
-                                                    color: Colors.black,
-                                                    fontSize: 12)),
+                                            style: TextSize.size12),
                                         Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
@@ -156,11 +142,7 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                                                   color: Colors.green),
                                               const SizedBox(width: 8),
                                               Text("$positive",
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleSmall!
-                                                      .copyWith(
-                                                          color: Colors.black)),
+                                                  style: TextSize.size10),
                                               const SizedBox(width: 10),
                                               const Icon(
                                                   Icons
@@ -169,11 +151,7 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                                                   color: Colors.red),
                                               const SizedBox(width: 8),
                                               Text("$negative",
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleSmall!
-                                                      .copyWith(
-                                                          color: Colors.black)),
+                                                  style: TextSize.size10),
                                             ])
                                       ],
                                     );
@@ -185,7 +163,7 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                     Container(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 16),
-                        child: const Divider(color: Colors.black45)),
+                        child: const Divider(color: Colors.grey)),
                     StreamBuilder(
                       stream: feedbackBloc.feedbacks,
                       builder: (context,
@@ -197,10 +175,7 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                                 margin: const EdgeInsets.only(top: 250),
                                 child: Text(
                                     AppLocalizations.of(context)!.no_data,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(color: Colors.black45)));
+                                    style: TextSize.size16));
                           }
                           return ListView.builder(
                             shrinkWrap: true,
@@ -217,10 +192,7 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                           );
                         } else if (snapshot.hasError) {
                           return Text(snapshot.error.toString(),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(color: Colors.black45));
+                              style: TextSize.size16);
                         }
                         return Container(
                             margin: const EdgeInsets.only(top: 200),
@@ -238,8 +210,7 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                       child: Center(
                           child: Column(
                         children: [
-                          Text(AppLocalizations.of(context)!.give_feedback,
-                              style: const TextStyle(color: Colors.black)),
+                          Text(AppLocalizations.of(context)!.give_feedback),
                           const SizedBox(height: 10),
                           SizedBox(
                               width: 300,
@@ -274,9 +245,6 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                                                       AppLocalizations.of(
                                                               context)!
                                                           .positive,
-                                                      style: const TextStyle(
-                                                          color:
-                                                              Colors.black54),
                                                     )
                                                   ],
                                                 )))),
@@ -305,8 +273,6 @@ class _FeedbacksPageState extends State<FeedbacksPage> {
                                               Text(
                                                 AppLocalizations.of(context)!
                                                     .negative,
-                                                style: const TextStyle(
-                                                    color: Colors.black54),
                                               )
                                             ],
                                           )),

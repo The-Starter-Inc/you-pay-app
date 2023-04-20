@@ -15,6 +15,7 @@ import 'package:p2p_pay/src/ui/success_page.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 
 import '../../models/dropdown.dart';
+import '../../theme/text_size.dart';
 import './../../blocs/post_bloc.dart';
 import './../../blocs/provider_bloc.dart';
 import './../../blocs/type_bloc.dart';
@@ -152,9 +153,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         title: Text(
             widget.post != null
                 ? AppLocalizations.of(context)!.edit_post
-                : AppLocalizations.of(context)!.add_new_post,
-            style: const TextStyle(color: Colors.black)),
-        backgroundColor: AppColor.primaryColor,
+                : AppLocalizations.of(context)!.add_new_post),
       ),
       body: Padding(
           padding: const EdgeInsets.all(10),
@@ -289,7 +288,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         errorText: frmError.latlng,
                         controller: latLngController,
                         suffixIcon: const Icon(Icons.location_pin,
-                            size: 24, color: Colors.black45),
+                            size: 24),
                         onTap: () {
                           if (_currentPosition != null) {
                             setState(() {
@@ -508,14 +507,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
           ),
         ],
         content: Text(message,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: Colors.black,
-                )),
+            style: TextSize.size14),
         title: Text(
           'Error',
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Colors.black,
-              ),
+          style: TextSize.size18,
         ),
       ),
     );
