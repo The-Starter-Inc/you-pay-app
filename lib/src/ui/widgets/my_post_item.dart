@@ -79,7 +79,10 @@ class _MyPostItemState extends State<MyPostItem> {
               });
               widget.onDeleted!();
             },
-            child: Text(AppLocalizations.of(context)!.delete, style: TextSize.size16,),
+            child: Text(
+              AppLocalizations.of(context)!.delete,
+              style: TextSize.size16,
+            ),
           ),
         ],
         content: Text(AppLocalizations.of(context)!.delete_confirm_msg,
@@ -143,7 +146,7 @@ class _MyPostItemState extends State<MyPostItem> {
                                         AppLocalizations.of(context)!.you,
                                         style: TextSize.size12,
                                       ),
-                                      const Icon(Icons.swap_horiz,  size: 22)
+                                      const Icon(Icons.swap_horiz, size: 22)
                                     ],
                                   )),
                             Column(
@@ -201,12 +204,10 @@ class _MyPostItemState extends State<MyPostItem> {
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 4),
                                   child: Column(
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!.you,
-                                        style: TextSize.size12,
-                                      ),
-                                      const Icon(Icons.swap_horiz,  size: 22)
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: const [
+                                      Icon(Icons.swap_horiz, size: 22)
                                     ],
                                   )),
                             if (widget.post.providers.length > 1)
@@ -370,8 +371,7 @@ class _MyPostItemState extends State<MyPostItem> {
     final scaffold = ScaffoldMessenger.of(context);
     scaffold.showSnackBar(
       SnackBar(
-        content:
-            Text(message, style: TextSize.size14),
+        content: Text(message, style: TextSize.size14),
         action: SnackBarAction(
             label: 'Okay', onPressed: scaffold.hideCurrentSnackBar),
       ),

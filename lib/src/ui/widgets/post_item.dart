@@ -171,8 +171,8 @@ class _PostItemState extends State<PostItem> {
     return Container(
       margin: const EdgeInsets.only(bottom: 0),
       //color: widget.post.priority! > 0 ? Colors.yellow.shade200 : Colors.white,
-      decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.black12))),
+      decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.grey.shade400))),
       child: Padding(
           padding: const EdgeInsets.only(bottom: 0),
           child: Stack(
@@ -218,9 +218,7 @@ class _PostItemState extends State<PostItem> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleLarge!
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontSize: 16)),
+                                            .copyWith(fontSize: 16)),
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
@@ -229,7 +227,7 @@ class _PostItemState extends State<PostItem> {
                                                         null &&
                                                     widget.post.priority! > 0
                                                 ? Colors.green
-                                                : Colors.black54,
+                                                : Colors.grey,
                                             size: 16),
                                         const SizedBox(width: 10),
                                         Text(
@@ -248,7 +246,7 @@ class _PostItemState extends State<PostItem> {
                                                                     .priority! >
                                                                 0
                                                         ? Colors.green
-                                                        : Colors.black54,
+                                                        : Colors.grey,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 12))
                                       ],
@@ -273,21 +271,15 @@ class _PostItemState extends State<PostItem> {
                                       .textTheme
                                       .titleLarge!
                                       .copyWith(
-                                          color: Colors.black,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16)),
                               Text(
-                                  widget.post.chargesType == 'percentage'
-                                      ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
-                                      : widget.post.chargesType == 'fix_amount'
-                                          ? "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}"
-                                          : "${MyanNunber.convertMoneyNumber(widget.post.exchangeRate)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.exchange_rate}",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                        color: Colors.black87,
-                                      ))
+                                widget.post.chargesType == 'percentage'
+                                    ? "${MyanNunber.convertNumber(widget.post.percentage.toString())} ${AppLocalizations.of(context)!.percentage}"
+                                    : widget.post.chargesType == 'fix_amount'
+                                        ? "${MyanNunber.convertMoneyNumber(widget.post.fees)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.fixed_amount}"
+                                        : "${MyanNunber.convertMoneyNumber(widget.post.exchangeRate)} ${AppLocalizations.of(context)!.mmk} ${AppLocalizations.of(context)!.exchange_rate}",
+                              )
                             ],
                           )),
                     ],
@@ -303,14 +295,10 @@ class _PostItemState extends State<PostItem> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(AppLocalizations.of(context)!.you,
-                                    textAlign: TextAlign.start,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall!
-                                        .copyWith(
-                                          color: Colors.black87,
-                                        )),
+                                Text(
+                                  AppLocalizations.of(context)!.you,
+                                  textAlign: TextAlign.start,
+                                ),
                                 Row(
                                   children: [
                                     Container(
@@ -326,9 +314,7 @@ class _PostItemState extends State<PostItem> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleLarge!
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontSize: 16))
+                                            .copyWith(fontSize: 16))
                                   ],
                                 )
                               ],
@@ -348,21 +334,14 @@ class _PostItemState extends State<PostItem> {
                                             color: Colors.white,
                                           ),
                                     ),
-                                    const Icon(Icons.swap_horiz,
-                                        color: Colors.black, size: 22)
+                                    const Icon(Icons.swap_horiz, size: 22)
                                   ],
                                 )),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(AppLocalizations.of(context)!.pay,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                        color: Colors.black87,
-                                      )),
+                              Text(AppLocalizations.of(context)!.pay),
                               Row(
                                 children: [
                                   Container(
@@ -378,9 +357,7 @@ class _PostItemState extends State<PostItem> {
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleLarge!
-                                          .copyWith(
-                                              color: Colors.black,
-                                              fontSize: 16))
+                                          .copyWith(fontSize: 16))
                                 ],
                               )
                             ],

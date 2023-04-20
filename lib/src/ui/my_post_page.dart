@@ -36,8 +36,9 @@ class _MyPostPageState extends State<MyPostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.my_posts,
-                style: const TextStyle(color: Colors.black))),
+            title: Text(
+          AppLocalizations.of(context)!.my_posts,
+        )),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Container(
           margin: const EdgeInsets.only(bottom: 16),
