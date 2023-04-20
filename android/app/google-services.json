@@ -1,0 +1,88 @@
+{
+  "project_info": {
+    "project_number": "1050747889461",
+    "project_id": "p2p-pay",
+    "storage_bucket": "p2p-pay.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1050747889461:android:fcfb6701ba04b31949ce7c",
+        "android_client_info": {
+          "package_name": "com.example.p2p_pay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1050747889461-91rt0oj4e6pfsscfgub5ek1kl6inqe9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEXq9vhvFS84WwOhpdOEJS6iBJQw6AsA8"
+        },
+        {
+          "current_key": "AIzaSyCsExAX4A275cFZv2KBGo1UZEBQhqsQLvw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1050747889461-91rt0oj4e6pfsscfgub5ek1kl6inqe9h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1050747889461-q49agjm863k3gf59i9oks9qv823b5slb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.p2pPay"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1050747889461:android:d4df84b13ec8953f49ce7c",
+        "android_client_info": {
+          "package_name": "com.thestarter.youpay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1050747889461-91rt0oj4e6pfsscfgub5ek1kl6inqe9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEXq9vhvFS84WwOhpdOEJS6iBJQw6AsA8"
+        },
+        {
+          "current_key": "AIzaSyCsExAX4A275cFZv2KBGo1UZEBQhqsQLvw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1050747889461-91rt0oj4e6pfsscfgub5ek1kl6inqe9h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1050747889461-q49agjm863k3gf59i9oks9qv823b5slb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.p2pPay"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

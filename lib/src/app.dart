@@ -1,10 +1,12 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:p2p_pay/src/provider/app_locale.dart';
 import 'package:provider/provider.dart';
 import 'theme/color_theme.dart';
 import 'theme/theme_text.dart';
-import 'ui/home_page.dart';
+import 'splash.dart';
 
 class P2PApp extends StatelessWidget {
   const P2PApp({super.key});
@@ -20,18 +22,28 @@ class P2PApp extends StatelessWidget {
       ],
       child: Consumer<AppLocale>(builder: (context, locale, child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
+            appBarTheme: const AppBarTheme(
+                titleTextStyle: TextStyle(
+                    fontFamily: 'Pyidaungsu',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+                backgroundColor: AppColor.primaryColor,
+                foregroundColor: Colors.black //here you can give the text color
+                ),
             unselectedWidgetColor: Colors.black54,
             primaryColor: AppColor.primaryColor,
             scaffoldBackgroundColor: Colors.white,
+            fontFamily: 'Pyidaungsu',
             textTheme: ThemeText.getTextTheme(),
             colorScheme: ColorScheme.fromSwatch()
-                .copyWith(secondary: AppColor.primaryColor),
+                .copyWith(primary: AppColor.primaryColor),
           ),
           locale: locale.locale,
-          home: const HomePage(),
+          home: const AppSplash(),
         );
       }),
     );
