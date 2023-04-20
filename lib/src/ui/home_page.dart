@@ -14,6 +14,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../main.dart';
+import '../utils/firebase_util.dart';
 import './../models/post.dart';
 import '../../src/constants/app_constant.dart';
 import '../../src/ui/entry/create_post_page.dart';
@@ -133,7 +134,7 @@ class _HomePageState extends State<HomePage> {
         AppConstant.hasNotification = true;
         hasNotification = AppConstant.hasNotification;
         notificationCounts = notifications.keys
-            .where((key) => notifications[key] == 'message')
+            .where((key) => notifications[key]['data']['type'] == 'message')
             .length;
       });
     }
@@ -150,6 +151,7 @@ class _HomePageState extends State<HomePage> {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        FirebaseUtil.updateUserOnline("", user!.uid, false);
         setState(() {
           AppConstant.firebaseUser = user;
         });
@@ -171,7 +173,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> showErrorAlert(message) async {
+  void showErrorAlert(message) async {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -197,8 +199,24 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) async {
     if (index == 2) return;
+    notificationCounts = 0;
+    final notifications =
+        await Localstore.instance.collection('notifications').get();
+    if (notifications != null &&
+        notifications.keys
+            .where((key) => notifications[key]['data']['type'] == 'message')
+            .isNotEmpty) {
+      setState(() {
+        AppConstant.hasNotification = true;
+        hasNotification = AppConstant.hasNotification;
+        notificationCounts = notifications.keys
+            .where((key) => notifications[key]['data']['type'] == 'message')
+            .length;
+        print(notificationCounts);
+      });
+    }
     setState(() {
       currentTab = index;
     });
@@ -300,9 +318,10 @@ class _HomePageState extends State<HomePage> {
                                         BorderRadius.all(Radius.circular(24)),
                                   ),
                                   margin: const EdgeInsets.only(right: 0),
-                                  child: const Center(
-                                    child: Text("1",
-                                        style: TextStyle(color: Colors.white)),
+                                  child: Center(
+                                    child: Text("$notificationCounts",
+                                        style: const TextStyle(
+                                            color: Colors.white)),
                                   ))
                           ],
                         ),
@@ -334,7 +353,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildLayout() {
     if (currentTab == 1) {
-      return MapsPage(you: widget.you, pay: widget.pay);
+      return MapsPage();
     } else if (currentTab == 2) {
       return Container();
     } else if (currentTab == 3) {
@@ -342,6 +361,6 @@ class _HomePageState extends State<HomePage> {
     } else if (currentTab == 4) {
       return const ProfilePage();
     }
-    return DashboardPage(you: widget.you, pay: widget.pay);
+    return DashboardPage();
   }
 }

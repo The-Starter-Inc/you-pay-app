@@ -22,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final PostBloc postBloc = PostBloc();
   final FeedbackBloc feedbackBloc = FeedbackBloc();
   final VerifiedUserBloc verifiedUserBloc = VerifiedUserBloc();
+  String language = "mm";
 
   @override
   void initState() {
@@ -36,6 +37,57 @@ class _ProfilePageState extends State<ProfilePage> {
   void getMyPosts() {
     postBloc.fetchPosts(
         null, "ads_user_id:equal:${AppConstant.firebaseUser!.uid}");
+  }
+
+  void showLanguateDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile(
+              title: Text(AppLocalizations.of(context)!.eng,
+                  style: const TextStyle(color: Colors.black54)),
+              value: "en",
+              groupValue: language,
+              onChanged: (value) {
+                setState(() {
+                  language = value!;
+                });
+              },
+            ),
+            RadioListTile(
+              title: Text(AppLocalizations.of(context)!.mm,
+                  style: const TextStyle(color: Colors.black54)),
+              value: "my",
+              groupValue: language,
+              onChanged: (value) {
+                setState(() {
+                  language = value!;
+                });
+              },
+            )
+          ],
+        ),
+        title: Text(
+          AppLocalizations.of(context)!.language,
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: Colors.black,
+                fontFamily: 'Pyidaungsu',
+              ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -197,7 +249,30 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.black54,
                       fontSize: 16,
                       fontFamily: 'Pyidaungsu')),
-            )
+            ),
+            // const SizedBox(height: 10),
+            // ListTile(
+            //   onTap: () {
+            //     showLanguateDialog();
+            //   },
+            //   leading: Container(
+            //     width: 48,
+            //     height: 48,
+            //     decoration: BoxDecoration(
+            //       color: Colors.yellow.shade200,
+            //       borderRadius: const BorderRadius.all(Radius.circular(48)),
+            //     ),
+            //     child: const Padding(
+            //       padding: EdgeInsets.all(4),
+            //       child: Center(child: Icon(Icons.language)),
+            //     ),
+            //   ),
+            //   title: Text(AppLocalizations.of(context)!.language,
+            //       style: Theme.of(context).textTheme.titleLarge!.copyWith(
+            //           color: Colors.black54,
+            //           fontSize: 16,
+            //           fontFamily: 'Pyidaungsu')),
+            // )
           ],
         ),
       ),

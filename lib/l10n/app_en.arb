@@ -87,5 +87,8 @@
     "human_atm": "Human ATM",
     "can_not_contact": "You can not contact to your post.",
     "hide_post": "Hide Post",
-    "show_post": "Show Post"
+    "show_post": "Show Post",
+    "language": "Language",
+    "mm": "Myanmar (မြန်မာ)",
+    "eng": "English (အင်္ဂလိပ်)"
 }

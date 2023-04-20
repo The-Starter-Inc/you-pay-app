@@ -1,19 +1,26 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:localstore/localstore.dart';
 import 'package:multi_stream_builder/multi_stream_builder.dart';
 import 'package:p2p_pay/src/blocs/app_version_bloc.dart';
 import 'package:p2p_pay/src/constants/app_constant.dart';
 import 'package:p2p_pay/src/models/app_version.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import '../../main.dart';
 import './../ui/entry/create_post_page.dart';
 import './../ui/my_post_page.dart';
 import '../theme/color_theme.dart';
 import './../blocs/provider_bloc.dart';
 import '../models/post.dart';
+import 'chat_page.dart';
 import 'home_page.dart';
+import 'notification_page.dart';
 import 'widgets/dropdown_text.dart';
 
 class SearchPage extends StatefulWidget {
@@ -29,17 +36,21 @@ class _SearchPageState extends State<SearchPage> {
   ProviderBloc providerBloc = ProviderBloc();
   AppVersionBloc appVersionBloc = AppVersionBloc();
   TextEditingController providerYouController = TextEditingController(
-      text: AppConstant.you != null ? AppConstant.you!.id.toString() : "");
+      text: AppConstant.you != null ? AppConstant.you!.id.toString() : "0");
   TextEditingController providerPayController = TextEditingController(
-      text: AppConstant.pay != null ? AppConstant.pay!.id.toString() : "");
+      text: AppConstant.pay != null ? AppConstant.pay!.id.toString() : "0");
   List<Provider> providers = [];
   Error frmError = Error(null, null);
   late bool checkFormError = false;
+  String? initialMessage;
+  bool hasNotification = false;
+  int notificationCounts = 0;
 
   @override
   initState() {
     super.initState();
     checkVersionUpdate();
+    initializeFirebaseFCM();
     providerBloc.fetchProviders();
     providerYouController.addListener(() {
       validationError();
@@ -47,6 +58,74 @@ class _SearchPageState extends State<SearchPage> {
       providerBloc.fetchProviders();
       setState(() {});
     });
+  }
+
+  void initializeFirebaseFCM() async {
+    FirebaseMessaging.instance.getInitialMessage().then(
+          (value) => setState(
+            () {
+              initialMessage = value?.data.toString();
+            },
+          ),
+        );
+
+    FirebaseMessaging.onMessage.listen(showFlutterNotification);
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+      if (message.data['type'] == 'message') {
+        final userIds = jsonDecode(message.data['userIds']);
+        final metadata = jsonDecode(message.data['metadata']);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChatPage(
+                      postId: int.parse(metadata['post_id']),
+                      room: types.Room(
+                          id: message.data['roomId'],
+                          name: metadata['phone'],
+                          users: [
+                            types.User(id: userIds[0]),
+                            types.User(id: userIds[1])
+                          ],
+                          type: types.RoomType.direct),
+                    )));
+      } else {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const NotificationPage()));
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      Localstore.instance
+          .collection('notifications')
+          .doc(message.messageId)
+          .set(message.toMap());
+      if (message.data['type'] == 'message') {
+        setState(() {
+          AppConstant.hasNotification = true;
+          hasNotification = true;
+          notificationCounts += 1;
+        });
+      }
+    });
+    setState(() {
+      hasNotification = AppConstant.hasNotification;
+    });
+    final notifications =
+        await Localstore.instance.collection('notifications').get();
+
+    if (notifications != null &&
+        notifications.keys
+            .where((key) => notifications[key]['data']['type'] == 'message')
+            .isNotEmpty) {
+      setState(() {
+        AppConstant.hasNotification = true;
+        hasNotification = AppConstant.hasNotification;
+        notificationCounts = notifications.keys
+            .where((key) => notifications[key]['data']['type'] == 'message')
+            .length;
+      });
+    }
   }
 
   void checkVersionUpdate() async {
@@ -157,6 +236,53 @@ class _SearchPageState extends State<SearchPage> {
             //     right: 0,
             //     bottom: 70,
             //     child: Image.asset("assets/images/you-pay-bottom-right.png")),
+            Positioned(
+                top: 55,
+                right: 22,
+                child: InkWell(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomePage(
+                                  you: AppConstant.you,
+                                  pay: AppConstant.pay,
+                                  selectedPage: 3)));
+                    },
+                    child: Stack(
+                      alignment: Alignment.centerRight,
+                      children: [
+                        Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black12,
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            height: 40,
+                            width: 40,
+                            child: const Icon(
+                              Icons.chat_bubble,
+                              color: Colors.black54,
+                              size: 24,
+                            )),
+                        if (notificationCounts > 0)
+                          Container(
+                              width: 24,
+                              height: 24,
+                              transform:
+                                  Matrix4.translationValues(10.0, -10, 0.0),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(24)),
+                              ),
+                              margin: const EdgeInsets.only(right: 0),
+                              child: Center(
+                                child: Text("$notificationCounts",
+                                    style:
+                                        const TextStyle(color: Colors.white)),
+                              ))
+                      ],
+                    ))),
             Column(
               children: [
                 Align(
@@ -199,7 +325,11 @@ class _SearchPageState extends State<SearchPage> {
                                                   .choose_you,
                                           controller: providerYouController,
                                           errorText: frmError.you,
-                                          items: dataList[0],
+                                          items: [
+                                                Provider(
+                                                    id: 0, name: "All Provider")
+                                              ] +
+                                              dataList[0],
                                         )),
                                         const SizedBox(width: 16),
                                         Flexible(
@@ -214,12 +344,17 @@ class _SearchPageState extends State<SearchPage> {
                                                 controller:
                                                     providerPayController,
                                                 errorText: frmError.pay,
-                                                items: providers
-                                                    .where((x) =>
-                                                        x.id.toString() !=
-                                                        providerYouController
-                                                            .text)
-                                                    .toList()))
+                                                items: [
+                                                      Provider(
+                                                          id: 0,
+                                                          name: "All Provider")
+                                                    ] +
+                                                    dataList[0]
+                                                        .where((x) =>
+                                                            x.id.toString() !=
+                                                            providerYouController
+                                                                .text)
+                                                        .toList()))
                                       ],
                                     ),
                                     const SizedBox(height: 72),

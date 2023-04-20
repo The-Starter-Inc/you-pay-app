@@ -221,18 +221,38 @@ class _PostItemState extends State<PostItem> {
                                             .copyWith(
                                                 color: Colors.black,
                                                 fontSize: 16)),
-                                    Text(
-                                        widget.post.priority != null &&
-                                                widget.post.priority! > 0
-                                            ? "Verified"
-                                            : "Unverified",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium!
-                                            .copyWith(
-                                                color: Colors.green,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12))
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.verified,
+                                            color: widget.post.priority !=
+                                                        null &&
+                                                    widget.post.priority! > 0
+                                                ? Colors.green
+                                                : Colors.black54,
+                                            size: 16),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                            widget.post.priority != null &&
+                                                    widget.post.priority! > 0
+                                                ? "Verified"
+                                                : "Unverified",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                    color: widget.post
+                                                                    .priority !=
+                                                                null &&
+                                                            widget.post
+                                                                    .priority! >
+                                                                0
+                                                        ? Colors.green
+                                                        : Colors.black54,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 12))
+                                      ],
+                                    )
                                   ],
                                 )
                               ],

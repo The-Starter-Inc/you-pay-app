@@ -18,10 +18,12 @@ class ExchangeItem extends StatefulWidget {
   final Function? onDeleted;
   late bool? hasNotification;
   final Function? onClick;
+  final String? message;
   ExchangeItem(
       {super.key,
       required this.exchange,
       this.hasNotification,
+      this.message,
       this.onDeleted,
       this.onClick});
 
@@ -173,10 +175,10 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                       child: Text(
                                           widget.exchange.adsUser!.id !=
                                                   AppConstant.currentUser!.id
-                                              ? widget
-                                                  .exchange.adsUser!.name![0]
-                                              : widget
-                                                  .exchange.exUser!.name![0],
+                                              ? widget.exchange.adsUser!.name!
+                                                  .trim()[0]
+                                              : widget.exchange.exUser!.name!
+                                                  .trim()[0],
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleLarge!
@@ -196,21 +198,57 @@ class _ExchangeItemState extends State<ExchangeItem> {
                                             .copyWith(
                                                 color: Colors.black,
                                                 fontSize: 16)),
-                                    Text(
-                                        widget.exchange.post!.priority !=
-                                                    null &&
-                                                widget.exchange.post!
-                                                        .priority! >
-                                                    0
-                                            ? "Verified"
-                                            : "Unverified",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium!
-                                            .copyWith(
-                                                color: Colors.green,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12))
+                                    if (widget.hasNotification!)
+                                      Text(
+                                        "“ ${widget.message} ”",
+                                        style: TextStyle(
+                                            color: widget.hasNotification!
+                                                ? Colors.black
+                                                : Colors.black54,
+                                            fontWeight: widget.hasNotification!
+                                                ? FontWeight.bold
+                                                : FontWeight.normal),
+                                      )
+                                    // Row(
+                                    //   mainAxisSize: MainAxisSize.min,
+                                    //   children: [
+                                    //     Icon(Icons.verified,
+                                    //         color: widget.exchange.post!
+                                    //                         .priority !=
+                                    //                     null &&
+                                    //                 widget.exchange.post!
+                                    //                         .priority! >
+                                    //                     0
+                                    //             ? Colors.green
+                                    //             : Colors.black54,
+                                    //         size: 16),
+                                    //     const SizedBox(width: 10),
+                                    //     Text(
+                                    //         widget.exchange.post!.priority !=
+                                    //                     null &&
+                                    //                 widget.exchange.post!
+                                    //                         .priority! >
+                                    //                     0
+                                    //             ? "Verified"
+                                    //             : "Unverified",
+                                    //         style: Theme.of(context)
+                                    //             .textTheme
+                                    //             .titleMedium!
+                                    //             .copyWith(
+                                    //                 color: widget.exchange.post!
+                                    //                                 .priority !=
+                                    //                             null &&
+                                    //                         widget
+                                    //                                 .exchange
+                                    //                                 .post!
+                                    //                                 .priority! >
+                                    //                             0
+                                    //                     ? Colors.green
+                                    //                     : Colors.black54,
+                                    //                 fontWeight: FontWeight.bold,
+                                    //                 fontSize: 12))
+                                    //   ],
+                                    // )
                                   ],
                                 )
                               ],
@@ -517,7 +555,12 @@ class _ExchangeItemState extends State<ExchangeItem> {
                         deleteExchange();
                       },
                     ),
-                  )
+                  ),
+                  if (widget.hasNotification!)
+                    const Positioned(
+                        top: 46,
+                        right: 16,
+                        child: Icon(Icons.circle, size: 16, color: Colors.red))
                 ],
               )),
         ));

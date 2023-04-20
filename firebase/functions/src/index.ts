@@ -63,7 +63,7 @@ exports.changeMessageStatus = functions.firestore
         if(userId != null) {
             const user = await db.collection('users').doc(userId).get();
             functions.logger.log('Sending to user id:', user.id);
-            if(!user.get('isOnline')) {
+            //if(!user.get('isOnline')) {
                 const payload = {
                     topic : "/topics/"+user.id,
                     notification: {
@@ -85,7 +85,7 @@ exports.changeMessageStatus = functions.firestore
                 }).catch((error) => {
                     return {error: error.code};
                 });
-            } 
+            //} 
             // else {
             //     return change.after.ref.update({
             //         status: 'seen',

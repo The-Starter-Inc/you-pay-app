@@ -22,9 +22,7 @@ import '../constants/app_constant.dart';
 import '../models/post.dart';
 
 class MapsPage extends StatefulWidget {
-  late Provider? you;
-  late Provider? pay;
-  MapsPage({super.key, this.you, this.pay});
+  MapsPage({super.key});
 
   @override
   State<MapsPage> createState() => _MapsPageState();
@@ -59,8 +57,6 @@ class _MapsPageState extends State<MapsPage> {
 
   initData() async {
     _getCurrentPosition();
-    AppConstant.you = widget.you ?? AppConstant.you;
-    AppConstant.pay = widget.pay ?? AppConstant.pay;
     providerBloc.fetchProviders();
     postBloc.fetchPosts(null, "status:equal:true");
     sponsorBloc.fetchSponsors("marquee");
@@ -265,22 +261,47 @@ class _MapsPageState extends State<MapsPage> {
                 stream: postBloc.posts,
                 builder: (context, AsyncSnapshot<List<Post>> snapshot) {
                   if (snapshot.hasData) {
-                    posts = AppConstant.pay!.name != 'All Provider'
-                        ? snapshot.data!
+                    if (AppConstant.you != null) {
+                      if (AppConstant.you!.name != 'All Provider' &&
+                          AppConstant.pay!.name != 'All Provider') {
+                        posts = snapshot.data!
                             .where((post) =>
                                 post.providers.length > 1 &&
-                                widget.you != null &&
-                                widget.pay != null &&
+                                post.adsUser != null &&
                                 post.providers[1].name ==
                                     AppConstant.you!.name &&
                                 post.providers[0].name == AppConstant.pay!.name)
-                            .toList()
-                        : snapshot.data!
+                            .toList();
+                      } else if (AppConstant.you!.name == 'All Provider' &&
+                          AppConstant.pay!.name != 'All Provider') {
+                        posts = snapshot.data!
                             .where((post) =>
                                 post.providers.length > 1 &&
-                                widget.you != null &&
+                                post.adsUser != null &&
+                                post.providers[0].name == AppConstant.pay!.name)
+                            .toList();
+                      } else if (AppConstant.you!.name != 'All Provider' &&
+                          AppConstant.pay!.name == 'All Provider') {
+                        posts = snapshot.data!
+                            .where((post) =>
+                                post.providers.length > 1 &&
+                                post.adsUser != null &&
                                 post.providers[1].name == AppConstant.you!.name)
                             .toList();
+                      } else {
+                        posts = snapshot.data!
+                            .where((post) =>
+                                post.providers.length > 1 &&
+                                post.adsUser != null)
+                            .toList();
+                      }
+                    } else {
+                      posts = snapshot.data!
+                          .where((post) =>
+                              post.providers.length > 1 && post.adsUser != null)
+                          .toList();
+                    }
+
                     addMarkers();
                     return _mapsOrList();
                   }
@@ -339,7 +360,7 @@ class _MapsPageState extends State<MapsPage> {
                                             color: Colors.black45,
                                           ),
                                           const SizedBox(width: 16),
-                                          if (widget.you != null)
+                                          if (AppConstant.you != null)
                                             Text(
                                               "${AppConstant.you!.name}, ${AppConstant.pay!.name}",
                                               style: Theme.of(context)

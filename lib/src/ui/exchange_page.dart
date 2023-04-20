@@ -70,6 +70,7 @@ class _ExchangePagetate extends State<ExchangePage> {
                 itemBuilder: (context, index) {
                   final exchange = snapshot.data![index];
                   var hasNotification = false;
+                  String? lastMessage = "";
                   if (notifications != null &&
                       notifications!.keys
                           .where((key) =>
@@ -81,6 +82,7 @@ class _ExchangePagetate extends State<ExchangePage> {
                         final metadata = jsonDecode(message.data['metadata']);
                         if ("${metadata['post_id']}" ==
                             "${exchange.adsPostId}") {
+                          lastMessage = message.notification!.body;
                           hasNotification = true;
                         }
                       }
@@ -89,6 +91,7 @@ class _ExchangePagetate extends State<ExchangePage> {
                   return ExchangeItem(
                       exchange: exchange,
                       hasNotification: hasNotification,
+                      message: lastMessage,
                       onClick: () async {
                         notifications = await Localstore.instance
                             .collection('notifications')

@@ -1,9 +1,11 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:p2p_pay/src/theme/color_theme.dart';
 import '../blocs/post_bloc.dart';
 import '../constants/app_constant.dart';
 import '../models/post.dart';
+import 'entry/create_post_page.dart';
 import 'widgets/my_post_item.dart';
 
 class MyPostPage extends StatefulWidget {
@@ -35,6 +37,20 @@ class _MyPostPageState extends State<MyPostPage> {
         appBar: AppBar(
             title: Text(AppLocalizations.of(context)!.my_posts,
                 style: const TextStyle(color: Colors.black))),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CreatePostPage()),
+              );
+            },
+            backgroundColor: AppColor.secondaryColor,
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        ),
         body: StreamBuilder(
           stream: postBloc.posts,
           builder: (context, AsyncSnapshot<List<Post>> snapshot) {

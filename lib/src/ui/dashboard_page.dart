@@ -18,9 +18,7 @@ import '../constants/app_constant.dart';
 import '../models/post.dart';
 
 class DashboardPage extends StatefulWidget {
-  late Provider? you;
-  late Provider? pay;
-  DashboardPage({super.key, this.you, this.pay});
+  DashboardPage({super.key});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -51,8 +49,6 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   initData() async {
-    AppConstant.you = widget.you ?? AppConstant.you;
-    AppConstant.pay = widget.pay ?? AppConstant.pay;
     //providerBloc.fetchProviders();
     postBloc.fetchPosts(null, "status:equal:true");
     sponsorBloc.fetchSponsors("marquee");
@@ -100,32 +96,42 @@ class _DashboardPageState extends State<DashboardPage> {
             stream: postBloc.posts,
             builder: (context, AsyncSnapshot<List<Post>> snapshot) {
               if (snapshot.hasData) {
-                print(snapshot.data!.length);
                 if (AppConstant.you != null) {
-                  posts = AppConstant.pay!.name != 'All Provider'
-                      ? snapshot.data!
-                          .where((post) =>
-                              post.providers.length > 1 &&
-                              widget.you != null &&
-                              widget.pay != null &&
-                              post.adsUser != null &&
-                              post.providers[1].name == AppConstant.you!.name &&
-                              post.providers[0].name == AppConstant.pay!.name)
-                          .toList()
-                      : snapshot.data!
-                          .where((post) =>
-                              post.providers.length > 1 &&
-                              widget.you != null &&
-                              widget.pay != null &&
-                              post.adsUser != null &&
-                              post.providers[1].name == AppConstant.you!.name)
-                          .toList();
+                  if (AppConstant.you!.name != 'All Provider' &&
+                      AppConstant.pay!.name != 'All Provider') {
+                    posts = snapshot.data!
+                        .where((post) =>
+                            post.providers.length > 1 &&
+                            post.adsUser != null &&
+                            post.providers[1].name == AppConstant.you!.name &&
+                            post.providers[0].name == AppConstant.pay!.name)
+                        .toList();
+                  } else if (AppConstant.you!.name == 'All Provider' &&
+                      AppConstant.pay!.name != 'All Provider') {
+                    posts = snapshot.data!
+                        .where((post) =>
+                            post.providers.length > 1 &&
+                            post.adsUser != null &&
+                            post.providers[0].name == AppConstant.pay!.name)
+                        .toList();
+                  } else if (AppConstant.you!.name != 'All Provider' &&
+                      AppConstant.pay!.name == 'All Provider') {
+                    posts = snapshot.data!
+                        .where((post) =>
+                            post.providers.length > 1 &&
+                            post.adsUser != null &&
+                            post.providers[1].name == AppConstant.you!.name)
+                        .toList();
+                  } else {
+                    posts = snapshot.data!
+                        .where((post) =>
+                            post.providers.length > 1 && post.adsUser != null)
+                        .toList();
+                  }
                 } else {
                   posts = snapshot.data!
                       .where((post) =>
-                          post.providers.length > 1 &&
-                          widget.you != null &&
-                          post.adsUser != null)
+                          post.providers.length > 1 && post.adsUser != null)
                       .toList();
                 }
 
@@ -181,7 +187,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         color: Colors.black45,
                                       ),
                                       const SizedBox(width: 16),
-                                      if (widget.you != null)
+                                      if (AppConstant.you != null)
                                         Text(
                                           "${AppConstant.you!.name}, ${AppConstant.pay!.name}",
                                           style: Theme.of(context)
