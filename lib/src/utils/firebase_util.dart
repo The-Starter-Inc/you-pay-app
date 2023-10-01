@@ -26,6 +26,12 @@ class FirebaseUtil {
         .update({'isOnline': isOnline, 'lastSeenRoom': roomId});
   }
 
+  static Future<List<dynamic>> getUsers() {
+    return getFirebaseFirestore()
+        .collection(config.usersCollectionName)
+        .snapshots();
+  }
+
   static Future<void> updatePostId(String roomId, String postId) {
     return getFirebaseFirestore()
         .collection(config.roomsCollectionName)

@@ -156,6 +156,8 @@ class _HomePageState extends State<HomePage> {
           AppConstant.firebaseUser = user;
         });
       });
+      var users = FirebaseUtil.getUsers();
+      print(users);
     } catch (e) {
       showErrorAlert(e);
     }
@@ -265,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                             color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
-                          child: const Icon(Icons.dashboard,  size: 24),
+                          child: const Icon(Icons.dashboard, size: 24),
                         )
                       : const Icon(Icons.dashboard),
                   label: AppLocalizations.of(context)!.home),
@@ -278,7 +280,7 @@ class _HomePageState extends State<HomePage> {
                             color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
-                          child: const Icon(Icons.fmd_good,  size: 24),
+                          child: const Icon(Icons.fmd_good, size: 24),
                         )
                       : const Icon(Icons.fmd_good),
                   label: AppLocalizations.of(context)!.maps),
@@ -329,9 +331,9 @@ class _HomePageState extends State<HomePage> {
                             color: AppColor.primaryLight,
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
-                          child: const Icon(Icons.person,  size: 24),
+                          child: const Icon(Icons.person, size: 24),
                         )
-                      : const Icon(Icons.person ),
+                      : const Icon(Icons.person),
                   label: AppLocalizations.of(context)!.profile)
             ],
             type: BottomNavigationBarType.fixed,
